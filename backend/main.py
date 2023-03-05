@@ -1,20 +1,17 @@
-import datetime
-from typing import List
-from fastapi import FastAPI, APIRouter, Request
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from ads_repository import AdsRepository
+from ads_repository import YDBClient
 from dotenv import load_dotenv
 import os
 import uvicorn
-import platform
+import asyncio
 
-from models import Ad, AddAd
 
 router = APIRouter()
 
 
 @router.get("/test")
-def test():
+async def test():
     return "Hello, world"
 
 # @router.get("/ads")
@@ -30,7 +27,7 @@ def test():
 #     return repository.insert_ad(**ad.dict())
 
 
-def main():
+async def main():
     load_dotenv()
 
     print('Starting app...')
@@ -44,14 +41,17 @@ def main():
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    ads_repository = AdsRepository(endpoint=os.environ.get("ENDPOINT"), database=os.environ.get("DB"))
-    ads_repository.connect()
+    ads_repository = YDBClient(endpoint=os.getenv("ENDPOINT"), database=os.getenv("DB"))
+
+    await ads_repository.connect()
     app.ads_repository = ads_repository
 
     app.include_router(router)
 
-    uvicorn.run(app, host='0.0.0.0', port=8080)
+    config = uvicorn.Config(app, host='0.0.0.0', port=8080)
+    server = uvicorn.Server(config)
+    await server.serve()
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
