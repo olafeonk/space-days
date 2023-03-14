@@ -44,3 +44,165 @@
 .custom-btn-toolbar > .btn {
   margin-right: 1rem;
 }
+
+.header {
+  background: #e1e1e1;
+  height: 100px;
+  border-radius: 0 0 200px 200px;
+}
+
+.banner {
+  height: 860px;
+  background: rgba(217, 217, 217, 0.32);
+  margin-top: -86px !important;
+  padding: 127px 127px 91px;
+}
+
+.banner img {
+  background: #b8b8b8;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 100px !important;
+}
+
+.about.row {
+  margin: 113px 170px;
+}
+
+.about span {
+  font-size: 20px;
+}
+
+.about > .col {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 200px;
+  border-radius: 60px;
+  background: #d9d9d9;
+  align-items: center;
+  justify-content: center;
+}
+
+h2 {
+  font-size: 48px !important;
+  margin-bottom: 38px !important;
+  width: auto !important;
+}
+
+.present {
+  background: rgba(217, 217, 217, 0.32);
+  padding: 85px 125px;
+  margin-bottom: 80px;
+}
+
+.present .row {
+  background: #d9d9d9;
+  border-radius: 60px;
+  padding: 65px 127px;
+}
+
+.present img {
+  width: 353px;
+  height: 353px;
+  border-radius: 70px !important;
+  background: #b8b8b8;
+  margin-top: -120px;
+}
+
+.map {
+  margin-bottom: 80px;
+}
+
+.map__steps {
+  height: 1010px;
+  background: url("./line.png") no-repeat;
+}
+
+.map__steps .container {
+  width: 302px;
+}
+
+.map__steps .first {
+  left: 224px;
+}
+
+.map__steps .second {
+  left: 885px;
+  top: 163px;
+}
+
+.map__steps .third {
+  left: 70px;
+  top: 544px;
+}
+
+.map__steps .fourth {
+  left: 789px;
+  top: 750px;
+}
+
+.map__steps span {
+  font-size: 36px;
+  font-weight: 700;
+  margin-left: -70px;
+}
+
+.map__steps img {
+  object-fit: contain;
+  margin-top: -40px;
+  width: 158px;
+  height: 132px;
+  border-radius: 50px;
+  background: #b8b8b8;
+}
+
+.archive {
+  margin-bottom: 80px;
+}
+
+.partners {
+  padding: 21px 85px 68px;
+  margin-bottom: 80px;
+}
+
+.partners img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  background: #d9d9d9;
+  padding: 0;
+}
+
+.registration {
+  background: #e5e5e5;
+  padding: 54px;
+}
+
+.registration button {
+  padding: 18px 133px;
+}
+
+.newsletter {
+  margin: 71px 123px !important;
+  padding: 25px 215px;
+  border-radius: 60px;
+  background: #d9d9d9;
+}
+
+.newsletter p {
+  padding: auto;
+  background: #ebebeb;
+  height: 111px;
+  width: 100%;
+}
+
+button {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+}
+
+.footer {
+  height: 170px;
+  background: #e1e1e1;
+}
