@@ -1,2 +1,4 @@
 .env
 service-key.json
+.idea/
+venv/
