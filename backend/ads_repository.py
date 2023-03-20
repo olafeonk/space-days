@@ -64,6 +64,7 @@ queries = [
     """
 ]
 
+
 async def _init_db(session: ydb.Session, query: str):
     try: 
         await session.execute_scheme(query)
@@ -104,11 +105,6 @@ class YDBClient:
         coros = [self._pool.retry_operation(_init_db, query) for query in queries]
 
         await asyncio.gather(*coros)
-        print('coros gather')
-        directory = await self._driver.scheme_client.list_directory(self._database)
-        print('directory')
-        for child in directory.children:
-            print(child.type, child.name)
 
     async def close(self):
         await self._driver.stop(timeout=5)
