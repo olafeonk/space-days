@@ -2,13 +2,15 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import { LinkContainer } from "react-router-bootstrap";
-import Footer from "./footer";
-import Header from "./header";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
-import CarouselFadeExample from "./carousel";
+import CarouselFadeExample from "../components/Carousel";
 import Form from "react-bootstrap/Form";
+import InfoList from "../components/InfoInNumbers/InfoList";
+import info from "../components/InfoInNumbers/infoObj";
 
 const HomePage = () => (
   <Container>
@@ -18,6 +20,9 @@ const HomePage = () => (
       </LinkContainer>
       <LinkContainer to="/events">
         <Button>Events</Button>
+      </LinkContainer>
+      <LinkContainer to="/registration">
+        <Button>Registration</Button>
       </LinkContainer>
     </ButtonToolbar>
     <Header></Header>
@@ -39,36 +44,7 @@ const HomePage = () => (
       </Row>
       <Row className="about justify-content-between align-items-center" md={4}>
         <Col>
-          <Row>
-            <h2>3500+</h2>
-          </Row>
-          <Row>
-            <span>Участников</span>
-          </Row>
-        </Col>
-        <Col>
-          <Row>
-            <h2>8</h2>
-          </Row>
-          <Row>
-            <span>Дней</span>
-          </Row>
-        </Col>
-        <Col>
-          <Row>
-            <h2>100</h2>
-          </Row>
-          <Row>
-            <span>Мероприятий</span>
-          </Row>
-        </Col>
-        <Col>
-          <Row>
-            <h2>18</h2>
-          </Row>
-          <Row>
-            <span>Площадок</span>
-          </Row>
+          <InfoList info={info} />
         </Col>
       </Row>
       <Row className="present">
