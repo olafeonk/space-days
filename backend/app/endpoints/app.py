@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from typing import Annotated
-
 import ydb
 import ydb.iam
-from fastapi import FastAPI, APIRouter, HTTPException, Query
+from fastapi import FastAPI, APIRouter, HTTPException, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import uvicorn
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime, date
 from ..config import YDB_DATABASE, YDB_ENDPOINT
 from ..adapters.repository import (
@@ -16,7 +14,8 @@ from ..adapters.repository import (
     generate_ticket_id,
     Repository,
     get_count_available_tickets,
-    is_children_event, get_user
+    is_children_event, get_user,
+    is_available_slot
 )
 import app.domain.model as model
 
@@ -42,7 +41,7 @@ class UserRequest(BaseModel):
     last_name: str
     phone: str
     birthdate: date
-    email: str
+    email: EmailStr
     child: list[ChildRequest] | None
     slot_id: int
 
@@ -57,7 +56,7 @@ class EventRequest(BaseModel):
 
 
 class EmailRequest(BaseModel):
-    email: str
+    email: EmailStr
 
 
 class TicketRequest(BaseModel):
@@ -130,7 +129,6 @@ WHERE event.event_id = {}
 ORDER BY event_id;
 """
 
-
 ADD_USER_QUERY = """PRAGMA TablePathPrefix("{}");
 DECLARE $userData AS List<Struct<
     user_id: Uint64,
@@ -198,9 +196,16 @@ async def test():
     return "Hello, world"
 
 
-@router.post("/emails/subscribe")
-async def add_email(email: EmailRequest):
+@router.post("/emails/subscribe", status_code=status.HTTP_201_CREATED)
+async def add_email(email: EmailRequest, response: Response):
     email_id = await get_count_table('emails')
+    emails = (await Repository.execute("""PRAGMA TablePathPrefix("{}");
+        SELECT * FROM emails
+        WHERE email = '{}';
+    """.format(YDB_DATABASE, email.email), {}))[0].rows
+    if emails:
+        response.status_code = status.HTTP_200_OK
+        return
     await Repository.execute(
         """PRAGMA TablePathPrefix("{}");
         DECLARE $emailData AS List<Struct<
@@ -220,12 +225,13 @@ async def add_email(email: EmailRequest):
 
 
 @router.get("/events/", response_model=list[EventRequest])
-async def get_events(id: int | None = None, day: list[int] | None = Query(None)):
-    if id:
+async def get_events(id: int | None = None, days: list[int] | None = Query(None)):
+    if id is not None:
         result_sets = await Repository.execute(GET_EVENT_ID_QUERY.format(YDB_DATABASE, id), {})
+    elif days:
+        result_sets = await Repository.execute(GET_EVENT_DATE_QUERY.format(YDB_DATABASE, days), {})
     else:
-        result_sets = await Repository.execute(GET_EVENT_DATE_QUERY.format(YDB_DATABASE, day), {})
-
+        return []
     event_id = 0
     result = []
     event = EventRequest(
@@ -239,18 +245,8 @@ async def get_events(id: int | None = None, day: list[int] | None = Query(None))
         if event_id != row.event_id:
             event_id = row.event_id
             result.append(event)
-            event = EventRequest(
-                event_id=row.event_id,
-                description=row.description,
-                location=row.location,
-                summary=row.summary,
-                title=row.title,
-                slots=[])
-        event.slots.append(SlotRequest(slot_id=row.slot_id,
-                                       start_time=row.start_time,
-                                       end_time=row.end_time,
-                                       amount=row.amount,
-                                       available_users=await get_count_available_tickets(row.slot_id)))
+            event = EventRequest(slots=[], **row)
+        event.slots.append(SlotRequest(available_users=(await get_count_available_tickets(row.slot_id)), **row))
 
     result.append(event)
     result.pop(0)
@@ -289,17 +285,25 @@ async def add_event(event: EventRequest) -> None:
 
 
 @router.post('/events/subscribe')
-async def add_user(user: UserRequest):
+async def add_user(user: UserRequest, response: Response):
     if len(user.child) > 3:
-        return HTTPException(status_code=400, detail='too more child')
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='too more child')
+    if not await is_available_slot(slot_id=user.slot_id):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='slot not available')
+    old_user = await get_user(user.phone, user.birthdate)
     is_child_event = await is_children_event(user.slot_id)
     available_tickets = await get_count_available_tickets(user.slot_id)
     booked_tickets = len(user.child) + (not is_child_event)
     print(available_tickets, booked_tickets)
     if available_tickets < booked_tickets:
-        return HTTPException(status_code=409, detail=f'available ticket {available_tickets} '
-                                                     f'< booked ticket {booked_tickets}')
+        return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'available ticket {available_tickets} '
+                                                                          f'< booked ticket {booked_tickets}')
+
     user_n = await get_count_table("user") + 1
+    if old_user:
+        user_n = old_user.user_id
     child_n = await get_count_table("child")
     children = []
     for child in user.child:
@@ -318,14 +322,15 @@ async def add_user(user: UserRequest):
         slot_id=user.slot_id,
         amount=booked_tickets,
     )
-    user = model.User(
-        user_id=user_n,
-        first_name=user.first_name,
-        last_name=user.last_name,
-        phone=user.phone,
-        birthdate=user.birthdate.strftime('%Y-%m-%d'),
-        email=user.email,
-    )
+    if not old_user:
+        user = model.User(
+            user_id=user_n,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            phone=user.phone,
+            birthdate=user.birthdate.strftime('%Y-%m-%d'),
+            email=user.email,
+        )
     await Repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
                              {
                                  "$childData": children,
@@ -339,12 +344,12 @@ async def add_user(user: UserRequest):
 async def get_user_events(body: TicketRequest):
     user = await get_user(body.phone, body.birthdate)
     if not user:
-        return HTTPException(status_code=400, detail="no user")
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no user")
     result = []
 
     for row in (await Repository.execute(GET_USER_EVENTS.format(YDB_DATABASE, user.user_id), {}))[0].rows:
-        result.append(UserEventsRequest(row))
-
+        print(f"result: {row}")
+        result.append(UserEventsRequest(**row))
     return result
 
 
