@@ -191,12 +191,12 @@ WHERE user_id = {}
 """
 
 
-@router.get("/test")
+@router.get("/api/test")
 async def test():
     return "Hello, world"
 
 
-@router.post("/emails/subscribe", status_code=status.HTTP_201_CREATED)
+@router.post("/api/emails/subscribe", status_code=status.HTTP_201_CREATED)
 async def add_email(email: EmailRequest, response: Response):
     email_id = await get_count_table('emails')
     emails = (await Repository.execute("""PRAGMA TablePathPrefix("{}");
@@ -224,7 +224,7 @@ async def add_email(email: EmailRequest, response: Response):
     )
 
 
-@router.get("/events/", response_model=list[EventRequest])
+@router.get("/api/events/", response_model=list[EventRequest])
 async def get_events(id: int | None = None, days: list[int] | None = Query(None)):
     if id is not None:
         result_sets = await Repository.execute(GET_EVENT_ID_QUERY.format(YDB_DATABASE, id), {})
@@ -254,7 +254,7 @@ async def get_events(id: int | None = None, days: list[int] | None = Query(None)
     return result
 
 
-@router.post("/event")
+@router.post("/api/event")
 async def add_event(event: EventRequest) -> None:
     driver = ydb.aio.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
                             credentials=ydb.iam.ServiceAccountCredentials.from_file('service-key.json'))
@@ -284,7 +284,7 @@ async def add_event(event: EventRequest) -> None:
             await pool.release(session)
 
 
-@router.post('/events/subscribe')
+@router.post('/api/events/subscribe')
 async def add_user(user: UserRequest, response: Response):
     if len(user.child) > 3:
         response.status_code = status.HTTP_400_BAD_REQUEST
@@ -296,7 +296,6 @@ async def add_user(user: UserRequest, response: Response):
     is_child_event = await is_children_event(user.slot_id)
     available_tickets = await get_count_available_tickets(user.slot_id)
     booked_tickets = len(user.child) + (not is_child_event)
-    print(available_tickets, booked_tickets)
     if available_tickets < booked_tickets:
         return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'available ticket {available_tickets} '
                                                                           f'< booked ticket {booked_tickets}')
@@ -340,7 +339,7 @@ async def add_user(user: UserRequest, response: Response):
     return ticket
 
 
-@router.post('/tickets/my')
+@router.post('/api/tickets/my')
 async def get_user_events(body: TicketRequest):
     user = await get_user(body.phone, body.birthdate)
     if not user:
