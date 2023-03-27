@@ -17,8 +17,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "deploy": "npm run build && ./update_frontend.sh",
+    "build": "echo \"Please use build:staging or build:production \" && exit 1",
+    "build:staging": "dotenv -e .env.staging react-scripts build",
+    "build:production": "dotenv -e .env.production react-scripts build",
+    "deploy": "echo \"Please use deploy:staging or deploy:production \" && exit 1",
+    "deploy:staging": "npm run build:staging && ./update_frontend_staging.sh",
+    "deploy:production": "npm run build:production && ./update_frontend_production.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -39,5 +43,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.1.0"
   }
 }
