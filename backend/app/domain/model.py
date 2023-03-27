@@ -1,6 +1,11 @@
 from pydantic import BaseModel
 
 
+class Email(BaseModel):
+    id: int
+    email: str
+
+
 class Event(BaseModel):
     event_id: int
     description: str
@@ -18,11 +23,13 @@ class Ticket(BaseModel):
     ticket_id: int
     user_id: int
     slot_id: int
+    amount: int
 
 
 class Child(BaseModel):
     child_id: int
     user_id: int
+    slot_id: int
     first_name: str
     last_name: str
     age: int
@@ -33,7 +40,7 @@ class User(BaseModel):
     first_name: str
     last_name: str
     phone: str
-    date_of_birth: str
+    birthdate: str
     email: str
 
 

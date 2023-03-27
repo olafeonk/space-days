@@ -8,6 +8,10 @@ queries = [
     CREATE table `event` (
         `event_id` Uint64,
         `description` Utf8,
+        `is_children` bool,
+        `location` Utf8,
+        `summary` Utf8,
+        `title` Utf8,
         PRIMARY KEY (`event_id`)
     )
     """,
@@ -33,6 +37,7 @@ queries = [
     CREATE table `child` (
         `child_id` Uint64,
         `user_id` Uint64,
+        `slot_id` Uint64,
         `first_name` Utf8,
         `last_name` Utf8,
         `age` Uint8,
@@ -45,7 +50,7 @@ queries = [
         `first_name` Utf8,
         `last_name` Utf8,
         `phone` Utf8,
-        `date_of_birth` Date,
+        `birthdate` Date,
         `email` Utf8,
         PRIMARY KEY (`user_id`, `phone`, `email`)
     )
@@ -60,6 +65,13 @@ queries = [
         `first_name` Utf8,
         `last_name` Utf8,
         PRIMARY KEY (`tg_user_id`, `user_id`)
+    )
+    """,
+    """
+    CREATE table `emails` (
+        `id` Uint64,
+        `email` Utf8,
+        PRIMARY KEY (`id`)
     )
     """
 ]
