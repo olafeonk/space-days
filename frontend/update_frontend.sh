@@ -10,6 +10,6 @@ if ! [ "${SPACE_DAYS_APP_BUCKET}" ]; then
     exit 1
 fi
 
-s3cmd sync ./ --exclude '.env' s3://${SPACE_DAYS_APP_BUCKET}
-s3cmd --recursive modify --add-header=content-type:application/javascript  s3://${SPACE_DAYS_APP_BUCKET}/js/
-s3cmd --recursive modify --add-header=content-type:text/css  s3://${SPACE_DAYS_APP_BUCKET}/css/
+cd ./build
+s3cmd sync . s3://${SPACE_DAYS_APP_BUCKET}
+cd ..
