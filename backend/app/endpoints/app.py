@@ -221,7 +221,7 @@ async def get_events(id: int | None = None, days: list[int] | None = Query(None)
         query += "\tWHERE DateTime::GetDayOfMonth(slots.start_time) IN {}\n".format(days)
     if hours:
         query += "\tWHERE DateTime::GetHour(slots.start_time) IN {}\n".format(hours)
-    query += "\tORDER BY evnet.event_id;"
+    query += "\tORDER BY event_id;"
     result_sets = await Repository.execute(query, {})
     event_id = 0
     result = []
