@@ -1,4 +1,4 @@
 .env
-.env-staging
-.env-production
+.env.staging
+.env.production
 service-key.json

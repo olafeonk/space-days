@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #variables in env file
-if [ -f ".env" ]; then
-    export $(grep -v '^#' .env | xargs)
+if [ -f ".env.staging" ]; then
+    export $(grep -v '^#' .env.staging | xargs)
 fi
 
 if ! [ "${SPACE_DAYS_APP_BUCKET}" ]; then

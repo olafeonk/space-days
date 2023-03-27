@@ -1,6 +1,5 @@
 "use strict";
-
-const API_BASE_URL = 'https://d5dhunj7miq7pks6r7fs.apigw.yandexcloud.net';
+import { API_BASE_URL } from "../constants";
 
 async function addMessage(name, title, text) {
     const body = {

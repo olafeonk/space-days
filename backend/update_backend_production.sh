@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #variables in env file
-if [ -f ".env-production" ]; then
-    export $(grep -v '^#' .env-production | xargs)
+if [ -f ".env.production" ]; then
+    export $(grep -v '^#' .env.production | xargs)
 fi
 
 if ! [ "${SPACE_DAYS_REGISTRY}" ]; then
