@@ -113,21 +113,6 @@ SELECT
 FROM AS_TABLE($slotData);
 """
 
-GET_EVENT_DATE_QUERY = """PRAGMA TablePathPrefix("{}");
-SELECT * FROM event
-INNER JOIN slots
-ON event.event_id = slots.event_id
-WHERE DateTime::GetDayOfMonth(slots.start_time) IN {}
-ORDER BY event_id;
-"""
-
-GET_EVENT_ID_QUERY = """PRAGMA TablePathPrefix("{}");
-SELECT * FROM event
-INNER JOIN slots
-ON event.event_id = slots.event_id
-WHERE event.event_id = {}
-ORDER BY event_id;
-"""
 
 ADD_USER_QUERY = """PRAGMA TablePathPrefix("{}");
 DECLARE $userData AS List<Struct<
@@ -225,13 +210,19 @@ async def add_email(email: EmailRequest, response: Response):
 
 
 @router.get("/api/events/", response_model=list[EventRequest])
-async def get_events(id: int | None = None, days: list[int] | None = Query(None)):
+async def get_events(id: int | None = None, days: list[int] | None = Query(None), hours: list[int] | None = Query(None)):
+    query = """PRAGMA TablePathPrefix("{}");
+    SELECT * FROM event
+    INNER JOIN slots
+    ON event.event_id = slots.event_id\n""".format(YDB_DATABASE)
     if id is not None:
-        result_sets = await Repository.execute(GET_EVENT_ID_QUERY.format(YDB_DATABASE, id), {})
-    elif days:
-        result_sets = await Repository.execute(GET_EVENT_DATE_QUERY.format(YDB_DATABASE, days), {})
-    else:
-        return []
+        query += "\tWHERE event.event_id = {}\n".format(id)
+    if days:
+        query += "\tWHERE DateTime::GetDayOfMonth(slots.start_time) IN {}\n".format(days)
+    if hours:
+        query += "\tWHERE DateTime::GetHour(slots.start_time) IN {}\n".format(hours)
+    query += "\tORDER BY evnet.event_id;"
+    result_sets = await Repository.execute(query, {})
     event_id = 0
     result = []
     event = EventRequest(
