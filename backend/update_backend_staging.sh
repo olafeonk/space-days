@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #variables in env file
-if [ -f ".env" ]; then
-    export $(grep -v '^#' .env | xargs)
+if [ -f ".env.staging" ]; then
+    export $(grep -v '^#' .env.staging | xargs)
 fi
 
 if ! [ "${SPACE_DAYS_REGISTRY}" ]; then
@@ -37,9 +37,7 @@ ENDPOINT=$(echo $ENDPOINT | tr -d '\r')
 DB=$(echo $DB | tr -d '\r')
 SERVICE_ACCOUNT_ID=$(echo $SERVICE_ACCOUNT_ID | tr -d '\r')
 
-cr.yandex/crprkhjar1gq4t8h8u0t
-
-new_image_name=$SPACE_DAYS_REGISTRY/space-days-backend:latest;
+new_image_name=$SPACE_DAYS_REGISTRY/space-days-backend:staging;
 echo $new_image_name;
 docker build -t $new_image_name . ;
 docker push $new_image_name;

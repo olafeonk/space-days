@@ -1,7 +1,4 @@
-const LOCAL_API_URL = null;
-const STAGING_API_URL =
-    "https://bbattsjk2r9dqss9q8gt.containers.yandexcloud.net";
-const API_BASE_URL = STAGING_API_URL;
+import { API_BASE_URL } from "../constants";
 
 export async function getEvent(id) {
     if (API_BASE_URL) {
