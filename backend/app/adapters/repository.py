@@ -3,7 +3,7 @@ import ydb.iam
 from app.config import YDB_DATABASE, YDB_ENDPOINT
 from random import randint
 from datetime import date
-import app.domain.model as model
+import backend.app.domain.model as model
 
 
 async def get_count_table(name_table: str) -> int:
@@ -65,13 +65,30 @@ async def get_user(phone: str, birthdate: date) -> model.User | None:
     WHERE birthdate = CAST("{}" AS Date) AND phone = "{}";
     """.format(YDB_DATABASE, birthdate.strftime("%Y-%m-%d"), phone), {}))[0].rows
     if user:
-        user = user[0]
-        return model.User(user_id=user.user_id,
-                          first_name=user.first_name,
-                          last_name=user.last_name,
-                          phone=user.phone,
-                          birthdate=user.birthdate,
-                          email=user.email)
+        return model.User(**user[0])
+
+
+async def get_user_by_ticket(ticket_id: int) -> model.User:
+    user = (await Repository.execute("""PRAGMA TablePathPrefix("{}");
+        SELECT DISTINCT user.user_id AS user_id, first_name, last_name, phone, birthdate, email FROM ticket
+        INNER JOIN user
+        ON user.user_id = ticket.user_id
+        WHERE ticket.ticket_id = {};
+        """.format(YDB_DATABASE, ticket_id), {}))[0].rows
+    if user:
+        return model.User(**user[0])
+
+
+async def get_tg_user(telegram_id: int) -> model.TelegramUser | None:
+    tg_user = (await Repository.execute("""PRAGMA TablePathPrefix("{}");
+        SELECT * FROM tg_user
+        WHERE telegram_id = {};
+    """.format(YDB_DATABASE, telegram_id), {}))[0].rows
+    if tg_user:
+        return model.TelegramUser(**tg_user[0])
+
+
+#TODO save tg user
 
 
 class Repository:
