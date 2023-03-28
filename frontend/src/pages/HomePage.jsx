@@ -39,7 +39,7 @@ const HomePage = () => (
           </Button>
         </Col>
         <Col className="d-flex justify-content-center align-items-center">
-          <Image fluid rounded src="./logo512.png"></Image>
+          <Image fluid rounded src="./image/banner_pic.png"></Image>
         </Col>
       </Row>
       <Row className="about justify-content-between align-items-center" md={4}>
