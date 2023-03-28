@@ -66,7 +66,7 @@
 }
 
 .about.row {
-  margin: 113px 170px;
+  margin: 110px 55px;
 }
 
 .about span {
@@ -75,18 +75,28 @@
 
 .about > .col {
   display: flex;
-  flex-direction: column;
-  width: 200px;
-  height: 200px;
-  border-radius: 60px;
-  background: #d9d9d9;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.about__item {
+  display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  border-radius: 40px;
+  background: #5e7fd6;
+  width: 269px;
+  height: 250px;
+  color: #fff;
+  box-shadow: 6px 6px 15px 0 #2b2ac5;
 }
 
 h2 {
   font-size: 48px !important;
-  margin-bottom: 38px !important;
+  margin-bottom: 21px !important;
   width: auto !important;
 }
 
@@ -205,4 +215,187 @@ button {
 .footer {
   height: 170px;
   background: #e1e1e1;
+}
+
+.add-child-button {
+  height: 38px;
+  width: 38px;
+  padding: 4px !important;
+}
+
+.dates-row > .col {
+  padding: 0 !important;
+}
+
+.dates-row {
+  margin: 0 0 60px !important;
+}
+
+button.date-button {
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  border: transparent solid 2px;
+  line-height: 30px;
+  padding: 10px 15px;
+}
+
+button.date-button:hover {
+  border: #5e7fd6 solid 2px;
+  background: none;
+  color: #000;
+}
+
+button.date-button:active {
+  border: transparent solid 2px !important;
+  background: transparent !important;
+  color: #5e7fd6 !important;
+}
+
+button.date-button_checked {
+  background: #5e7fd6;
+  color: #fff;
+}
+
+button.date-button_checked:hover {
+  background: #5e7fd6;
+  color: #fff;
+}
+
+button.date-button_checked:active {
+  background: #5e7fd6 !important;
+  color: #fff !important;
+}
+
+.day-title {
+  font-size: 70px;
+  font-weight: 700;
+  margin: 0 97px 70px;
+}
+
+.day-title_h2 {
+  font-size: 48px;
+  margin: 0 97px 33px;
+}
+
+.time-row {
+  margin: 0 90px 60px !important;
+}
+
+.time-button {
+  padding: 5px 20px !important;
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  line-height: 30px;
+  border: #b8b8b8 solid 2px !important;
+}
+
+.time-button:hover {
+  background: transparent !important;
+  color: #000 !important;
+  border: #868686 solid 2px !important;
+}
+
+.time-button:active {
+  border: #5e7fd6 solid 2px !important;
+}
+
+.time-button_checked {
+  border: #5e7fd6 solid 2px !important;
+}
+
+.events-row {
+  padding: 47px 83px 47px 117px;
+  background: #e5e5e5;
+  border-radius: 60px;
+}
+
+.events-row .col {
+  gap: 72px 100px;
+  padding: 0;
+}
+
+.event-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 60px;
+  max-width: 520px;
+  min-height: 455px;
+  padding: 12px 30px 30px;
+  box-shadow: 7px 10px 7px 0 rgba(0, 0, 0, 0.25);
+}
+
+.event-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-card__duration {
+  margin-bottom: 5px;
+}
+
+.event-card img {
+  position: absolute;
+  height: 100px;
+  width: 100px;
+  object-fit: cover;
+  background: #5e7fd6;
+  top: -17px;
+  left: -62px;
+}
+
+.event-card h3 {
+  margin: 0 0 0 27px;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.event-card hr {
+  margin: 0 0 5px 0;
+  height: 3px;
+}
+
+.event-card span,
+.event-card p {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.event-card span:last-child {
+  margin-bottom: 10px;
+}
+
+span.event-card__title {
+  color: #787878;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.event-card__time.time-button {
+  cursor: pointer;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  padding: 5px 10px !important;
+  margin-right: 15px;
+}
+
+.event-card__button {
+  width: 240px;
+  font-size: 16px !important;
+  align-self: center;
+  color: #5e7fd6 !important;
+  border: #5e7fd6 solid 2px !important;
+}
+
+.event-card__button:hover {
+  color: #fff !important;
+  background: #5e7fd6 !important;
+}
+
+.event-card__button:active {
+  background: #5777cf !important;
+  border: #5777cf solid 2px !important;
 }
