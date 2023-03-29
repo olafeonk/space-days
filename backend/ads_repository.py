@@ -1,78 +1,121 @@
-from typing import List, Optional
+import asyncio
 import ydb
-import os
-import uuid
-import json
-from models import Ad
-from dotenv import load_dotenv
-import datetime
+import ydb.iam
 
-_TABLE_NAME = 'series'
-_INITIAL_QUERY = '''
-CREATE table `{}` (
-    `ad_id` String,
-    `author` String,
-    `title` String,
-    `text` String,
-    `created_at` Datetime,
-    PRIMARY KEY (`ad_id`)
-)
-'''.format(_TABLE_NAME)
 
-class AdsRepository:
+queries = [
+    """
+    CREATE table `event` (
+        `event_id` Uint64,
+        `description` Utf8,
+        `is_children` bool,
+        `location` Utf8,
+        `summary` Utf8,
+        `title` Utf8,
+        PRIMARY KEY (`event_id`)
+    )
+    """,
+    """
+    CREATE table `slots` (
+        `slot_id` Uint64,
+        `event_id` Uint64,
+        `start_time` Datetime,
+        `amount` Uint64,
+        PRIMARY KEY (`slot_id`, `event_id`)
+    )
+    """,
+    """
+    CREATE table `ticket` (
+        `ticket_id` Uint64,
+        `user_id` Uint64,
+        `slot_id` Uint64,
+        PRIMARY KEY (`ticket_id`, `user_id`, `slot_id`)
+    )
+    """,
+    """
+    CREATE table `child` (
+        `child_id` Uint64,
+        `user_id` Uint64,
+        `slot_id` Uint64,
+        `first_name` Utf8,
+        `last_name` Utf8,
+        `age` Uint8,
+        PRIMARY KEY (`child_id`, `user_id`)
+    )
+    """,
+    """
+    CREATE table `user` (
+        `user_id` Uint64,
+        `first_name` Utf8,
+        `last_name` Utf8,
+        `phone` Utf8,
+        `birthdate` Date,
+        `email` Utf8,
+        PRIMARY KEY (`user_id`, `phone`, `email`)
+    )
+    """,
+    """
+    CREATE table `tg_user` (
+        `tg_user_id` Uint64,
+        `user_id` Uint64,
+        `type_user` Utf8,
+        `telegram_id` Uint64,
+        `username` Utf8,
+        `first_name` Utf8,
+        `last_name` Utf8,
+        PRIMARY KEY (`tg_user_id`, `user_id`)
+    )
+    """,
+    """
+    CREATE table `emails` (
+        `id` Uint64,
+        `email` Utf8,
+        PRIMARY KEY (`id`)
+    )
+    """
+]
+
+
+async def _init_db(session: ydb.Session, query: str):
+    try: 
+        await session.execute_scheme(query)
+    except ydb.issues.GenericError as e:
+        print(query, e)
+
+    else:
+        print("created table, query: ", query)
+    
+
+class YDBClient:
     def __init__(self, endpoint: str, database: str):
         self._endpoint = endpoint
         self._database = database
-        self._driver = ydb.Driver(
-            endpoint=endpoint,
-            database=database,
-            credentials=ydb.construct_credentials_from_environ())
-        self._pool: Optional[ydb.SessionPool] = None
-    
-    def _init_db(self, session: ydb.Session):
-        session.execute_scheme(_INITIAL_QUERY)
-    
-    def connect(self):
-        self._driver.wait(timeout=5, fail_fast=True)
-        self._pool = ydb.SessionPool(self._driver)
-        self._pool.retry_operation_sync(self._init_db)
+        self._pool: ydb.aio.SessionPool | None = None
+        self._driver: ydb.aio.Driver | None = None
 
-    def close(self):
-        self._driver.stop(timeout=5)
-    
-    def insert_ad(self, author: str, title: str, text: str):
-        def callee(session) -> Ad:
-            generated_uuid = uuid.uuid4()
-            current_date = datetime.datetime.today()
-            current_date_formatted = current_date.strftime("%Y-%m-%dT%H:%M:%SZ")
-            query = '''
-                INSERT INTO {} (ad_id, author, title, text, created_at)
-                VALUES ("{}", "{}", "{}", '{}', DATETIME('{}'));
-            '''.format(_TABLE_NAME, generated_uuid, author, title, text, current_date_formatted)
-            session.transaction().execute(query, commit_tx=True)
+    async def create_driver(self):
+        print(self._endpoint)
+        driver_config = ydb.DriverConfig(
+            self._endpoint,
+            self._database,
+            credentials=ydb.iam.ServiceAccountCredentials.from_file('service-key.json'),
+        )
 
-            return Ad(ad_id=str(generated_uuid), author=author, text=text, title=title, created_at=current_date_formatted)
+        driver = ydb.aio.Driver(driver_config)
+        try:
+            await driver.wait(timeout=5)
+        except Exception:
+            raise ConnectionError(driver.discovery_debug_details())
+        return driver
         
-        return self._pool.retry_operation_sync(callee)
-    
-    def get_ads(self) -> List[Ad]:
-        def callee(session):
-            result: List[Ad] = []
-            query = '''
-                SELECT ad_id, author, title, text, created_at FROM {};
-            '''.format(_TABLE_NAME)
-            query_result = session.transaction().execute(query)
+    async def connect(self):
+        self._driver = await self.create_driver()
 
-            for row in query_result[0].rows:
-                print(row.created_at)
-                result.append(Ad(
-                    ad_id=row.ad_id.decode(),
-                    author=row.author.decode(),
-                    title=row.title.decode(),
-                    text=row.text.decode(),
-                    created_at=row.created_at
-                ))
-            
-            return result
-        
-        return self._pool.retry_operation_sync(callee)
+        self._pool = ydb.aio.SessionPool(self._driver, size=10)
+
+        coros = [self._pool.retry_operation(_init_db, query) for query in queries]
+
+        await asyncio.gather(*coros)
+
+    async def close(self):
+        await self._driver.stop(timeout=5)

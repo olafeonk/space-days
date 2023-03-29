@@ -5,66 +5,7 @@ import ydb.aio
 import os
 
 
-queries = [
-    """
-    CREATE table `event` (
-        `event_id` Uint64,
-        `description` Utf8 NOT NULL,
-        PRIMARY KEY (`event_id`)
-    )
-    """,
-    """
-    CREATE table `slots` (
-        `slot_id` Uint64,
-        `event_id` Uint64,
-        `start_time` Datetime NOT NULL,
-        `end_time` Datetime NOT NULL,
-        `amount` Uint64,
-        PRIMARY KEY (`slot_id`, `event_id`)
-    )
-    """,
-    """
-    CREATE table `ticket` (
-        `ticket_id` Uint64,
-        `user_id` Uint64,
-        `slot_id` Uint64,
-        PRIMARY KEY (`ticket_id`, `user_id`, `slot_id`)
-    )
-    """,
-    """
-    CREATE table `child` (
-        `child_id` Uint64,
-        `user_id` Uint64,
-        `first_name` Utf8 NOT NULL,
-        `last_name` Utf8 NOT NULL,
-        `age` Uint8 NOT NULL,
-        PRIMARY KEY (`child_id`, `user_id`)
-    )
-    """,
-    """
-    CREATE table `user` (
-        `user_id` Uint64,
-        `first_name` Utf8 NOT NULL,
-        `last_name` Utf8 NOT NULL,
-        `phone` Utf8,
-        `date_of_birth` Date NOT NULL,
-        `email` Utf8,
-        PRIMARY KEY (`user_id`, `phone`, `email`)
-    )
-    """,
-    """
-    CREATE table `tg_user` (
-        `tg_user_id` Uint64,
-        `user_id` Uint64,
-        `type_user` Utf8,
-        `telegram_id` Uint64,
-        'username' Utf8,
-        `first_name` Utf8,
-        `last_name` Utf8,
-        PRIMARY KEY (`tg_user_id`, `user_id`),
-    )
-    """
-]
+
 
 
 async def create_table(session, query):

@@ -2,3 +2,5 @@
 .env.staging
 .env.production
 service-key.json
+.idea/
+venv/
