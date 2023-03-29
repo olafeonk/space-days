@@ -1,13 +1,14 @@
 import Image from "react-bootstrap/Image";
+import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
 const EventCard = (props) => {
   const { event } = props;
   return (
-    <article className="event-card">
+    <Col className="event-card" as={"article"}>
       <Image fluid roundedCircle src={event.image}></Image>
       <div>
-        <h3>{event.name}</h3>
+        <h3>{event.title}</h3>
         <hr></hr>
         <div>
           <span className="event-card__title">Дата:</span>{" "}
@@ -16,8 +17,11 @@ const EventCard = (props) => {
         <div>
           <span className="event-card__title">Время:</span>{" "}
           {event.times.map((it) => (
-            <span className="event-card__time time-button rounded-pill">
-              {it}
+            <span
+              key={it.time}
+              className="event-card__time time-button rounded-pill"
+            >
+              {it.time}
             </span>
           ))}
         </div>
@@ -29,7 +33,7 @@ const EventCard = (props) => {
           <span className="event-card__title">Продолжительность:</span>{" "}
           <span>{event.duration}</span>
         </div>
-        <p>{event.description}</p>
+        <p>{event.summary}</p>
       </div>
       <Button
         variant="outline-primary"
@@ -37,7 +41,7 @@ const EventCard = (props) => {
       >
         Зарегистрироваться
       </Button>
-    </article>
+    </Col>
   );
 };
 
