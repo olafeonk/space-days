@@ -7,7 +7,7 @@ const Header = () => (
   <Row className="header align-items-center justify-content-between">
     <Col className="school-logo">
       <a href="http://kantrskrip.ru/?utm_source=website&amp;utm_medium=header&amp;utm_campaign=logo">
-        <Image src="https://thumb.tildacdn.com/tild6531-3631-4565-b734-613637306531/-/resize/64x/-/format/webp/__.png"></Image>
+        <Image width={54} src="/kantrskrip.png"></Image>
       </a>
       <a href="http://kantrskrip.ru/?utm_source=website&amp;utm_medium=header&amp;utm_campaign=logo">
         школа астрономии
