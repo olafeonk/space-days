@@ -46,27 +46,74 @@
 }
 
 .header {
-  background: #e1e1e1;
-  height: 100px;
-  border-radius: 0 0 200px 200px;
+  background: #f8f8f8;
+  margin: 0 30px;
+  border-radius: 0 0 60px 60px;
+  box-shadow: 0px 5px 20px 0px rgb(32 32 32 / 10%);
+  padding: 30px;
+  text-transform: uppercase;
+}
+
+.header .col {
+  padding: 0;
+  flex: 0 0 auto;
+  width: auto;
+  font-weight: 500;
+}
+
+.header a {
+  text-decoration: none;
+  color: #000;
+  margin-right: 20px;
+}
+
+.header a:hover {
+  color: #000;
+}
+
+.header .school-logo {
+  font-weight: 700;
+}
+
+.header .school-logo a {
+  margin-right: 10px;
 }
 
 .banner {
-  height: 860px;
-  background: rgba(217, 217, 217, 0.32);
-  margin-top: -86px !important;
-  padding: 127px 127px 91px;
+  padding: 60px;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.banner .col {
+  flex: 0 0 auto;
+  width: auto;
 }
 
 .banner img {
-  background: #b8b8b8;
   height: 100%;
   object-fit: contain;
-  border-radius: 100px !important;
+  border-radius: 122px !important;
+}
+
+.banner h1 {
+  font-size: calc(2.575rem + 1.5vw);
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.banner p {
+  font-size: 20px;
+  margin-bottom: 100px;
+}
+
+.banner button {
+  padding: 18px 60px;
 }
 
 .about.row {
-  margin: 110px 55px;
+  padding: 60px;
+  gap: 60px;
 }
 
 .about span {
@@ -74,10 +121,7 @@
 }
 
 .about > .col {
-  display: flex;
-  width: 100%;
   align-items: center;
-  justify-content: space-between;
   padding: 0;
 }
 
@@ -88,45 +132,57 @@
   flex-direction: column;
   border-radius: 40px;
   background: #5e7fd6;
-  width: 269px;
+  min-width: 269px;
   height: 250px;
   color: #fff;
   box-shadow: 6px 6px 15px 0 #2b2ac5;
 }
 
-h2 {
-  font-size: 48px !important;
-  margin-bottom: 21px !important;
-  width: auto !important;
+.about__item h2 {
+  font-size: 3rem;
+  margin-bottom: 21px;
 }
 
 .present {
-  background: rgba(217, 217, 217, 0.32);
-  padding: 85px 125px;
-  margin-bottom: 80px;
-}
-
-.present .row {
-  background: #d9d9d9;
-  border-radius: 60px;
-  padding: 65px 127px;
+  padding: 60px;
+  gap: 150px;
 }
 
 .present img {
-  width: 353px;
-  height: 353px;
-  border-radius: 70px !important;
-  background: #b8b8b8;
-  margin-top: -120px;
+  width: 440px;
+  height: 430px;
+  object-fit: contain;
+}
+
+.present .col {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.present h2 {
+  font-weight: 700;
+  margin-bottom: 50px;
+  font-weight: 3rem;
+}
+
+.present p {
+  font-size: 24px;
+  max-width: 600px;
 }
 
 .map {
-  margin-bottom: 80px;
+  padding: 60px;
+}
+
+.map h2 {
+  margin-bottom: 30px;
+  font-weight: 700;
+  font-size: 3rem;
 }
 
 .map__steps {
   height: 1010px;
-  background: url("./line.png") no-repeat;
+  background: lightblue;
 }
 
 .map__steps .container {
@@ -185,12 +241,18 @@ h2 {
 }
 
 .registration {
-  background: #e5e5e5;
-  padding: 54px;
+  padding: 60px;
+}
+
+.registration .col {
+  max-width: 900px;
+  display: flex;
+  justify-content: center;
 }
 
 .registration button {
   padding: 18px 133px;
+  width: 100%;
 }
 
 .newsletter {
@@ -208,13 +270,24 @@ h2 {
 }
 
 button {
-  font-size: 20px !important;
   font-weight: 700 !important;
 }
 
 .footer {
-  height: 170px;
-  background: #e1e1e1;
+  background: #f8f8f8;
+  margin: 0 30px;
+  border-radius: 60px 60px 0 0;
+  box-shadow: 0px 5px 20px 0px rgb(32 32 32 / 10%);
+  padding: 30px;
+}
+
+.footer .col {
+  padding: 0;
+  flex: 0 0 auto;
+  width: auto;
+  line-height: 23px;
+  font-size: 15px;
+  height: 23px;
 }
 
 .add-child-button {
