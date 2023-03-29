@@ -42,7 +42,6 @@ async def start(message: types.Message):
             logging.info(f"Ticket {ticket} not found")
             await message.answer("Привет у нас тут скоро новое мероприятие если хочешь зарегайся")
 
-
     await message.answer(ticket + message.from_user.username)
 
 

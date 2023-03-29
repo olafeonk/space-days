@@ -20,7 +20,6 @@ queries = [
         `slot_id` Uint64,
         `event_id` Uint64,
         `start_time` Datetime,
-        `end_time` Datetime,
         `amount` Uint64,
         PRIMARY KEY (`slot_id`, `event_id`)
     )

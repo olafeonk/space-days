@@ -9,13 +9,17 @@ class Email(BaseModel):
 class Event(BaseModel):
     event_id: int
     description: str
+    summary: str
+    title: str
+    location: str
+    age: str | None
+    duration: str | None
 
 
 class Slot(BaseModel):
     slot_id: int
     event_id: int
     start_time: str
-    end_time: str
     amount: int
 
 
@@ -32,7 +36,6 @@ class Child(BaseModel):
     slot_id: int
     first_name: str
     last_name: str
-    age: int
 
 
 class User(BaseModel):
@@ -42,6 +45,7 @@ class User(BaseModel):
     phone: str
     birthdate: str
     email: str
+    age: str
 
 
 class TelegramUser(BaseModel):
