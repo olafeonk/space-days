@@ -11,6 +11,7 @@ import CarouselFadeExample from "../components/Carousel";
 import Form from "react-bootstrap/Form";
 import InfoList from "../components/InfoInNumbers/InfoList";
 import info from "../components/InfoInNumbers/infoObj";
+import InputGroup from "react-bootstrap/InputGroup";
 
 const HomePage = () => (
   <Container>
@@ -27,133 +28,181 @@ const HomePage = () => (
     </ButtonToolbar>
     <Header></Header>
     <Container fluid>
-      <Row className="banner no-gutters">
-        <Col className="d-flex flex-column justify-content-around">
-          <h1>Заголовок</h1>
-          <p>Какое-то описание</p>
+      <Row className="banner">
+        <Col className="d-flex flex-column justify-content-center">
+          <h1>Дни космоса 2023</h1>
+          <p>94 бесплатных мероприятия за 8 дней + большое открытие</p>
           <Button
-            variant="secondary"
-            className="rounded-pill align-self-center"
+            variant="outline-primary"
+            className="rounded-pill align-self-start"
           >
             Зарегистрироваться
           </Button>
         </Col>
         <Col className="d-flex justify-content-center align-items-center">
-          <Image fluid rounded src="./logo512.png"></Image>
+          <Image fluid rounded src="./image/banner_pic.png"></Image>
         </Col>
       </Row>
-      <Row className="about justify-content-between align-items-center" md={4}>
-        <Col>
-          <InfoList info={info} />
+      <Row className="about justify-content-center align-items-center" md={4}>
+        <InfoList info={info} />
+      </Row>
+      <Row className="present justify-content-center">
+        <Col className="d-flex justify-content-center align-items-center">
+          <Image fluid rounded src="./image/present.png"></Image>
+        </Col>
+        <Col className="d-flex flex-column justify-content-center">
+          <h2>Вас ждут подарки!</h2>
+          <p>
+            Получи на открытии или распечатай <a href="#">флаер</a>
+            <br />
+            <br />
+            Посещай мероприятия на неделе с 8 по 16 апреля
+            <br />
+            <br />
+            Собери не менее 5 наклеек
+            <br />
+            <br />
+            Обменяй флаер на призы в Школе Астрономии kantrSkrip
+          </p>
         </Col>
       </Row>
-      <Row className="present">
-        <Row>
-          <Col className="d-flex justify-content-center align-items-center">
-            <Image fluid rounded src="./logo512.png"></Image>
-          </Col>
-          <Col className="d-flex flex-column justify-content-between align-items-center">
-            <h1>Заголовок</h1>
-            <p>Какое-то описание</p>
-            <Button variant="secondary" className="rounded-pill">
-              Подробнее
-            </Button>
-          </Col>
-        </Row>
-      </Row>
-      <Row className="map position-relative justify-content-center">
+      <Row className="map justify-content-center">
         <h2>Этапы мероприятия</h2>
-        <Container className="map__steps">
-          <Container className="position-absolute first">
-            <span>01</span>
-            <Col>
-              <Image fluid src="./logo512.png"></Image>
-              <h3>Расписание</h3>
-              <p>
-                Перейдите на страницу с <a href="#">расписанием мероприятий</a>
-              </p>
-            </Col>
-          </Container>
-          <Container className="position-absolute second">
-            <span>02</span>
-            <Col>
-              <Image fluid src="./logo512.png"></Image>
-              <h3>Регистрация</h3>
-              <p>Запишитесь на нужный день и время</p>
-            </Col>
-          </Container>
-          <Container className="position-absolute third">
-            <span>03</span>
-            <Col>
-              <Image fluid src="./logo512.png"></Image>
-              <h3>Рассылка</h3>
-              <p>
-                <a href="#">Подпишитесь на уведомления</a>, чтобы не пропустить
-                мероприятия
-              </p>
-            </Col>
-          </Container>
-          <Container className="position-absolute fourth">
-            <span>04</span>
-            <Col>
-              <Image fluid src="./logo512.png"></Image>
-              <h3>Мероприятия и призы</h3>
-              <p>
-                Посетите мероприятия и получите фишки за участие<br></br>Так у
-                вас будет больше шансов выиграть призы
-              </p>
-            </Col>
-          </Container>
-        </Container>
+        <Col className="map__steps first">
+          <span>01</span>
+          <Image fluid src="./image/planet_1.png"></Image>
+          <h3>Расписание</h3>
+          <p>
+            Перейдите на страницу с <a href="#">расписанием мероприятий</a>
+          </p>
+        </Col>
+        <Col className="map__steps second">
+          <span>02</span>
+          <Image fluid src="./image/planet_2.png"></Image>
+          <h3>Регистрация</h3>
+          <p>Запишитесь на нужный день и время</p>
+        </Col>
+        <Col className="map__steps third ">
+          <span>03</span>
+          <Image fluid src="./image/planet_4.png"></Image>
+          <h3>Мероприятия и призы</h3>
+          <p>
+            Посетите мероприятия и получите фишки за участие<br></br>Так у вас
+            будет больше шансов выиграть призы
+          </p>
+        </Col>
       </Row>
       <Row className="archive justify-content-center">
-        <h2>Архив</h2>
+        <h2>Дни Космоса 2022</h2>
         <CarouselFadeExample></CarouselFadeExample>
       </Row>
       <Row className="partners d-flex justify-content-center align-items-center gap-3">
-        <h2>Партнеры</h2>
-        <Row className="justify-content-around">
+        <Col className="title">
+          <h2>Партнеры</h2>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
-        </Row>
-        <Row className="justify-content-around">
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
           <Image roundedCircle src="./logo512.png"></Image>
-        </Row>
+        </Col>
+        <Col>
+          <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
+          <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
+          <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
+          <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
+        <Col>
+          <Image roundedCircle src="./logo512.png"></Image>
+        </Col>
       </Row>
       <Row className="registration d-flex justify-content-center">
-        <Button variant="secondary" className="rounded-pill">
-          Зарегистрироваться
-        </Button>
+        <Col>
+          <Button variant="outline-primary" className="rounded-pill">
+            Зарегистрироваться
+          </Button>
+        </Col>
       </Row>
       <Row className="newsletter justify-content-center">
-        <h2>Рассылка</h2>
+        <h2>Подпишитесь на рассылку</h2>
         <Form className="d-flex flex-column justify-content-center align-items-center">
-          <p>Описание</p>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
+          <p>
+            Будь в курсе новостей и получай уведомления о ближайших мероприятиях
+          </p>
+          <InputGroup controlId="formBasicEmail">
+            <InputGroup.Text className="rounded-pill">
+              <Image src="./image/mail.png"></Image>
+            </InputGroup.Text>
             <Form.Control
               type="email"
-              placeholder="Почта"
+              placeholder="Электронная почта"
               className="rounded-pill"
+              aria-label="Email"
+              aria-describedby="basic-addon1"
             />
-          </Form.Group>
-          <Button variant="secondary" type="submit" className="rounded-pill">
-            Подписаться
-          </Button>
+            <Button
+              variant="outline-primary"
+              type="submit"
+              id="button-addon1"
+              className="rounded-pill"
+            >
+              <Image src="./image/arrow.png"></Image>
+            </Button>
+          </InputGroup>
         </Form>
       </Row>
     </Container>
