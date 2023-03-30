@@ -272,58 +272,6 @@
   width: 100%;
 }
 
-.newsletter {
-  padding: 60px;
-  border-radius: 40px;
-  background: #5e7fd6;
-  box-shadow: 6px 6px 15px 0 #2b2ac5;
-  margin-bottom: 100px;
-  color: #fff;
-}
-
-.newsletter input {
-  padding: 20px 50px;
-  border: #4c2ac5 solid 3px;
-}
-
-.newsletter input:focus {
-  z-index: 0 !important;
-  border: #4c2ac5 solid 3px;
-}
-
-.newsletter .input-group {
-  position: relative;
-  max-width: 530px;
-}
-
-.newsletter span {
-  position: absolute;
-  background: none;
-  border: none;
-  height: 100%;
-  padding-left: 18px;
-  z-index: 1 !important;
-}
-
-.newsletter button {
-  position: absolute !important;
-  right: 3px;
-  padding-right: 20px;
-  border: none;
-  height: 100%;
-}
-
-.newsletter button:hover,
-.newsletter button:active {
-  background: none !important;
-}
-
-.newsletter p {
-  padding: auto;
-  height: 111px;
-  width: 100%;
-}
-
 button {
   font-weight: 700 !important;
 }

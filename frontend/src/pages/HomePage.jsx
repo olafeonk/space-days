@@ -177,34 +177,6 @@ const HomePage = () => (
           </Button>
         </Col>
       </Row>
-      <Row className="newsletter justify-content-center">
-        <h2>Подпишитесь на рассылку</h2>
-        <Form className="d-flex flex-column justify-content-center align-items-center">
-          <p>
-            Будь в курсе новостей и получай уведомления о ближайших мероприятиях
-          </p>
-          <InputGroup controlId="formBasicEmail">
-            <InputGroup.Text className="rounded-pill">
-              <Image src="./image/mail.png"></Image>
-            </InputGroup.Text>
-            <Form.Control
-              type="email"
-              placeholder="Электронная почта"
-              className="rounded-pill"
-              aria-label="Email"
-              aria-describedby="basic-addon1"
-            />
-            <Button
-              variant="outline-primary"
-              type="submit"
-              id="button-addon1"
-              className="rounded-pill"
-            >
-              <Image src="./image/arrow.png"></Image>
-            </Button>
-          </InputGroup>
-        </Form>
-      </Row>
     </Container>
     <Footer></Footer>
   </Container>
