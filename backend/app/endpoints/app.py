@@ -229,6 +229,7 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
         query += "DateTime::GetHour(slots.start_time) IN {}\n".format(hours)
     query += "\tORDER BY event_id;"
     result_sets = await repository.execute(query, {})
+    available_tickets = await get_count_available_tickets(repository)
     event_id = 0
     result = []
     event = EventRequest(
@@ -243,8 +244,7 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
             event_id = row.event_id
             result.append(event)
             event = EventRequest(slots=[], **row)
-        event.slots.append(SlotRequest(available_users=(await get_count_available_tickets(repository, row.slot_id)),
-                                       **row))
+        event.slots.append(SlotRequest(available_users=available_tickets[row.slot_id], **row))
 
     result.append(event)
     result.pop(0)
@@ -293,9 +293,9 @@ async def add_user(request: Request, user: UserRequest, response: Response):
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='slot not available')
     old_user = await get_user(repository, user.phone, user.birthdate)
     is_child_event = await is_children_event(repository, user.slot_id)
-    available_tickets = await get_count_available_tickets(repository, user.slot_id)
+    available_tickets = await get_count_available_tickets(repository)
     booked_tickets = len(user.child) + (not is_child_event)
-    if available_tickets < booked_tickets:
+    if available_tickets[user.slot_id] < booked_tickets:
         return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'available ticket {available_tickets} '
                                                                           f'< booked ticket {booked_tickets}')
 

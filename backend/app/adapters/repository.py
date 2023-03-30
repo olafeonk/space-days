@@ -13,15 +13,19 @@ async def get_count_table(repository: Repository, name_table: str) -> int:
     """.format(YDB_DATABASE, name_table), {}))[0].rows[0].count
 
 
-async def get_count_available_tickets(repository: Repository, slot_id: int) -> int:
-    count_ticket = (await repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT SUM(amount) as sum FROM ticket
-    WHERE slot_id = {};
-    """.format(YDB_DATABASE, slot_id), {}))[0].rows[0].sum or 0
-    amount_ticket = (await repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT amount FROM slots
-    WHERE slot_id = {}""".format(YDB_DATABASE, slot_id), {}))[0].rows[0].amount
-    return amount_ticket - count_ticket
+async def get_count_available_tickets(repository: Repository) -> dict[int, int]:
+    result_query = (await repository.execute("""PRAGMA TablePathPrefix("{}");
+    SELECT slots.slot_id AS slot_id, amount - COALESCE(sum,0) AS available_ticket FROM slots
+    LEFT JOIN (
+        SELECT slot_id, SUM(amount) AS sum FROM ticket
+        GROUP BY slot_id) as t
+    ON slots.slot_id = t.slot_id;
+
+    """.format(YDB_DATABASE), {}))[0].rows
+    available_tickets = {}
+    for row in result_query:
+        available_tickets[row.slot_id] = row.available_ticket
+    return available_tickets
 
 
 async def generate_ticket_id(repository: Repository) -> int:
@@ -97,6 +101,7 @@ class Repository:
         await self.driver.wait(fail_fast=True)
 
     async def execute(self, query: str, data: dict):
+        print(query)
         session = await self.pool.acquire()
         prepared_query = await session.prepare(query)
         result_transaction = await session.transaction(ydb.SerializableReadWrite()).execute(
