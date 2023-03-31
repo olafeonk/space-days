@@ -38,7 +38,10 @@ const RegistrationPage = () => {
     phone: "",
     email: "",
     hasChildren: false,
-    children: [],
+    children: [{
+      name: "",
+      age: "",
+    }],
   });
 
   const handleFormChange = useCallback((f) => {
