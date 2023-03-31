@@ -250,7 +250,7 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
 
     result.append(event)
     result.pop(0)
-
+    result.sort(key=lambda x: x.slots[0].start_time)
     return result
 
 
