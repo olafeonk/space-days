@@ -30,7 +30,8 @@ const STATUS_SUCCESS = 2;
 // 6. Запрос на сервер, показываем страницу успеха (со ссылкой записаться еще)
 
 const RegistrationPage = () => {
-  const { status, event, slot } = useEventLoading();
+  const { status, event, slot, setStatus } = useEventLoading();
+  const [ticket, setTicket] = useState(null);
 
   const [form, setForm] = useState({
     surname: "",
@@ -49,7 +50,16 @@ const RegistrationPage = () => {
     setForm(f);
   }, []);
 
-  const handleRegister = async () => {};
+  const handleRegister = async () => {
+    const ticket = await subscribeEvent(slot.slot_id, form);
+    if (ticket) {
+      setStatus(STATUS_SUCCESS);
+      setTicket(ticket);
+    } else {
+      setStatus(STATUS_ERROR);
+      setTicket(null);
+    }
+  };
 
   switch (status) {
     case STATUS_LOADING:
@@ -57,7 +67,7 @@ const RegistrationPage = () => {
     case STATUS_LOADED:
       return renderLoaded(form, event, slot, handleFormChange, handleRegister);
     case STATUS_SUCCESS:
-      return renderSuccess();
+      return renderSuccess(event, slot, ticket);
     default:
       return renderError();
   }
@@ -70,6 +80,7 @@ function renderLoading() {
 function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
   const {title, location, description} = event;
   const dateTime = convertTime(slot.start_time);
+  const registrationDisabled = !checkFormFilled(form);
 
   return (
     <Container>
@@ -94,6 +105,7 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
       <Row>
         <Col>
           <Button
+            disabled={registrationDisabled}
             variant="outline-primary"
             type="submit"
             className="rounded-pill d-flex flex-column justify-content-center align-items-center w-100"
@@ -117,12 +129,45 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
   );
 }
 
-function renderSuccess() {
-  return <h1 style={{textAlign: "center"}}>Успех</h1>;
+function renderSuccess(event, slot, ticket) {
+  // {"ticket_id":289977493,"user_id":2,"slot_id":52,"amount":0}
+  const {title, location} = event;
+  const dateTime = convertTime(slot.start_time);
+  
+  return (
+  <>
+    <h1 style={{textAlign: "center"}}>Ваш билет на мероприятие</h1>
+    <p>№ {ticket.ticket_id}</p>
+    <p>{title}</p>
+    <p>Дата: {convertDate(dateTime.getDate())}</p>
+    <p>Время: {`${padTime(dateTime.getHours())}:${padTime(dateTime.getMinutes())}`}</p>
+    <p>Адрес: {location}</p>
+  </>
+  );
 }
 
 function renderError() {
   return <h1 style={{textAlign: "center"}}>Ошибка</h1>;
+}
+
+function checkFormFilled(form) {
+  const {
+    surname,
+    name,
+    birthdate,
+    phone,
+    email,
+  } = form;
+
+  if (surname && surname.length > 0
+    && name && name.length > 0
+    && birthdate && birthdate.length > 0
+    && phone && phone.length > 0
+    && email && email.length > 0) {
+      return true;
+  }
+
+  return false;
 }
 
 function useEventLoading() {
@@ -156,7 +201,7 @@ function useEventLoading() {
     run();
   }, [query]);
 
-  return { status, event: eventAndSlot.event, slot: eventAndSlot.slot };
+  return { status, event: eventAndSlot.event, slot: eventAndSlot.slot, setStatus };
 }
 
 function convertDate(dayOfMonth) {

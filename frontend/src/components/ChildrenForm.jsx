@@ -43,7 +43,7 @@ const ChildrenForm = ({ form, onChange }) => {
   return (
     <>
       {form.children.map((child, index) => (
-        <>
+        <React.Fragment key={index}>
           <div className="child-label">
             <p className="text-muted mb-0">Ребенок {index + 1}</p>
             <CloseButton onClick={() => handleChildRemoved(index)} />
@@ -53,7 +53,7 @@ const ChildrenForm = ({ form, onChange }) => {
             child={child}
             onChange={(value) => handleChildChanged(value, index)}
           />
-        </>
+        </React.Fragment>
       ))}
       {form.children.length < 3 && (
         <Button

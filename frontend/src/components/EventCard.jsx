@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 const EventCard = ({event, onRegister}) => {
   const [slot, setSlot] = useState(null);
   const handleRegister = () => {
-    onRegister && onRegister(event, slot);
+    slot && onRegister && onRegister(event, slot);
   };
 
   return (
@@ -44,6 +44,7 @@ const EventCard = ({event, onRegister}) => {
         <p>{event.summary}</p>
       </div>
       <Button
+        disabled={!slot}
         variant="outline-primary"
         className="rounded-pill event-card__button"
         onClick={handleRegister}
