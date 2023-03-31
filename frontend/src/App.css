@@ -389,11 +389,31 @@ button {
 }
 
 .dates-row > .col {
-  padding: 0 !important;
+  flex: 0 0 auto;
+  width: auto;
 }
 
 .dates-row {
-  margin: 0 0 60px !important;
+  margin: 0 20px 60px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 15px 20px;
+}
+
+.slot-times {
+  max-width: 440px;
+  min-width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.slots {
+  display: flex;
+  align-items: center;
+}
+
+.slots span {
+  margin-bottom: 10px;
 }
 
 a.date-button {
@@ -401,7 +421,8 @@ a.date-button {
   font-weight: 400 !important;
   border: transparent solid 2px;
   line-height: 30px;
-  padding: 10px 15px;
+  padding: 10px;
+  width: 150px;
 }
 
 a.date-button:hover {
@@ -434,24 +455,33 @@ a.date-button_checked:active {
 .day-title {
   font-size: 70px;
   font-weight: 700;
-  margin: 0 97px 70px;
+  margin: 0 0 30px 30px;
 }
 
 .day-title_h2 {
   font-size: 48px;
-  margin: 0 97px 33px;
+  margin: 0 0 30px 30px;
 }
 
 .time-row {
-  margin: 0 90px 60px !important;
+  margin: 0 0 60px 30px;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  gap: 15px 30px;
+}
+
+.time-row .col {
+  width: auto;
+  flex: 0 0 auto;
 }
 
 .time-button {
-  padding: 5px 20px !important;
   font-size: 24px !important;
   font-weight: 400 !important;
   line-height: 30px;
   border: #b8b8b8 solid 2px !important;
+  width: 96px;
 }
 
 .time-button:hover {
@@ -469,33 +499,24 @@ a.date-button_checked:active {
 }
 
 .events-row {
-  padding: 47px 83px 47px 117px;
-  background-color: #e5e5e5;
+  padding: 50px;
+  background-color: #f8f8f8;
   border-radius: 60px;
-}
-
-.events-row .col {
-  gap: 72px 100px;
-  padding: 0;
+  gap: 70px;
+  margin-bottom: 60px;
 }
 
 .event-card {
   position: relative;
   display: flex;
+  margin-left: 70px;
   flex-direction: column;
   justify-content: space-between;
   background-color: #fff;
   border-radius: 60px;
-  max-width: 520px;
   min-height: 455px;
   padding: 12px 30px 30px;
   box-shadow: 7px 10px 7px 0 rgba(0, 0, 0, 0.25);
-}
-
-.event-card > div {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .event-card__duration {
@@ -506,8 +527,7 @@ a.date-button_checked:active {
   position: absolute;
   height: 100px;
   width: 100px;
-  object-fit: cover;
-  background-color: #5e7fd6;
+  object-fit: contain;
   top: -17px;
   left: -62px;
 }
@@ -516,6 +536,7 @@ a.date-button_checked:active {
   margin: 0 0 0 27px;
   font-weight: 700;
   font-size: 24px;
+  min-height: 60px;
 }
 
 .event-card hr {
@@ -529,10 +550,6 @@ a.date-button_checked:active {
   font-weight: 500;
 }
 
-.event-card span:last-child {
-  margin-bottom: 10px;
-}
-
 span.event-card__title {
   color: #787878;
   font-size: 16px;
@@ -543,8 +560,10 @@ span.event-card__title {
   cursor: pointer;
   font-size: 18px !important;
   font-weight: 500 !important;
-  padding: 5px 10px !important;
-  margin-right: 15px;
+  margin-left: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 65px;
 }
 
 .event-card__button {
@@ -761,6 +780,31 @@ input[type="radio"] {
 @media screen and (max-width: 768px) {
   .header .col {
     justify-content: normal;
+  }
+
+  .slot-times {
+    min-width: 100px;
+  }
+
+  .events-row {
+    padding: 50px 0;
+  }
+
+  .day-title {
+    margin: 0;
+    font-size: 3rem;
+  }
+
+  .event-card {
+    border: #f8f8f8 solid 2px;
+  }
+
+  .event-card h3 {
+    font-size: 20px;
+  }
+
+  .events-row {
+    background: none;
   }
 }
 
