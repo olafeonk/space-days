@@ -111,7 +111,7 @@
 }
 
 .banner h1 {
-  font-size: calc(2.575rem + 1.5vw);
+  font-size: calc(2.3rem + 1.5vw);
   font-weight: 700;
   margin-bottom: 30px;
 }
@@ -123,6 +123,10 @@
 
 .banner button {
   padding: 18px 60px;
+}
+
+button.hidden {
+  display: none;
 }
 
 .about.row {
@@ -245,7 +249,30 @@
 }
 
 .archive {
-  margin: 60px;
+  position: relative;
+  margin: 0 0 60px;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.archive::before,
+.archive::after {
+  background: linear-gradient(to right, #fff, #fff0);
+  content: "";
+  height: 100%;
+  position: absolute;
+  width: 100px;
+  z-index: 2;
+}
+
+.archive::before {
+  left: 0;
+}
+
+.archive::after {
+  right: 0;
+  transform: rotateZ(180deg);
 }
 
 .partners {
@@ -479,6 +506,128 @@ span.event-card__title {
   border: #5777cf solid 2px !important;
 }
 
+/* carousel */
+
+input[type="radio"] {
+  display: none;
+}
+
+.carousel .card {
+  position: absolute;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+  margin: auto;
+  transition: transform 0.4s ease;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.carousel.container {
+  width: 100%;
+  max-width: 30%;
+  height: 450px;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel .cards {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+#item-1:checked ~ .cards #photo-10,
+#item-2:checked ~ .cards #photo-1,
+#item-3:checked ~ .cards #photo-2,
+#item-4:checked ~ .cards #photo-3,
+#item-5:checked ~ .cards #photo-4,
+#item-6:checked ~ .cards #photo-5,
+#item-7:checked ~ .cards #photo-6,
+#item-8:checked ~ .cards #photo-7,
+#item-9:checked ~ .cards #photo-8,
+#item-10:checked ~ .cards #photo-9 {
+  opacity: 1;
+  transform: translatex(-90%) scale(0.75);
+  filter: blur(3px);
+  z-index: 1;
+}
+
+#item-1:checked ~ .cards #photo-2,
+#item-2:checked ~ .cards #photo-3,
+#item-3:checked ~ .cards #photo-4,
+#item-4:checked ~ .cards #photo-5,
+#item-5:checked ~ .cards #photo-6,
+#item-6:checked ~ .cards #photo-7,
+#item-7:checked ~ .cards #photo-8,
+#item-8:checked ~ .cards #photo-9,
+#item-9:checked ~ .cards #photo-10,
+#item-10:checked ~ .cards #photo-1 {
+  opacity: 1;
+  transform: translatex(90%) scale(0.75);
+  filter: blur(3px);
+  z-index: 1;
+}
+
+#item-1:checked ~ .cards #photo-3,
+#item-2:checked ~ .cards #photo-4,
+#item-3:checked ~ .cards #photo-5,
+#item-4:checked ~ .cards #photo-6,
+#item-5:checked ~ .cards #photo-7,
+#item-6:checked ~ .cards #photo-8,
+#item-7:checked ~ .cards #photo-9,
+#item-8:checked ~ .cards #photo-10,
+#item-9:checked ~ .cards #photo-1,
+#item-10:checked ~ .cards #photo-2 {
+  opacity: 1;
+  transform: translatex(156%) scale(0.5);
+  z-index: 0;
+  filter: blur(6px);
+}
+
+#item-1:checked ~ .cards #photo-9,
+#item-2:checked ~ .cards #photo-10,
+#item-3:checked ~ .cards #photo-1,
+#item-4:checked ~ .cards #photo-2,
+#item-5:checked ~ .cards #photo-3,
+#item-6:checked ~ .cards #photo-4,
+#item-7:checked ~ .cards #photo-5,
+#item-8:checked ~ .cards #photo-6,
+#item-9:checked ~ .cards #photo-7,
+#item-10:checked ~ .cards #photo-8 {
+  opacity: 1;
+  transform: translatex(-156%) scale(0.5);
+  z-index: 0;
+  filter: blur(6px);
+}
+
+#item-1:checked ~ .cards #photo-1,
+#item-2:checked ~ .cards #photo-2,
+#item-3:checked ~ .cards #photo-3,
+#item-4:checked ~ .cards #photo-4,
+#item-5:checked ~ .cards #photo-5,
+#item-6:checked ~ .cards #photo-6,
+#item-7:checked ~ .cards #photo-7,
+#item-8:checked ~ .cards #photo-8,
+#item-9:checked ~ .cards #photo-9,
+#item-10:checked ~ .cards #photo-10 {
+  opacity: 1;
+  transform: translatex(0) scale(1);
+  z-index: 2;
+  filter: none;
+}
+
 @media screen and (max-width: 1400px) {
   .header .col {
     width: 100%;
@@ -504,6 +653,14 @@ span.event-card__title {
 }
 
 @media screen and (max-width: 991px) {
+  .container {
+    max-width: 100% !important;
+  }
+
+  .carousel.container {
+    max-width: 60% !important;
+  }
+
   .banner button {
     display: none;
   }
@@ -543,3 +700,9 @@ span.event-card__title {
   }
 }
 
+@media screen and (max-width: 480px) {
+  .carousel.container {
+    max-width: 60% !important;
+    max-height: 300px;
+  }
+}

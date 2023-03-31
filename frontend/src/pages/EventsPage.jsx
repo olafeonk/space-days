@@ -10,7 +10,7 @@ import EventList from "../components/EventList";
 import { padTime } from "../core";
 import { getEventsByDays, getEventsByHours } from "../apis/backend";
 
-const DEFAULT_EVENT_IMAGE = "./image/banner_pic.png";
+const DEFAULT_EVENT_IMAGE = "./image/planet_3.png";
 const TIME_ZONE = 5;
 
 const STATUS_LOADING = 0;
@@ -250,16 +250,19 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     return t;
   });
   const hasSlots = times.some((t) => t.hasSlots);
+  const image = backendEvent.logo
+    ? `./image/partners/${backendEvent.logo}.png`
+    : DEFAULT_EVENT_IMAGE;
 
   const result = {
     id: backendEvent.event_id,
     title: backendEvent.title,
-    image: DEFAULT_EVENT_IMAGE, // где взять?
+    image: image,
     hasSlots: hasSlots,
     date: date,
     times: times,
-    age: "от 5 до 8 лет", // где взять?
-    duration: "10 минут", // где взять?
+    age: backendEvent.age,
+    duration: `${backendEvent.duration} минут`,
     summary: backendEvent.summary,
     description: backendEvent.description,
     location: backendEvent.location, // куда воткнуть
