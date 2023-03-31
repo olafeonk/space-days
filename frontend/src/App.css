@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color-color: #282c34;
+  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -280,12 +280,12 @@ button.hidden {
 
 .archive::before,
 .archive::after {
-  background-color: linear-gradient(to right, #fff, #fff0);
+  background: linear-gradient(to right, #fff, #fff0);
   content: "";
   height: 100%;
   position: absolute;
-  width: 100px;
-  z-index: 2;
+  width: 10px;
+  z-index: 3;
 }
 
 .archive::before {
