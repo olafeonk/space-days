@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -46,7 +46,7 @@
 }
 
 .header {
-  background: #f8f8f8;
+  background-color: #f8f8f8;
   margin: 0 30px;
   border-radius: 0 0 60px 60px;
   box-shadow: 0px 5px 20px 0px rgb(32 32 32 / 10%);
@@ -76,7 +76,7 @@
 .vertical-hr {
   height: 55px;
   width: 2px;
-  background: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .header a:hover {
@@ -156,7 +156,7 @@ button.hidden {
   justify-content: center;
   flex-direction: column;
   border-radius: 40px;
-  background: #5e7fd6;
+  background-color: #5e7fd6;
   min-width: 269px;
   height: 250px;
   color: #fff;
@@ -280,7 +280,7 @@ button.hidden {
 
 .archive::before,
 .archive::after {
-  background: linear-gradient(to right, #fff, #fff0);
+  background-color: linear-gradient(to right, #fff, #fff0);
   content: "";
   height: 100%;
   position: absolute;
@@ -329,7 +329,7 @@ button {
 }
 
 .footer {
-  background: #f8f8f8;
+  background-color: #f8f8f8;
   margin: 0 30px;
   border-radius: 60px 60px 0 0;
   box-shadow: 0px 5px 20px 0px rgb(32 32 32 / 10%);
@@ -396,7 +396,7 @@ button {
   margin: 0 0 60px !important;
 }
 
-button.date-button {
+a.date-button {
   font-size: 24px !important;
   font-weight: 400 !important;
   border: transparent solid 2px;
@@ -404,30 +404,30 @@ button.date-button {
   padding: 10px 15px;
 }
 
-button.date-button:hover {
-  border: #5e7fd6 solid 2px;
-  background: none;
+a.date-button:hover {
+  border: #5e7fd6 solid 2px !important;
+  background-color: none !important;
   color: #000;
 }
 
-button.date-button:active {
+a.date-button:active {
   border: transparent solid 2px !important;
-  background: transparent !important;
+  background-color: transparent !important;
   color: #5e7fd6 !important;
 }
 
-button.date-button_checked {
-  background: #5e7fd6;
+a.date-button_checked {
+  background-color: #5e7fd6;
   color: #fff;
 }
 
-button.date-button_checked:hover {
-  background: #5e7fd6;
+a.date-button_checked:hover {
+  background-color: #5e7fd6;
   color: #fff;
 }
 
-button.date-button_checked:active {
-  background: #5e7fd6 !important;
+a.date-button_checked:active {
+  background-color: #5e7fd6 !important;
   color: #fff !important;
 }
 
@@ -455,7 +455,7 @@ button.date-button_checked:active {
 }
 
 .time-button:hover {
-  background: transparent !important;
+  background-color: transparent !important;
   color: #000 !important;
   border: #868686 solid 2px !important;
 }
@@ -470,7 +470,7 @@ button.date-button_checked:active {
 
 .events-row {
   padding: 47px 83px 47px 117px;
-  background: #e5e5e5;
+  background-color: #e5e5e5;
   border-radius: 60px;
 }
 
@@ -484,7 +484,7 @@ button.date-button_checked:active {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: #fff;
+  background-color: #fff;
   border-radius: 60px;
   max-width: 520px;
   min-height: 455px;
@@ -507,7 +507,7 @@ button.date-button_checked:active {
   height: 100px;
   width: 100px;
   object-fit: cover;
-  background: #5e7fd6;
+  background-color: #5e7fd6;
   top: -17px;
   left: -62px;
 }
@@ -557,11 +557,11 @@ span.event-card__title {
 
 .event-card__button:hover {
   color: #fff !important;
-  background: #5e7fd6 !important;
+  background-color: #5e7fd6 !important;
 }
 
 .event-card__button:active {
-  background: #5777cf !important;
+  background-color: #5777cf !important;
   border: #5777cf solid 2px !important;
 }
 

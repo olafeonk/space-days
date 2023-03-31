@@ -7,6 +7,8 @@ import { LinkContainer } from "react-router-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import EventList from "../components/EventList";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import { padTime, pluralize } from "../core";
 import { getEventsByDays, getEventsByHours } from "../apis/backend";
 
@@ -18,14 +20,14 @@ const STATUS_LOADED = 1;
 const STATUS_SUCCESS = 2;
 
 const dayMap = {
-  8: '8 апреля, суббота',
-  9: '9 апреля, воскресенье',
-  10: '10 апреля, понедельник',
-  11: '11 апреля, вторник',
-  12: '12 апреля, среда',
-  13: '13 апреля, четверг',
-  14: '14 апреля, пятница',
-  15: '15 апреля, суббота',
+  8: "8 апреля, суббота",
+  9: "9 апреля, воскресенье",
+  10: "10 апреля, понедельник",
+  11: "11 апреля, вторник",
+  12: "12 апреля, среда",
+  13: "13 апреля, четверг",
+  14: "14 апреля, пятница",
+  15: "15 апреля, суббота",
 };
 
 const EventsPage = () => {
@@ -35,18 +37,9 @@ const EventsPage = () => {
 
   return (
     <Container className="p-0">
-      <ButtonToolbar className="custom-btn-toolbar">
-        <LinkContainer to="/">
-          <Button>Home</Button>
-        </LinkContainer>
-        <LinkContainer to="/events">
-          <Button>Events</Button>
-        </LinkContainer>
-        <LinkContainer to="/registration">
-          <Button>Registration</Button>
-        </LinkContainer>
-      </ButtonToolbar>
+      <Header />
       {body}
+      <Footer />
     </Container>
   );
 };
@@ -83,7 +76,10 @@ function renderLoaded(content) {
       <Row>
         <Col>
           <h1 className="day-title">День Открытия Фестиваля</h1>
-          <h2 className="day-title_h2">{dayMap[day]}{hour ? `, ${hour}:00` : ""}</h2>
+          <h2 className="day-title_h2">
+            {dayMap[day]}
+            {hour ? `, ${hour}:00` : ""}
+          </h2>
         </Col>
       </Row>
 
@@ -109,70 +105,49 @@ function renderDayMenu(day) {
       </Col>
       <Col>
         <LinkContainer to={{ pathname: "/events", search: "?day=9" }}>
-          <Button
-            className="date-button date-button_checked rounded-pill"
-            variant="outline-dark"
-          >
+          <Button className="date-button rounded-pill" variant="outline-dark">
             9&nbsp;апреля
           </Button>
         </LinkContainer>
       </Col>
       <Col>
         <LinkContainer to={{ pathname: "/events", search: "?day=10" }}>
-          <Button
-            className="date-button date-button_checked rounded-pill"
-            variant="outline-dark"
-          >
+          <Button className="date-button  rounded-pill" variant="outline-dark">
             10&nbsp;апреля
           </Button>
         </LinkContainer>
       </Col>
       <Col>
         <LinkContainer to={{ pathname: "/events", search: "?day=11" }}>
-          <Button
-            className="date-button date-button_checked rounded-pill"
-            variant="outline-dark"
-          >
+          <Button className="date-button  rounded-pill" variant="outline-dark">
             11&nbsp;апреля
           </Button>
         </LinkContainer>
       </Col>
       <Col>
         <LinkContainer to={{ pathname: "/events", search: "?day=12" }}>
-          <Button
-            className="date-button date-button_checked rounded-pill"
-            variant="outline-dark"
-          >
+          <Button className="date-button  rounded-pill" variant="outline-dark">
             12&nbsp;апреля
           </Button>
         </LinkContainer>
       </Col>
       <Col>
         <LinkContainer to={{ pathname: "/events", search: "?day=13" }}>
-          <Button
-            className="date-button date-button_checked rounded-pill"
-            variant="outline-dark"
-          >
+          <Button className="date-button  rounded-pill" variant="outline-dark">
             13&nbsp;апреля
           </Button>
         </LinkContainer>
       </Col>
       <Col>
         <LinkContainer to={{ pathname: "/events", search: "?day=14" }}>
-          <Button
-            className="date-button date-button_checked rounded-pill"
-            variant="outline-dark"
-          >
+          <Button className="date-button  rounded-pill" variant="outline-dark">
             14&nbsp;апреля
           </Button>
         </LinkContainer>
       </Col>
       <Col>
         <LinkContainer to={{ pathname: "/events", search: "?day=15" }}>
-          <Button
-            className="date-button date-button_checked rounded-pill"
-            variant="outline-dark"
-          >
+          <Button className="date-button  rounded-pill" variant="outline-dark">
             15&nbsp;апреля
           </Button>
         </LinkContainer>
@@ -272,7 +247,12 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     date: date,
     times: times,
     age: backendEvent.age,
-    duration: `${backendEvent.duration} ${pluralize(backendEvent.duration, "минута", "минуты", "минут")}`,
+    duration: `${backendEvent.duration} ${pluralize(
+      backendEvent.duration,
+      "минута",
+      "минуты",
+      "минут"
+    )}`,
     summary: backendEvent.summary,
     description: backendEvent.description,
     location: backendEvent.location, // куда воткнуть
@@ -286,7 +266,7 @@ function convertDate(dayOfMonth) {
 }
 
 function convertTime(time) {
-  const t = time.split('+')[0];
+  const t = time.split("+")[0];
   return new Date(t);
 }
 

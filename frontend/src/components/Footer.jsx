@@ -4,7 +4,7 @@ import Image from "react-bootstrap/Image";
 
 const Footer = () => (
   <Row className="footer justify-content-center">
-    <Col md={8} lg={9} xl={10}>
+    <Col md={8} lg={9}>
       <p className="bold gray">
         Мы в социальных сетях:{" "}
         <span>
