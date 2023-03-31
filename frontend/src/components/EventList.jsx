@@ -1,7 +1,8 @@
+import React from "react";
 import EventCard from "./EventCard";
 
-const EventList = ({ events }) => {
-  return events.map((event) => <EventCard event={event} key={event.id} />);
+const EventList = ({ events, onRegister }) => {
+  return events.map((event) => <EventCard event={event} key={event.id} onRegister={onRegister} />);
 };
 
-export default EventList;
+export default React.memo(EventList);
