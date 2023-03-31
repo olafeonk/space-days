@@ -17,7 +17,7 @@ const EventCard = (props) => {
         <div className="slots">
           <span className="event-card__title">Время:</span>{" "}
           <div
-            class="btn-group slot-times"
+            className="btn-group slot-times"
             role="group"
             aria-label="Basic radio toggle button group"
           >

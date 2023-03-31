@@ -58,7 +58,7 @@ function renderBody(status, content) {
 }
 
 function renderLoading() {
-  return <h1>Loading</h1>;
+  return <h1 style={{textAlign: "center"}}>Загрузка</h1>;
 }
 
 function renderLoaded(content) {
@@ -175,11 +175,11 @@ function renderTimeMenu(day, hour) {
 }
 
 function renderSuccess() {
-  return <h1>Success</h1>;
+  return <h1 style={{textAlign: "center"}}>Успех</h1>;
 }
 
 function renderError() {
-  return <h1>Error</h1>;
+  return <h1 style={{textAlign: "center"}}>Ошибка</h1>;
 }
 
 function useLoading() {
