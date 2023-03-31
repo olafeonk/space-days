@@ -9,6 +9,8 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import ParentForm from "../components/ParentForm";
 import { getEvent, subscribeEvent } from "../apis/backend";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const STATUS_LOADING = 0;
 const STATUS_ERROR = -1;
@@ -64,30 +66,19 @@ function renderLoading() {
 function renderLoaded(form, handleFormChange, handleRegister) {
   return (
     <Container>
-      <ButtonToolbar className="custom-btn-toolbar">
-        <LinkContainer to="/">
-          <Button>Home</Button>
-        </LinkContainer>
-        <LinkContainer to="/events">
-          <Button>Events</Button>
-        </LinkContainer>
-        <LinkContainer to="/registration">
-          <Button>Registration</Button>
-        </LinkContainer>
-      </ButtonToolbar>
+      <Header />
       <Row>
         <Col>
           <p>Правила</p>
         </Col>
       </Row>
       <Row>
-        <Col>
+        <Col className="registration-form">
           <ParentForm form={form} onChange={handleFormChange} />
         </Col>
         <Col>
           <h1>Мероприятие</h1>
           <p>Описание</p>
-          <Image fluid rounded src="./logo512.png"></Image>
         </Col>
       </Row>
       <Row>
@@ -111,6 +102,7 @@ function renderLoaded(form, handleFormChange, handleRegister) {
           </p>
         </Col>
       </Row>
+      <Footer />
     </Container>
   );
 }

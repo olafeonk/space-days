@@ -67,6 +67,7 @@ code {
 
 :root {
   --bs-link-color: #5e7fd6;
+  --bs-border-radius: 10px;
 }
 
 @media (min-width: 1400px) {

@@ -1,6 +1,8 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import ChildForm from "../components/ChildForm";
+import Image from "react-bootstrap/Image";
+import CloseButton from "react-bootstrap/CloseButton";
 
 const ChildrenForm = ({ form, onChange }) => {
   const handleAddChild = () => {
@@ -33,7 +35,10 @@ const ChildrenForm = ({ form, onChange }) => {
     <>
       {form.children.map((child, index) => (
         <>
-          <p className="text-muted mb-0">Ребенок {index + 1}</p>
+          <div className="child-label">
+            <p className="text-muted mb-0">Ребенок {index + 1}</p>
+            <CloseButton />
+          </div>
           <hr className="text-muted mt-0" />
           <ChildForm
             child={child}
@@ -47,26 +52,7 @@ const ChildrenForm = ({ form, onChange }) => {
           className="add-child-button rounded-circle d-flex m-auto border"
           onClick={handleAddChild}
         >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 28 28"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M16 1L16 31"
-              stroke="#A4A4A4"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-            <path
-              d="M1 16H31"
-              stroke="#A4A4A4"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
+          <Image src="./image/plus.png" alt="кнопка добавить"></Image>
         </Button>
       )}
     </>
