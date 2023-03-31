@@ -16,9 +16,9 @@ const EventCard = (props) => {
         </div>
         <div>
           <span className="event-card__title">Время:</span>{" "}
-          {event.times.map((it) => (
+          {event.times.map((it, index) => (
             <span
-              key={it.time}
+              key={index}
               className="event-card__time time-button rounded-pill"
             >
               {it.time}

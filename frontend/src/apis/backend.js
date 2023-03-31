@@ -43,10 +43,10 @@ export async function getEventsByDays(days) {
     }
 }
 
-export async function getEventsByHours(hours) {
+export async function getEventsByHours(day, hours) {
     if (API_BASE_URL) {
         const hoursQuery = hours.map(d => `hours=${d}`).join('&');
-        const response = await fetch(`${API_BASE_URL}/events/?${hoursQuery}`, {
+        const response = await fetch(`${API_BASE_URL}/events/?days=${day}&${hoursQuery}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

@@ -7,16 +7,26 @@ import { LinkContainer } from "react-router-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import EventList from "../components/EventList";
-import { padTime } from "../core";
+import { padTime, pluralize } from "../core";
 import { getEventsByDays, getEventsByHours } from "../apis/backend";
 
 const DEFAULT_EVENT_IMAGE = "./image/planet_3.png";
-const TIME_ZONE = 5;
 
 const STATUS_LOADING = 0;
 const STATUS_ERROR = -1;
 const STATUS_LOADED = 1;
 const STATUS_SUCCESS = 2;
+
+const dayMap = {
+  8: '8 апреля, суббота',
+  9: '9 апреля, воскресенье',
+  10: '10 апреля, понедельник',
+  11: '11 апреля, вторник',
+  12: '12 апреля, среда',
+  13: '13 апреля, четверг',
+  14: '14 апреля, пятница',
+  15: '15 апреля, суббота',
+};
 
 const EventsPage = () => {
   const { status, content } = useLoading();
@@ -60,6 +70,7 @@ function renderLoading() {
 
 function renderLoaded(content) {
   const { events, day, hour } = content;
+
   return (
     <>
       <Row>
@@ -72,7 +83,7 @@ function renderLoaded(content) {
       <Row>
         <Col>
           <h1 className="day-title">День Открытия Фестиваля</h1>
-          <h2 className="day-title_h2">8 апреля, суббота</h2>
+          <h2 className="day-title_h2">{dayMap[day]}{hour ? `, ${hour}:00` : ""}</h2>
         </Col>
       </Row>
 
@@ -215,9 +226,8 @@ function useLoading() {
         dayParameter && !hourParameter ? parseInt(dayParameter, 10) : 8;
       const hour = hourParameter ? parseInt(hourParameter, 10) : null;
 
-      // todo возможно в getEventsByHours надо будет передавать [day]
       const backendEvents = hour
-        ? await getEventsByHours([hour - TIME_ZONE])
+        ? await getEventsByHours(day, [hour])
         : await getEventsByDays([day]);
       if (!backendEvents) {
         setStatus(STATUS_ERROR);
@@ -239,10 +249,10 @@ function useLoading() {
 function convertEvent(backendEvent, dayOfMonthNumber) {
   const date = convertDate(dayOfMonthNumber);
   const backendSlots = backendEvent.slots.filter((s) => {
-    return new Date(s.start_time).getDate() === dayOfMonthNumber;
+    return convertTime(s.start_time).getDate() === dayOfMonthNumber;
   });
   const times = backendSlots.map((s) => {
-    const d = new Date(s.start_time);
+    const d = convertTime(s.start_time);
     const t = {
       time: `${padTime(d.getHours())}:${padTime(d.getMinutes())}`,
       hasSlots: s.available_users > 0,
@@ -262,7 +272,7 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     date: date,
     times: times,
     age: backendEvent.age,
-    duration: `${backendEvent.duration} минут`,
+    duration: `${backendEvent.duration} ${pluralize(backendEvent.duration, "минута", "минуты", "минут")}`,
     summary: backendEvent.summary,
     description: backendEvent.description,
     location: backendEvent.location, // куда воткнуть
@@ -273,6 +283,11 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
 
 function convertDate(dayOfMonth) {
   return `${padTime(dayOfMonth)}.04.2023`;
+}
+
+function convertTime(time) {
+  const t = time.split('+')[0];
+  return new Date(t);
 }
 
 export default EventsPage;
