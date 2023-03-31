@@ -51,6 +51,7 @@ class EventRequest(BaseModel):
     title: str
     age: str | None
     duration: str | None
+    id_partner: str
     slots: list[SlotRequest]
 
 
@@ -238,6 +239,7 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
         location='',
         summary='',
         title='',
+        id_partner='',
         slots=[SlotRequest(slot_id=0, start_time=datetime.now(), amount=0)])
     for row in result_sets[0].rows:
         if event_id != row.event_id:

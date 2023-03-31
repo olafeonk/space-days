@@ -75,6 +75,7 @@ async def get_user_by_ticket(repository: Repository, ticket_id: int) -> model.Us
         WHERE ticket.ticket_id = {};
         """.format(YDB_DATABASE, ticket_id), {}))[0].rows
     if user:
+        print(user[0])
         return model.User(**user[0])
 
 
@@ -87,7 +88,30 @@ async def get_tg_user(repository: Repository, telegram_id: int) -> model.Telegra
         return model.TelegramUser(**tg_user[0])
 
 
-# TODO save tg user
+async def save_tg_user(repository: Repository, telegram_user: model.TelegramUser) -> None:
+    print(telegram_user.dict())
+    await repository.execute("""PRAGMA TablePathPrefix("{}");
+    
+        DECLARE $tgUserData AS List<Struct<
+            tg_user_id: Uint64,
+            user_id: Uint64,
+            first_name: Utf8,
+            last_name: Utf8?,
+            telegram_id: Int64,
+            username: Utf8,
+            type_user: Utf8>>;
+        
+        INSERT INTO tg_user
+        SELECT
+            tg_user_id,
+            user_id,
+            first_name,
+            last_name,
+            telegram_id,
+            username,
+            type_user
+        FROM AS_TABLE($tgUserData);
+    """.format(YDB_DATABASE), {"$tgUserData": [telegram_user]})
 
 
 class Repository:
@@ -99,6 +123,7 @@ class Repository:
 
     async def connect(self):
         await self.driver.wait(fail_fast=True)
+        return self
 
     async def execute(self, query: str, data: dict):
         print(query)
