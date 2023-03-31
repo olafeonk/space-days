@@ -175,7 +175,6 @@ button.hidden {
 
 .present img {
   width: 440px;
-  height: 430px;
   object-fit: contain;
 }
 
@@ -777,7 +776,31 @@ input[type="radio"] {
 
   .map p,
   .map h3 {
-    margin-left: 30px;
     text-align: left;
+  }
+
+  .map h2,
+  .archive h2,
+  .partners h2,
+  .present h2 {
+    font-size: 2rem;
+  }
+
+  .banner,
+  .present {
+    padding: 60px 10px 0;
+  }
+
+  .header,
+  .footer {
+    margin: 0;
+  }
+
+  .map__steps img {
+    margin: 25px -25px 15px 25px;
+  }
+
+  .present {
+    gap: 50px;
   }
 }
