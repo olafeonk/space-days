@@ -5,3 +5,4 @@ fastapi~=0.94.0
 python-dotenv~=1.0.0
 ydb[yc]
 email_validator
+aiogram

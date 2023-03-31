@@ -45,7 +45,6 @@ class User(BaseModel):
     phone: str
     birthdate: str
     email: str
-    age: str
 
 
 class TelegramUser(BaseModel):

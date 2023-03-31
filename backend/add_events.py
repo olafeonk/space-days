@@ -16,7 +16,8 @@ DECLARE $eventData AS List<Struct<
     is_children: bool,
     location: Utf8,
     summary: Utf8,
-    title: Utf8>>;
+    title: Utf8,
+    id_partner: Utf8>>;
 
 DECLARE $slotData AS List<Struct<
     slot_id: Uint64,
@@ -33,7 +34,8 @@ SELECT
     is_children,
     location,
     summary,
-    title
+    title,
+    id_partner
 FROM AS_TABLE($eventData);
 
 INSERT INTO slots
@@ -55,6 +57,7 @@ class Event(BaseModel):
     age: str
     duration: str
     is_children: bool
+    id_partner: str
 
 
 class Slot(BaseModel):
@@ -65,11 +68,13 @@ class Slot(BaseModel):
 
 
 def timestamp_to_str(start_time):
+    print("Start time", start_time)
     return f"{start_time.year}-{start_time.month}-{start_time.day}T{start_time.hour}:{start_time.minute}:{start_time.second}Z"
 
 
 def get_data() -> tuple[list[Event], list[Slot]]:
     data = pd.read_excel("space_days1.xlsx")
+    print(data)
     events = []
     slot_counter = 0
     slots = []
@@ -82,8 +87,10 @@ def get_data() -> tuple[list[Event], list[Slot]]:
             location=row['Место мероприятия'],
             age=row['Возраст участников'],
             duration=row['Продолжительность'],
+            id_partner=row['ID партнера'],
             is_children=row['Только для детей'] == 'да'
         )
+        print(row['Время начала'], row['количество людей в определенный слот'])
         slots_1 = [Slot(event_id=index, slot_id=slot_counter,
                         start_time=timestamp_to_str(row['Время начала']), amount=row['количество людей в определенный слот'])]
         slot_counter += 1
@@ -98,8 +105,9 @@ def get_data() -> tuple[list[Event], list[Slot]]:
             else:
                 break
         slots.extend(slots_1)
-        # if event.event_id == nan or event.description == nan or event.summary == nan or event.title == nan or event.location == nan or event.age == nan or event.duration == nan or event.is_children == nan or event.is_children == nan:
-        #     print(event)
+        nan = "nan"
+        if event.event_id == nan or event.description == nan or event.summary == nan or event.title == nan or event.location == nan or event.age == nan or event.duration == nan or event.is_children == nan or event.is_children == nan:
+            print(event)
         events.append(event)
     return events, slots
 
