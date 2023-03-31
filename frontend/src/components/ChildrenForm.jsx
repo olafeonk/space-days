@@ -20,6 +20,15 @@ const ChildrenForm = ({ form, onChange }) => {
     onChange(newForm);
   };
 
+  const handleChildRemoved = (index) => {
+    const newChildren = form.children.filter((v, i) => index !== i);
+    const newForm = {
+      ...form,
+      children: newChildren,
+    };
+    onChange(newForm);
+  };
+
   const handleChildChanged = (child, index) => {
     const newChildren = form.children.map((it, i) =>
       i === index ? child : it
@@ -37,7 +46,7 @@ const ChildrenForm = ({ form, onChange }) => {
         <>
           <div className="child-label">
             <p className="text-muted mb-0">Ребенок {index + 1}</p>
-            <CloseButton />
+            <CloseButton onClick={() => handleChildRemoved(index)} />
           </div>
           <hr className="text-muted mt-0" />
           <ChildForm

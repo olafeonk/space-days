@@ -9,6 +9,7 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import ParentForm from "../components/ParentForm";
 import { getEvent, subscribeEvent } from "../apis/backend";
+import { padTime } from "../core";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -38,7 +39,10 @@ const RegistrationPage = () => {
     phone: "",
     email: "",
     hasChildren: false,
-    children: [],
+    children: [{
+      name: "",
+      age: "",
+    }],
   });
 
   const handleFormChange = useCallback((f) => {
@@ -51,7 +55,7 @@ const RegistrationPage = () => {
     case STATUS_LOADING:
       return renderLoading();
     case STATUS_LOADED:
-      return renderLoaded(form, handleFormChange, handleRegister);
+      return renderLoaded(form, event, slot, handleFormChange, handleRegister);
     case STATUS_SUCCESS:
       return renderSuccess();
     default:
@@ -63,7 +67,10 @@ function renderLoading() {
   return <h1 style={{textAlign: "center"}}>Загрузка</h1>;
 }
 
-function renderLoaded(form, handleFormChange, handleRegister) {
+function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
+  const {title, location, description} = event;
+  const dateTime = convertTime(slot.start_time);
+
   return (
     <Container>
       <Header />
@@ -77,8 +84,11 @@ function renderLoaded(form, handleFormChange, handleRegister) {
           <ParentForm form={form} onChange={handleFormChange} />
         </Col>
         <Col>
-          <h1>Мероприятие</h1>
-          <p>Описание</p>
+          <h1>{title}</h1>
+          <p>Дата: {convertDate(dateTime.getDate())}</p>
+          <p>Время: {`${padTime(dateTime.getHours())}:${padTime(dateTime.getMinutes())}`}</p>
+          <p>Адрес: {location}</p>
+          <p>{description}</p>
         </Col>
       </Row>
       <Row>
@@ -147,6 +157,15 @@ function useEventLoading() {
   }, [query]);
 
   return { status, event: eventAndSlot.event, slot: eventAndSlot.slot };
+}
+
+function convertDate(dayOfMonth) {
+  return `${padTime(dayOfMonth)}.04.2023`;
+}
+
+function convertTime(time) {
+  const t = time.split("+")[0];
+  return new Date(t);
 }
 
 export default RegistrationPage;
