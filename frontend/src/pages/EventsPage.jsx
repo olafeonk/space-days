@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
@@ -32,8 +32,12 @@ const dayMap = {
 
 const EventsPage = () => {
   const { status, content } = useLoading();
+  const navigate = useNavigate();
+  const handleRegister = useCallback((event, time) => {
+    navigate(`/registration?eventId=${event.id}&slotId=${time.slotId}`);
+  }, [status, content])
 
-  const body = renderBody(status, content);
+  const body = renderBody(status, content, handleRegister);
 
   return (
     <Container className="p-0">
@@ -44,12 +48,12 @@ const EventsPage = () => {
   );
 };
 
-function renderBody(status, content) {
+function renderBody(status, content, handleRegister) {
   switch (status) {
     case STATUS_LOADING:
       return renderLoading();
     case STATUS_LOADED:
-      return renderLoaded(content);
+      return renderLoaded(content, handleRegister);
     case STATUS_SUCCESS:
       return renderSuccess();
     default:
@@ -61,7 +65,7 @@ function renderLoading() {
   return <h1 style={{textAlign: "center"}}>Загрузка</h1>;
 }
 
-function renderLoaded(content) {
+function renderLoaded(content, handleRegister) {
   const { events, day, hour } = content;
 
   return (
@@ -81,9 +85,8 @@ function renderLoaded(content) {
         </Col>
       </Row>
       {day === 8 && renderTimeMenu(day, hour)}
-
       <Row className="events-row justify-content-between">
-        <EventList events={events} />
+        <EventList events={events} onRegister={handleRegister} />
       </Row>
     </>
   );
@@ -156,11 +159,11 @@ function renderDayMenu(day) {
 }
 
 function renderTimeMenu(day, hour) {
-  const hours = [9, 10, 11, 12, 13, 14, 15];
+  const hours = [11, 12, 13, 14, 15];
   return (
     <Row className="time-row">
       {hours.map((h) => (
-        <Col>
+        <Col key={h}>
           <LinkContainer
             to={{ pathname: "/events", search: `?day=${day}&hour=${h}` }}
           >
@@ -226,11 +229,12 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     const d = convertTime(s.start_time);
     const t = {
       time: `${padTime(d.getHours())}:${padTime(d.getMinutes())}`,
-      hasSlots: s.available_users > 0,
+      hasSeats: s.available_users > 0,
+      slotId: s.slot_id
     };
     return t;
   });
-  const hasSlots = times.some((t) => t.hasSlots);
+  const hasSeats = times.some((t) => t.hasSeats);
   const image = backendEvent.id_partner
     ? `./image/partners/${backendEvent.id_partner}.png`
     : DEFAULT_EVENT_IMAGE;
@@ -239,7 +243,7 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     id: backendEvent.event_id,
     title: backendEvent.title,
     image: image,
-    hasSlots: hasSlots,
+    hasSeats: hasSeats,
     date: date,
     times: times.sort((a, b) => (a.time > b.time) - (a.time < b.time)),
     age: backendEvent.age,
@@ -251,7 +255,7 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     )}`,
     summary: backendEvent.summary,
     description: backendEvent.description,
-    location: backendEvent.location, // куда воткнуть
+    location: backendEvent.location,
   };
 
   return result;

@@ -1,9 +1,14 @@
+import React, { useState } from "react";
 import Image from "react-bootstrap/Image";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
-const EventCard = (props) => {
-  const { event } = props;
+const EventCard = ({event, onRegister}) => {
+  const [slot, setSlot] = useState(null);
+  const handleRegister = () => {
+    onRegister && onRegister(event, slot);
+  };
+
   return (
     <Col className="event-card" as={"article"}>
       <Image fluid rounded src={event.image}></Image>
@@ -21,14 +26,7 @@ const EventCard = (props) => {
             role="group"
             aria-label="Basic radio toggle button group"
           >
-            {event.times.sort().map((it, index) => (
-              <span
-                key={index}
-                className="event-card__time time-button rounded-pill"
-              >
-                {it.time}
-              </span>
-            ))}
+            {renderSlots(event.times, slot, setSlot)}
           </div>
         </div>
         <div>
@@ -48,11 +46,40 @@ const EventCard = (props) => {
       <Button
         variant="outline-primary"
         className="rounded-pill event-card__button"
+        onClick={handleRegister}
       >
         Зарегистрироваться
       </Button>
     </Col>
   );
 };
+
+function renderSlots(times, slot, setSlot) {
+  const result = times.sort().map((it, index) => {
+    if (!it.hasSeats) {
+      return (
+        <span
+          key={index}
+          className="event-card__time time-button rounded-pill time-button_disabled"
+        >
+          {it.time}
+        </span>
+      )
+    }
+
+    const className = `event-card__time time-button rounded-pill ${it.slotId === (slot && slot.slotId) ? ' time-button_checked' : ''}`;
+    return (
+      <span
+        key={index}
+        className={className}
+        onClick={() => setSlot(it)}
+      >
+        {it.time}
+      </span>
+    )
+  });
+
+  return result;
+}
 
 export default EventCard;

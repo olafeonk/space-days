@@ -498,6 +498,18 @@ a.date-button_checked:active {
   border: #5e7fd6 solid 2px !important;
 }
 
+.time-button.time-button_disabled {
+  border:  #cccccc solid 2px !important;
+  background-color: #eeeeee;
+  color: #cccccc !important;
+}
+
+.time-button.time-button_disabled:hover {
+  border:  #cccccc solid 2px !important;
+  background-color: #eeeeee;
+  color: #cccccc !important;
+}
+
 .events-row {
   padding: 50px;
   background-color: #f8f8f8;
