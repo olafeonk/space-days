@@ -68,11 +68,10 @@ function renderLoaded(content) {
     <>
       <Row>
         <Col>
-          <p>Инфографика</p>
+          <p></p>
         </Col>
       </Row>
       {renderDayMenu(day)}
-      {day === 8 && renderTimeMenu(day, hour)}
       <Row>
         <Col>
           <h1 className="day-title">День Открытия Фестиваля</h1>
@@ -82,8 +81,9 @@ function renderLoaded(content) {
           </h2>
         </Col>
       </Row>
+      {day === 8 && renderTimeMenu(day, hour)}
 
-      <Row className="events-row">
+      <Row className="events-row justify-content-between">
         <EventList events={events} />
       </Row>
     </>
@@ -165,10 +165,7 @@ function renderTimeMenu(day, hour) {
           <LinkContainer
             to={{ pathname: "/events", search: `?day=${day}&hour=${h}` }}
           >
-            <Button
-              variant="outline-dark"
-              className="time-button rounded-pill time-button_checked"
-            >
+            <Button variant="outline-dark" className="time-button rounded-pill">
               {`${padTime(h)}:00`}
             </Button>
           </LinkContainer>
@@ -235,8 +232,8 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     return t;
   });
   const hasSlots = times.some((t) => t.hasSlots);
-  const image = backendEvent.logo
-    ? `./image/partners/${backendEvent.logo}.png`
+  const image = backendEvent.id_partner
+    ? `./image/partners/${backendEvent.id_partner}.png`
     : DEFAULT_EVENT_IMAGE;
 
   const result = {
@@ -245,7 +242,7 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     image: image,
     hasSlots: hasSlots,
     date: date,
-    times: times,
+    times: times.sort((a, b) => (a.time > b.time) - (a.time < b.time)),
     age: backendEvent.age,
     duration: `${backendEvent.duration} ${pluralize(
       backendEvent.duration,

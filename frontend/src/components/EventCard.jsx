@@ -6,7 +6,7 @@ const EventCard = (props) => {
   const { event } = props;
   return (
     <Col className="event-card" as={"article"}>
-      <Image fluid roundedCircle src={event.image}></Image>
+      <Image fluid rounded src={event.image}></Image>
       <div>
         <h3>{event.title}</h3>
         <hr></hr>
@@ -14,16 +14,22 @@ const EventCard = (props) => {
           <span className="event-card__title">Дата:</span>{" "}
           <span>{event.date}</span>
         </div>
-        <div>
+        <div className="slots">
           <span className="event-card__title">Время:</span>{" "}
-          {event.times.map((it, index) => (
-            <span
-              key={index}
-              className="event-card__time time-button rounded-pill"
-            >
-              {it.time}
-            </span>
-          ))}
+          <div
+            class="btn-group slot-times"
+            role="group"
+            aria-label="Basic radio toggle button group"
+          >
+            {event.times.sort().map((it, index) => (
+              <span
+                key={index}
+                className="event-card__time time-button rounded-pill"
+              >
+                {it.time}
+              </span>
+            ))}
+          </div>
         </div>
         <div>
           <span className="event-card__title">Возраст:</span>{" "}
@@ -32,6 +38,10 @@ const EventCard = (props) => {
         <div className="event-card__duration">
           <span className="event-card__title">Продолжительность:</span>{" "}
           <span>{event.duration}</span>
+        </div>
+        <div className="event-card__location">
+          <span className="event-card__title">Место мероприятия:</span>{" "}
+          <span>{event.location}</span>
         </div>
         <p>{event.summary}</p>
       </div>
