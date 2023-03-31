@@ -4,7 +4,7 @@ import Image from "react-bootstrap/Image";
 
 const Footer = () => (
   <Row className="footer justify-content-center">
-    <Col md={8} lg={9}>
+    <Col>
       <p className="bold gray">
         Мы в социальных сетях:{" "}
         <span>
@@ -25,12 +25,6 @@ const Footer = () => (
         По всем вопросам можете писать в{" "}
         <a href="https://t.me/dni_kosmosa">телеграм-поддержку</a>
       </p>
-    </Col>
-    <Col>
-      <p className="bold gray">Контакты</p>
-      <a href="tel:+79222106000" className="tel">
-        8-922-210-60-00
-      </a>
     </Col>
     <Col xs={12}>
       <hr />
