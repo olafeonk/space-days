@@ -16,7 +16,7 @@ const Footer = () => (
           </a>
         </span>
       </p>
-      <p>
+      <p className="bot">
         <a href="#" className="bold">
           Телеграм-бот для проверки билетов
         </a>
