@@ -50,15 +50,17 @@
   margin: 0 30px;
   border-radius: 0 0 60px 60px;
   box-shadow: 0px 5px 20px 0px rgb(32 32 32 / 10%);
-  padding: 30px;
+  padding: 30px 10px;
   text-transform: uppercase;
 }
 
 .header .col {
-  padding: 0;
+  padding: 0 20px;
   flex: 0 0 auto;
   width: auto;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header a {
@@ -67,16 +69,28 @@
   margin-right: 20px;
 }
 
+.header .col a:last-child {
+  margin-right: 0;
+}
+
+.vertical-hr {
+  height: 55px;
+  width: 2px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
 .header a:hover {
   color: #000;
 }
 
-.header .school-logo {
+.header div a:nth-child(2) {
   font-weight: 700;
+  display: block;
 }
 
-.header .school-logo a {
-  margin-right: 10px;
+.molodeznaya a:nth-child(2) {
+  font-size: 10px;
+  max-width: 250px;
 }
 
 .banner {
@@ -172,40 +186,27 @@
 
 .map {
   padding: 60px;
-  flex-direction: column;
-  align-items: center;
+  text-align: center;
 }
 
 .map h2 {
   margin-bottom: 30px;
   font-weight: 700;
   font-size: 3rem;
-  width: auto;
+  width: 100%;
+  text-align: center;
 }
 
 .map h3 {
   margin-bottom: 15px;
   font-weight: 700;
-  font-size: 2rem;
+  font-size: 1.75rem;
   width: auto;
+  text-align: left;
 }
 
 .map__steps {
-  height: 1010px;
-  width: auto;
   margin-left: 70px;
-}
-
-.map__steps.first {
-  align-self: flex-start !important;
-}
-
-.map__steps.second {
-  align-self: center !important;
-}
-
-.map__steps.third {
-  align-self: flex-end !important;
 }
 
 .map__steps span {
@@ -218,6 +219,7 @@
   max-width: 300px;
   font-size: 20px;
   margin-bottom: 0;
+  text-align: left;
 }
 
 .map__steps img {
@@ -233,6 +235,7 @@
   font-weight: 700;
   width: auto;
   margin-bottom: 30px;
+  z-index: 3;
 }
 
 .partners .title {
@@ -246,19 +249,19 @@
 }
 
 .partners {
-  padding: 20px 60px 60px;
+  padding: 20px 0 60px;
 }
 
 .partners img {
-  width: 90px;
-  height: 90px;
+  width: 160px;
+  height: 160px;
+  margin-right: 50px;
   object-fit: contain;
-  background: #d9d9d9;
   padding: 0;
 }
 
 .registration {
-  padding: 60px;
+  padding: 0 60px 60px;
 }
 
 .registration .col {
@@ -475,3 +478,68 @@ span.event-card__title {
   background: #5777cf !important;
   border: #5777cf solid 2px !important;
 }
+
+@media screen and (max-width: 1400px) {
+  .header .col {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .header .col a:last-child {
+    order: 999;
+    margin-left: auto;
+  }
+
+  .vertical-hr {
+    width: 100%;
+    height: 2px;
+    margin: 20px 0;
+  }
+}
+
+@media screen and (max-width: 1199px) {
+  .banner h1 {
+    font-size: calc(1.375rem + 1.5vw);
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .banner button {
+    display: none;
+  }
+
+  .banner p {
+    margin-bottom: 20px;
+  }
+
+  .registration button,
+  .banner button.hidden {
+    padding: 18px 0.75rem;
+    width: 100%;
+  }
+
+  .banner button.hidden {
+    display: block;
+    width: 100%;
+  }
+
+  .banner .col {
+    width: 100%;
+  }
+
+  .map__steps p,
+  .map__steps h3 {
+    text-align: center;
+  }
+
+  .map__steps p {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .header .col {
+    justify-content: normal;
+  }
+}
+
