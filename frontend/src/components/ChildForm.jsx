@@ -16,7 +16,7 @@ const ChildForm = ({ child, onChange }) => (
       <Form.Label>Возраст</Form.Label>
       <Form.Control
         type="number"
-        className="rounded age"
+        className="rounded"
         value={child.age}
         onChange={(event) => onChange({ ...child, age: event.target.value })}
       />

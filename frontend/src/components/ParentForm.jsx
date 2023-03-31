@@ -1,6 +1,7 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import ChildrenForm from "../components/ChildrenForm";
+import Image from "react-bootstrap/Image";
 
 const ParentForm = ({ form, onChange }) => {
   return (
@@ -47,6 +48,13 @@ const ParentForm = ({ form, onChange }) => {
           onChange={(event) => onChange({ ...form, phone: event.target.value })}
         />
       </Form.Group>
+      <div className="rounded-pill warning">
+        <Image src="./image/warning.png" alt="внимание"></Image>
+        <p>
+          На <span>один номер телефона</span> можно зарегистрировать максимум{" "}
+          <span>себя и 3 детей</span>
+        </p>
+      </div>
       <Form.Group controlId="formEmail">
         <Form.Label>Почта</Form.Label>
         <Form.Control
@@ -59,13 +67,22 @@ const ParentForm = ({ form, onChange }) => {
       <Form.Group controlId="formCheckbox">
         <Form.Check
           type="checkbox"
-          className="mb-5"
+          className="mb-3"
           label="Есть ребенок/дети"
           checked={form.hasChildren}
           onChange={(event) =>
             onChange({ ...form, hasChildren: event.target.checked })
           }
         />
+        {form.hasChildren && (
+          <div className="rounded-pill warning">
+            <Image src="./image/warning.png" alt="внимание"></Image>
+            <p>
+              Регистрировать ребенка может только{" "}
+              <span>родитель/законный представитель!</span>
+            </p>
+          </div>
+        )}
         {form.hasChildren && <ChildrenForm form={form} onChange={onChange} />}
       </Form.Group>
     </Form>
