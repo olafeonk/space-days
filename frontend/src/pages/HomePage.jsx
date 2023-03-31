@@ -1,7 +1,5 @@
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
-import { LinkContainer } from "react-router-bootstrap";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Row from "react-bootstrap/Row";
@@ -23,12 +21,17 @@ const HomePage = () => (
           lg={5}
         >
           <h1>Дни космоса 2023</h1>
+          <p>
+            При поддержке УПРАВЛЕНИя МОЛОДЕЖНОЙ ПОЛИТИКИ администрации города
+            Екатеринбурга
+          </p>
           <p>94 бесплатных мероприятия за 8 дней + большое открытие</p>
           <Button
             variant="outline-primary"
             className="rounded-pill align-self-start"
+            disabled
           >
-            Зарегистрироваться
+            Регистрация откроется 1 апреля
           </Button>
         </Col>
         <Col
@@ -42,8 +45,9 @@ const HomePage = () => (
           <Button
             variant="outline-primary"
             className="rounded-pill align-self-start hidden"
+            disabled
           >
-            Зарегистрироваться
+            Регистрация откроется 1 апреля
           </Button>
         </Col>
       </Row>
@@ -56,18 +60,17 @@ const HomePage = () => (
         </Col>
         <Col className="d-flex flex-column justify-content-center">
           <h2>Вас ждут подарки!</h2>
-          <p>
-            Получи на открытии или распечатай <a href="#">флаер</a>
-            <br />
-            <br />
-            Посещай мероприятия на неделе с 8 по 16 апреля
-            <br />
-            <br />
-            Собери не менее 5 наклеек
-            <br />
-            <br />
-            Обменяй флаер на призы в Школе Астрономии kantrSkrip
-          </p>
+          <ul>
+            <li>
+              Получи на открытии или распечатай{" "}
+              <a href="https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1gx5O5gpuFQXjbfWIMpKBZ5PukoSQ3IbN">
+                флаер
+              </a>
+            </li>
+            <li>Посещай мероприятия на неделе с 8 по 16 апреля</li>
+            <li>Собери не менее 5 наклеек</li>
+            <li>Обменяй флаер на призы в Школе Астрономии kantrSkrip</li>
+          </ul>
         </Col>
       </Row>
       <Row className="map justify-content-between">
@@ -76,10 +79,7 @@ const HomePage = () => (
           <span>01</span>
           <Image fluid src="./image/planet_1.png"></Image>
           <h3>Расписание</h3>
-          <p>
-            Перейдите на страницу с{" "}
-            <a href="#/events">расписанием мероприятий</a>
-          </p>
+          <p>Перейдите на страницу срасписанием мероприятий</p>
         </Col>
         <Col className="map__steps" md={12} lg={3}>
           <span>02</span>
@@ -111,8 +111,8 @@ const HomePage = () => (
       </Row>
       <Row className="registration d-flex justify-content-center">
         <Col>
-          <Button variant="outline-primary" className="rounded-pill">
-            Зарегистрироваться
+          <Button variant="outline-primary" className="rounded-pill" disabled>
+            Регистрация откроется 1 апреля
           </Button>
         </Col>
       </Row>
