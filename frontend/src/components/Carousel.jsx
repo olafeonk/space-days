@@ -1,31 +1,52 @@
-import Carousel from "react-bootstrap/Carousel";
+import Container from "react-bootstrap/Container";
 
-function CarouselFadeExample() {
+function Carousel() {
   return (
-    <Carousel fade>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://avatars.mds.yandex.net/i?id=c8d31dd9a9897445828fb10c36be8b187745f7be-9227998-images-thumbs&n=13"
-          alt="First slide"
-        />
-      </Carousel.Item>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://avatars.mds.yandex.net/i?id=cc4e2f1f4f09158221743025329af4ca-5324012-images-thumbs&n=13"
-          alt="Second slide"
-        />
-      </Carousel.Item>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://avatars.mds.yandex.net/i?id=0c670d31502301d380aab4424e7aba789ce584ad-8187767-images-thumbs&n=13"
-          alt="Third slide"
-        />
-      </Carousel.Item>
-    </Carousel>
+    <Container className="carousel">
+      <input type="radio" name="slider" id="item-1" defaultChecked={true} />
+      <input type="radio" name="slider" id="item-2" />
+      <input type="radio" name="slider" id="item-3" />
+      <input type="radio" name="slider" id="item-4" />
+      <input type="radio" name="slider" id="item-5" />
+      <input type="radio" name="slider" id="item-6" />
+      <input type="radio" name="slider" id="item-7" />
+      <input type="radio" name="slider" id="item-8" />
+      <input type="radio" name="slider" id="item-9" />
+      <input type="radio" name="slider" id="item-10" />
+      <div className="cards">
+        <label className="card" htmlFor="item-1" id="photo-1">
+          <img src="./image/2022/1.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-2" id="photo-2">
+          <img src="./image/2022/2.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-3" id="photo-3">
+          <img src="./image/2022/3.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-4" id="photo-4">
+          <img src="./image/2022/4.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-5" id="photo-5">
+          <img src="./image/2022/5.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-6" id="photo-6">
+          <img src="./image/2022/6.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-7" id="photo-7">
+          <img src="./image/2022/7.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-8" id="photo-8">
+          <img src="./image/2022/8.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-9" id="photo-9">
+          <img src="./image/2022/9.png" alt="дни космоса 2022" />
+        </label>
+        <label className="card" htmlFor="item-10" id="photo-10">
+          <img src="./image/2022/10.png" alt="дни космоса 2022" />
+        </label>
+      </div>
+    </Container>
   );
 }
 
-export default CarouselFadeExample;
+export default Carousel;
