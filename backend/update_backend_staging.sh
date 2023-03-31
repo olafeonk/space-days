@@ -44,10 +44,11 @@ docker push $new_image_name;
 
 yc sls container revisions deploy \
     --container-id ${SPACE_DAYS_BACKEND_CONTAINER_ID} \
-    --memory 128M \
+    --memory 512M \
     --cores 1 \
-    --execution-timeout 5s \
-    --concurrency 4 \
+    --execution-timeout 10s \
+    --concurrency 8 \
+    --min-instances 1 \
     --environment ENDPOINT=${ENDPOINT},DB=${DB},SA_KEY_FILE=${YDB_SERVICE_ACCOUNT_KEY_FILE_CREDENTIALS} \
     --service-account-id ${SERVICE_ACCOUNT_ID} \
     --image "$new_image_name";
