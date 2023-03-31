@@ -77,7 +77,6 @@ function renderLoaded(content) {
           <h1 className="day-title">День Открытия Фестиваля</h1>
           <h2 className="day-title_h2">
             {dayMap[day]}
-            {hour ? `, ${hour}:00` : ""}
           </h2>
         </Col>
       </Row>

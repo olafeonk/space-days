@@ -228,7 +228,7 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
         if id is not None or days:
             query += " AND "
         query += "DateTime::GetHour(slots.start_time) IN {}\n".format(hours)
-    query += "\tORDER BY event_id;"
+    query += "\tORDER BY event_id, start_time;"
     result_sets = await repository.execute(query, {})
     available_tickets = await get_count_available_tickets(repository)
     event_id = 0
@@ -250,7 +250,7 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
 
     result.append(event)
     result.pop(0)
-
+    result.sort(key=lambda x: x.slots[0].start_time)
     return result
 
 
