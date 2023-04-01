@@ -77,6 +77,15 @@ class TicketRequest(BaseModel):
     birthdate: date
 
 
+class TicketResponse(BaseModel):
+    ticket_id: int
+    user_id: str
+    slot_id: int
+    amount: int
+    user_data: str
+    child: int
+
+
 class UserEventsRequest(BaseModel):
     event_id: int
     slot_id: int
@@ -408,7 +417,14 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
                            "$ticketData": [ticket],
                        })
     logger.info("Success Query")
-    return ticket
+    return TicketResponse(
+        ticket_id=ticket.ticket_id,
+        user_id=ticket.user_id,
+        slot_id=ticket.slot_id,
+        amount=ticket.amount,
+        user_data=ticket.user_data,
+        child=len(childs),
+    )
 
 
 @router.post('/api/tickets/my')
