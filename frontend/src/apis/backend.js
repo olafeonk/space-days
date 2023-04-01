@@ -65,7 +65,7 @@ export async function getEventsByHours(day, hours) {
     }
 }
 
-export async function subscribeEvent(slotId, form) {
+export async function subscribeEvent(slotId, form, force = false) {
     if (API_BASE_URL) {
         const body = {
             first_name: form.name,
@@ -80,6 +80,7 @@ export async function subscribeEvent(slotId, form) {
                 }))
                 : [],
             slot_id: slotId,
+            force_registration: force,
         };
 
         const response = await fetch(`${API_BASE_URL}/events/subscribe`, {

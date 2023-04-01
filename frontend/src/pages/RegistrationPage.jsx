@@ -9,6 +9,9 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import ParentForm from "../components/ParentForm";
 import { getEvent, subscribeEvent } from "../apis/backend";
+import { padTime } from "../core";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const STATUS_LOADING = 0;
 const STATUS_ERROR = -1;
@@ -27,7 +30,8 @@ const STATUS_SUCCESS = 2;
 // 6. Запрос на сервер, показываем страницу успеха (со ссылкой записаться еще)
 
 const RegistrationPage = () => {
-  const { status, event, slot } = useEventLoading();
+  const { status, event, slot, setStatus } = useEventLoading();
+  const [ticket, setTicket] = useState(null);
 
   const [form, setForm] = useState({
     surname: "",
@@ -36,63 +40,72 @@ const RegistrationPage = () => {
     phone: "",
     email: "",
     hasChildren: false,
-    children: [],
+    children: [{
+      name: "",
+      age: "",
+    }],
   });
 
   const handleFormChange = useCallback((f) => {
     setForm(f);
   }, []);
 
-  const handleRegister = async () => {};
+  const handleRegister = async () => {
+    const ticket = await subscribeEvent(slot.slot_id, form);
+    if (ticket) {
+      setStatus(STATUS_SUCCESS);
+      setTicket(ticket);
+    } else {
+      setStatus(STATUS_ERROR);
+      setTicket(null);
+    }
+  };
 
   switch (status) {
     case STATUS_LOADING:
       return renderLoading();
     case STATUS_LOADED:
-      return renderLoaded(form, handleFormChange, handleRegister);
+      return renderLoaded(form, event, slot, handleFormChange, handleRegister);
     case STATUS_SUCCESS:
-      return renderSuccess();
+      return renderSuccess(event, slot, ticket);
     default:
       return renderError();
   }
 };
 
 function renderLoading() {
-  return <h1>Loading</h1>;
+  return <h1 style={{textAlign: "center"}}>Загрузка</h1>;
 }
 
-function renderLoaded(form, handleFormChange, handleRegister) {
+function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
+  const {title, location, description} = event;
+  const dateTime = convertTime(slot.start_time);
+  const registrationDisabled = !checkFormFilled(form);
+
   return (
     <Container>
-      <ButtonToolbar className="custom-btn-toolbar">
-        <LinkContainer to="/">
-          <Button>Home</Button>
-        </LinkContainer>
-        <LinkContainer to="/events">
-          <Button>Events</Button>
-        </LinkContainer>
-        <LinkContainer to="/registration">
-          <Button>Registration</Button>
-        </LinkContainer>
-      </ButtonToolbar>
+      <Header />
       <Row>
         <Col>
           <p>Правила</p>
         </Col>
       </Row>
       <Row>
-        <Col>
+        <Col className="registration-form">
           <ParentForm form={form} onChange={handleFormChange} />
         </Col>
         <Col>
-          <h1>Мероприятие</h1>
-          <p>Описание</p>
-          <Image fluid rounded src="./logo512.png"></Image>
+          <h1>{title}</h1>
+          <p>Дата: {convertDate(dateTime.getDate())}</p>
+          <p>Время: {`${padTime(dateTime.getHours())}:${padTime(dateTime.getMinutes())}`}</p>
+          <p>Адрес: {location}</p>
+          <p>{description}</p>
         </Col>
       </Row>
       <Row>
         <Col>
           <Button
+            disabled={registrationDisabled}
             variant="outline-primary"
             type="submit"
             className="rounded-pill d-flex flex-column justify-content-center align-items-center w-100"
@@ -111,16 +124,50 @@ function renderLoaded(form, handleFormChange, handleRegister) {
           </p>
         </Col>
       </Row>
+      <Footer />
     </Container>
   );
 }
 
-function renderSuccess() {
-  return <h1>Success</h1>;
+function renderSuccess(event, slot, ticket) {
+  // {"ticket_id":289977493,"user_id":2,"slot_id":52,"amount":0}
+  const {title, location} = event;
+  const dateTime = convertTime(slot.start_time);
+  
+  return (
+  <>
+    <h1 style={{textAlign: "center"}}>Ваш билет на мероприятие</h1>
+    <p>№ {ticket.ticket_id}</p>
+    <p>{title}</p>
+    <p>Дата: {convertDate(dateTime.getDate())}</p>
+    <p>Время: {`${padTime(dateTime.getHours())}:${padTime(dateTime.getMinutes())}`}</p>
+    <p>Адрес: {location}</p>
+  </>
+  );
 }
 
 function renderError() {
-  return <h1>Error</h1>;
+  return <h1 style={{textAlign: "center"}}>Ошибка</h1>;
+}
+
+function checkFormFilled(form) {
+  const {
+    surname,
+    name,
+    birthdate,
+    phone,
+    email,
+  } = form;
+
+  if (surname && surname.length > 0
+    && name && name.length > 0
+    && birthdate && birthdate.length > 0
+    && phone && phone.length > 0
+    && email && email.length > 0) {
+      return true;
+  }
+
+  return false;
 }
 
 function useEventLoading() {
@@ -154,7 +201,16 @@ function useEventLoading() {
     run();
   }, [query]);
 
-  return { status, event: eventAndSlot.event, slot: eventAndSlot.slot };
+  return { status, event: eventAndSlot.event, slot: eventAndSlot.slot, setStatus };
+}
+
+function convertDate(dayOfMonth) {
+  return `${padTime(dayOfMonth)}.04.2023`;
+}
+
+function convertTime(time) {
+  const t = time.split("+")[0];
+  return new Date(t);
 }
 
 export default RegistrationPage;

@@ -324,6 +324,10 @@ button.hidden {
   width: 100%;
 }
 
+.registration-form .text-muted {
+  font-size: 25px;
+}
+
 button {
   font-weight: 700 !important;
 }
@@ -383,9 +387,15 @@ button {
 }
 
 .add-child-button {
-  height: 38px;
-  width: 38px;
-  padding: 4px !important;
+  height: 50px;
+  width: 50px;
+  padding: 0;
+  margin-bottom: 50px !important;
+}
+
+.add-child-button img {
+  margin: auto;
+  height: 30px;
 }
 
 .dates-row > .col {
@@ -498,6 +508,18 @@ a.date-button_checked:active {
   border: #5e7fd6 solid 2px !important;
 }
 
+.time-button.time-button_disabled {
+  border:  #cccccc solid 2px !important;
+  background-color: #eeeeee;
+  color: #cccccc !important;
+}
+
+.time-button.time-button_disabled:hover {
+  border:  #cccccc solid 2px !important;
+  background-color: #eeeeee;
+  color: #cccccc !important;
+}
+
 .events-row {
   padding: 50px;
   background-color: #f8f8f8;
@@ -582,6 +604,51 @@ span.event-card__title {
 .event-card__button:active {
   background-color: #5777cf !important;
   border: #5777cf solid 2px !important;
+}
+
+.registration-form input {
+  height: 50px;
+  margin-bottom: 20px;
+}
+
+.form-control {
+  border: 3px solid #ced4da;
+}
+
+.form-control:focus {
+  border-color: #5e7fd6;
+  box-shadow: 0 0 0 0.25rem #5e7fd640;
+}
+
+.form-check-input:checked {
+  background-color: #5e7fd6;
+  border-color: #5e7fd6;
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem #5e7fd640;
+}
+
+.registration-form p,
+.registration-form label {
+  font-size: 30px;
+}
+
+.registration-form .form-check {
+  line-height: 30px;
+}
+
+.registration-form .form-check-input {
+  height: 30px;
+  width: 30px;
+  margin-top: 0;
+  margin-right: 15px;
+}
+
+.child-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* carousel */

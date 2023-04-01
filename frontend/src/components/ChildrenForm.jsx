@@ -1,6 +1,8 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import ChildForm from "../components/ChildForm";
+import Image from "react-bootstrap/Image";
+import CloseButton from "react-bootstrap/CloseButton";
 
 const ChildrenForm = ({ form, onChange }) => {
   const handleAddChild = () => {
@@ -11,6 +13,15 @@ const ChildrenForm = ({ form, onChange }) => {
         age: "",
       },
     ];
+    const newForm = {
+      ...form,
+      children: newChildren,
+    };
+    onChange(newForm);
+  };
+
+  const handleChildRemoved = (index) => {
+    const newChildren = form.children.filter((v, i) => index !== i);
     const newForm = {
       ...form,
       children: newChildren,
@@ -32,14 +43,17 @@ const ChildrenForm = ({ form, onChange }) => {
   return (
     <>
       {form.children.map((child, index) => (
-        <>
-          <p className="text-muted mb-0">Ребенок {index + 1}</p>
+        <React.Fragment key={index}>
+          <div className="child-label">
+            <p className="text-muted mb-0">Ребенок {index + 1}</p>
+            <CloseButton onClick={() => handleChildRemoved(index)} />
+          </div>
           <hr className="text-muted mt-0" />
           <ChildForm
             child={child}
             onChange={(value) => handleChildChanged(value, index)}
           />
-        </>
+        </React.Fragment>
       ))}
       {form.children.length < 3 && (
         <Button
@@ -47,26 +61,7 @@ const ChildrenForm = ({ form, onChange }) => {
           className="add-child-button rounded-circle d-flex m-auto border"
           onClick={handleAddChild}
         >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 28 28"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M16 1L16 31"
-              stroke="#A4A4A4"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-            <path
-              d="M1 16H31"
-              stroke="#A4A4A4"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
+          <Image src="./image/plus.png" alt="кнопка добавить"></Image>
         </Button>
       )}
     </>

@@ -3,11 +3,11 @@ import Form from "react-bootstrap/Form";
 
 const ChildForm = ({ child, onChange }) => (
   <Container className="p-0">
-    <Form.Group className="mb-3" controlId="formLastName">
+    <Form.Group controlId="formLastName">
       <Form.Label>Имя</Form.Label>
       <Form.Control
         type="text"
-        className="rounded-pill"
+        className="rounded"
         value={child.name}
         onChange={(event) => onChange({ ...child, name: event.target.value })}
       />
@@ -16,7 +16,7 @@ const ChildForm = ({ child, onChange }) => (
       <Form.Label>Возраст</Form.Label>
       <Form.Control
         type="number"
-        className="rounded-pill"
+        className="rounded age"
         value={child.age}
         onChange={(event) => onChange({ ...child, age: event.target.value })}
       />

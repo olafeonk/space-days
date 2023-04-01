@@ -11,7 +11,7 @@ const Footer = () => (
           <a href="https://t.me/+BGVoanm9OLxjNzRi" className="img-link">
             <Image src="./image/tg.png" alt="telegram" />
           </a>
-          <a href="https://vk.com/dnikosmosa2022" className="img-link">
+          <a href="https://vk.com/dnikosmosa2023" className="img-link">
             <Image src="./image/vk.png" alt="vkontakte" />
           </a>
         </span>
