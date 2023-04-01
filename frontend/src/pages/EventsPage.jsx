@@ -83,8 +83,14 @@ function renderLoaded(content, handleRegister) {
       {renderDayMenu(day)}
       <Row>
         <Col>
-          <h1 className="day-title">День Открытия Фестиваля</h1>
-          <h2 className="day-title_h2">{dayMap[day]}</h2>
+          {day === 8 ? (
+            <>
+              <h1 className="day-title">День Открытия Фестиваля</h1>
+              <h2 className="day-title_h2">{dayMap[day]}</h2>
+            </>
+          ) : (
+            <h1 className="day-title">{dayMap[day]}</h1>
+          )}
         </Col>
       </Row>
       {day === 8 && renderTimeMenu(day, hour)}
