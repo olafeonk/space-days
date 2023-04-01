@@ -90,8 +90,7 @@ def get_data() -> tuple[list[Event], list[Slot]]:
             id_partner=row['ID партнера'],
             is_children=row['Только для детей'] == 'да'
         )
-        print(row['Время начала'], row['количество людей в определенный слот'])
-        slots_1 = [Slot(event_id=index, slot_id=slot_counter,
+        slots_1 = [Slot(event_id=row['id'], slot_id=slot_counter,
                         start_time=timestamp_to_str(row['Время начала']), amount=row['количество людей в определенный слот'])]
         slot_counter += 1
         for i in range(1, 12):
@@ -99,12 +98,13 @@ def get_data() -> tuple[list[Event], list[Slot]]:
             start_time = row[f'Время начала.{i}']
             if amount != float('nan') and not pd.isnull(start_time) :
                 slots_1.append(
-                    Slot(event_id=index, slot_id=slot_counter,
+                    Slot(event_id=row['id'], slot_id=slot_counter,
                          start_time=timestamp_to_str(start_time), amount=amount))
                 slot_counter += 1
             else:
                 break
         slots.extend(slots_1)
+        print(slots)
         nan = "nan"
         if event.event_id == nan or event.description == nan or event.summary == nan or event.title == nan or event.location == nan or event.age == nan or event.duration == nan or event.is_children == nan or event.is_children == nan:
             print(event)

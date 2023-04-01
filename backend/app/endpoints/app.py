@@ -361,15 +361,17 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         if not force_registration:
             response.status_code = status.HTTP_409_CONFLICT
             logger.warning(f"User {old_user.user_id} already registered on slot {user.slot_id}")
-            return HTTPException(status_code=status.HTTP_409_CONFLICT, detail='user already registered')
+            return HTTPException(status_code=status.HTTP_409_CONFLICT, detail='user already registered',
+                                 headers={'reason': 'already_registered'})
     is_child_event = is_children_event(repository, user.slot_id)
     available_tickets = get_count_available_tickets(repository)
     booked_tickets = max(len(childs) + (not is_child_event), 1)
     if available_tickets[user.slot_id] < booked_tickets:
-        logger.warning(f'available ticket {available_tickets} < booked ticket {booked_tickets}')
+        logger.warning(f'available ticket {available_tickets[user.slot_id]} < booked ticket {booked_tickets}')
         return HTTPException(status_code=status.HTTP_409_CONFLICT,
                              detail=f'available ticket {available_tickets[user.slot_id]} '
-                                    f'< booked ticket {booked_tickets}')
+                                    f'< booked ticket {booked_tickets}',
+                             headers={'reason': 'no_tickets', 'amount': available_tickets[user.slot_id]})
 
     user_n = str(uuid.uuid4())
     if old_user:
