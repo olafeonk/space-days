@@ -83,6 +83,10 @@ export async function subscribeEvent(slotId, form, force = false) {
             force_registration: force,
         };
 
+        if (!form.hasChildren) {
+            delete body.child;
+        }
+
         const response = await fetch(`${API_BASE_URL}/events/subscribe`, {
             method: "POST",
             headers: {
