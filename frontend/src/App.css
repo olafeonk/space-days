@@ -842,6 +842,12 @@ span.event-card__title {
   padding: 0 30px 25px;
 }
 
+.ticket__seats {
+  font-weight: 700;
+  font-size: 20px;
+  padding: 0 30px 25px;
+}
+
 .ticket__info {
   padding: 25px 30px 30px;
   border-top: #a4a4a4 solid 2px;

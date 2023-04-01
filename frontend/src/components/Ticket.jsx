@@ -1,8 +1,8 @@
 import { Container } from "react-bootstrap";
-import { padTime } from "../core";
+import { padTime, pluralize } from "../core";
 import Image from "react-bootstrap/Image";
 
-const Ticket = ({event, slot, ticket}) => {
+const Ticket = ({ event, slot, ticket }) => {
   const { title, location } = event;
   const dateTime = convertTime(slot.start_time);
   return (
@@ -28,9 +28,8 @@ const Ticket = ({event, slot, ticket}) => {
             <span>Адрес: </span>
             {location}
           </p>
-          <p className="ticket__location">
-            <span>Количество участников: </span>
-            {ticket.amount}
+          <p className="ticket__seats">
+            {`${ticket.amount} ${pluralize(ticket.amount, 'участник', 'участника', 'участников')}`}
           </p>
           <p className="ticket__info">
             Для того, чтобы пройти на мероприятие — назовите номер билета
@@ -48,7 +47,8 @@ const Ticket = ({event, slot, ticket}) => {
 };
 
 function formatTicketId(ticketId) {
-  return `${ticketId.substr(0, 3)} ${ticketId.substr(3, 3)} ${ticketId.substr(6)}`;
+  const str = `${ticketId}`;
+  return `${str.substr(0, 3)} ${str.substr(3, 3)} ${str.substr(6)}`;
 }
 
 function convertDate(dayOfMonth) {
