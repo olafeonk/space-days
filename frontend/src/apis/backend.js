@@ -95,9 +95,12 @@ export async function subscribeEvent(slotId, form, force = false) {
             body: JSON.stringify(body),
         });
 
-        if (response.ok) {
-            const result = await response.json();
-            return result;
+        if (response.ok || response.status === 409 || response.status === 422) {
+            return {
+                ok: response.ok,
+                status: response.status,
+                body: await response.json()
+            };
         } else {
             console.log("HTTP error: " + response.status);
             return {

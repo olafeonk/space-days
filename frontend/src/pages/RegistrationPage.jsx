@@ -7,7 +7,7 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import ParentForm from "../components/ParentForm";
 import { getEvent, subscribeEvent } from "../apis/backend";
-import { padTime } from "../core";
+import { padTime, pluralize } from "../core";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Ticket from "../components/Ticket";
@@ -36,22 +36,37 @@ const RegistrationPage = () => {
 
   const handleRegister = async () => {
     const result = await subscribeEvent(slot.slot_id, form);
-    if (result.status) {
-      if (result.status === 422) {
-        setErrorMessage("Ошибка в заполнении формы");
-      } else {
-        setErrorMessage(null);
-        setStatus(STATUS_ERROR);
-        setTicket(null);
-      }
-    }
-    else {
-      const ticket = result;
+    if (result.ok) {
+      const ticket = result.body;
       setErrorMessage(null);
       setStatus(STATUS_SUCCESS);
       setTicket(ticket);
       saveForm(form);
+      return;
     }
+
+    if (result.status === 409) {
+      const reason = result.body && result.body.headers && result.body.headers.reason;
+      const amount = result.body && result.body.headers && result.body.headers.amount;
+      if (reason === "already_registered") {
+        setErrorMessage("Вы уже регистрировались на это мероприятие");
+      } else if (reason === "no_tickets") {
+        const msg = `${pluralize(amount, 'Остался', 'Осталось', 'Осталось')} только ${amount} ${pluralize(amount, 'билет', 'билета', 'билетов')}`;
+        setErrorMessage(msg);
+      } else {
+        setErrorMessage("Конфликт при регистрации");
+      }
+      return;
+    }
+
+    if (result.status === 422) {
+      setErrorMessage("Ошибка в заполнении формы");
+      return;
+    }
+
+    setErrorMessage(null);
+    setStatus(STATUS_ERROR);
+    setTicket(null);
   };
 
   switch (status) {
@@ -141,7 +156,7 @@ function renderLoaded(form, event, slot, errorMessage, handleFormChange, handleR
             </a>
             .
           </p>
-          <h3 class={"text-danger"} style={{ textAlign: "center", padding: 10 }}>{errorMessage}</h3>
+          <h3 className={"text-danger"} style={{ textAlign: "center", padding: 10 }}>{errorMessage}</h3>
         </Col>
       </Row>
       <Footer />
