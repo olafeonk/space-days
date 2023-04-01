@@ -42,6 +42,9 @@ const Ticket = ({ event, slot, ticket }) => {
           Вся необходимая информация о мероприятии будет выслана на вашу почту
         </p>
       </div>
+      <div style={{ textAlign: "center", padding: 20, fontSize: 24 }}>
+          <a href="/#/events">Записаться еще</a>
+      </div>
     </Container>
   );
 };
