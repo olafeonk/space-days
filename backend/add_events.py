@@ -73,14 +73,14 @@ def timestamp_to_str(start_time):
 
 
 def get_data() -> tuple[list[Event], list[Slot]]:
-    data = pd.read_excel("space_days1.xlsx")
+    data = pd.read_excel("space_days2.xlsx")
     print(data)
     events = []
     slot_counter = 0
     slots = []
     for index, row in data.iterrows():
         event = Event(
-            event_id=index,
+            event_id=row['id'],
             description=row['Полное описание'],
             summary=row['Краткое описание'],
             title=row['Название мероприятия'],
@@ -97,7 +97,7 @@ def get_data() -> tuple[list[Event], list[Slot]]:
         for i in range(1, 12):
             amount = row[f'количество людей в определенный слот.{i}']
             start_time = row[f'Время начала.{i}']
-            if amount != float('nan') and not pd.isnull(start_time):
+            if amount != float('nan') and not pd.isnull(start_time) :
                 slots_1.append(
                     Slot(event_id=index, slot_id=slot_counter,
                          start_time=timestamp_to_str(start_time), amount=amount))
