@@ -1,22 +1,26 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import uvicorn
 from pydantic import BaseModel, EmailStr
 from datetime import datetime, date
-from ..config import YDB_DATABASE
+from ..config import YDB_DATABASE, API_TOKEN
 from ..adapters.repository import (
     get_count_table,
     generate_ticket_id,
     Repository,
     get_count_available_tickets,
     is_children_event, get_user,
-    is_available_slot
+    is_available_slot,
+    is_user_already_registration,
+    update_data_user
 )
 import app.domain.model as model
-
+import aiohttp
 router = APIRouter()
 
 
@@ -29,7 +33,6 @@ class SlotRequest(BaseModel):
 
 class ChildRequest(BaseModel):
     first_name: str
-    last_name: str
     age: int
 
 
@@ -119,7 +122,7 @@ DECLARE $userData AS List<Struct<
     first_name: Utf8,
     last_name: Utf8,
     phone: Utf8,
-    birthdate: Utf8,
+    birthdate: Date,
     email: Utf8>>;
 
 DECLARE $childData AS List<Struct<
@@ -127,22 +130,22 @@ DECLARE $childData AS List<Struct<
     user_id: Uint64,
     slot_id: Uint64,
     first_name: Utf8,
-    last_name: Utf8,
     age: Uint8>>;
 
 DECLARE $ticketData AS List<Struct<
     ticket_id: Uint64,
     slot_id: Uint64,
     user_id: Uint64,
-    amount: Uint64>>;
+    amount: Uint64,
+    user_data: Utf8>>;
     
-INSERT INTO user
+UPSERT INTO user
 SELECT
     user_id,
     first_name,
     last_name,
     phone,
-    CAST(birthdate AS Date) AS birthdate,
+    birthdate,
     email
 FROM AS_TABLE($userData);
 
@@ -152,7 +155,6 @@ SELECT
     user_id,
     slot_id,
     first_name,
-    last_name,
     age
 FROM AS_TABLE($childData);
 
@@ -161,7 +163,8 @@ SELECT
     ticket_id,
     user_id,
     slot_id,
-    amount
+    amount,
+    user_data
 FROM AS_TABLE($ticketData);
 """
 
@@ -173,6 +176,23 @@ INNER JOIN event
 ON event.event_id = slots.event_id
 WHERE user_id = {}
 """
+
+
+async def send_email(email: str, first_name: str, last_name: str, ticket: int):
+    headers = {'Authorization': f'Bearer {API_TOKEN}', 'Content-Type': 'application/json'}
+    data = {
+        "to": email,
+        "params": {
+            "first_name": first_name,
+            "last_name": last_name,
+            "ticket": ticket,
+        }
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post('https://api.notisend.ru/v1/email/templates/782569/messages',
+                                headers=headers, json=data) as r:
+            result = await r.json()
+            print(result)
 
 
 @router.get("/api/test")
@@ -284,36 +304,59 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
 #             await pool.release(session)
 
 
+def refactor_phone(phone: str) -> str:
+    correct_phone = ''
+    for char in phone:
+        if char.isdigit():
+            correct_phone += char
+    if len(correct_phone) == 10:
+        return correct_phone
+    if len(correct_phone) == 11 and correct_phone[0] in '78':
+        return correct_phone[1:]
+    raise TypeError
+
+
 @router.post('/api/events/subscribe')
-async def add_user(request: Request, user: UserRequest, response: Response):
+async def add_user(request: Request, user: UserRequest, response: Response, force_registration: bool = False):
     repository: Repository = request.app.repository
+    user_response = user.__repr__()
+    print(user_response)
+    try:
+        phone = refactor_phone(user.phone)
+    except TypeError as err:
+        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        print("ERROR:", err, "phone:", user.phone)
+        return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='invalid phone')
     if len(user.child) > 3:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='too more child')
     if not await is_available_slot(repository, slot_id=user.slot_id):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='slot not available')
-    old_user = await get_user(repository, user.phone, user.birthdate)
+    old_user = await get_user(repository, phone)
+    if old_user and await is_user_already_registration(repository, user.slot_id, old_user.user_id):
+        if not force_registration:
+            response.status_code = status.HTTP_409_CONFLICT
+            return HTTPException(status_code=status.HTTP_409_CONFLICT, detail='user already registered')
     is_child_event = await is_children_event(repository, user.slot_id)
     available_tickets = await get_count_available_tickets(repository)
-    booked_tickets = len(user.child) + (not is_child_event)
+    booked_tickets = max(len(user.child) + (not is_child_event), 1)
     if available_tickets[user.slot_id] < booked_tickets:
         return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'available ticket {available_tickets} '
                                                                           f'< booked ticket {booked_tickets}')
 
-    user_n = await get_count_table(repository, "user") + 1
+    user_n = await get_count_table(repository, "user")
     if old_user:
         user_n = old_user.user_id
+    print(old_user)
     child_n = await get_count_table(repository, "child")
     children = []
     for child in user.child:
-        child_n += 1
         children.append(model.Child(
             child_id=child_n,
             user_id=user_n,
             slot_id=user.slot_id,
             first_name=child.first_name,
-            last_name=child.last_name,
             age=child.age,
         ))
     ticket = model.Ticket(
@@ -321,16 +364,19 @@ async def add_user(request: Request, user: UserRequest, response: Response):
         user_id=user_n,
         slot_id=user.slot_id,
         amount=booked_tickets,
+        user_data=user_response,
     )
-    if not old_user:
-        user = model.User(
-            user_id=user_n,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            phone=user.phone,
-            birthdate=user.birthdate.strftime('%Y-%m-%d'),
-            email=user.email,
-        )
+    user = model.User(
+        user_id=user_n,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        phone=phone,
+        birthdate=user.birthdate.strftime('%Y-%m-%d'),
+        email=user.email,
+    )
+    print(children)
+    print(user)
+    print(ticket)
     await repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
                              {
                                  "$childData": children,

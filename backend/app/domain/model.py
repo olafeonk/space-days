@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from datetime import date
 
 class Email(BaseModel):
     id: int
@@ -28,6 +28,7 @@ class Ticket(BaseModel):
     user_id: int
     slot_id: int
     amount: int
+    user_data: str
 
 
 class Child(BaseModel):
@@ -35,7 +36,7 @@ class Child(BaseModel):
     user_id: int
     slot_id: int
     first_name: str
-    last_name: str
+    age: int
 
 
 class User(BaseModel):
@@ -43,7 +44,7 @@ class User(BaseModel):
     first_name: str
     last_name: str
     phone: str
-    birthdate: str
+    birthdate: date
     email: str
 
 
