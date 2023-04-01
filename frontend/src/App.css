@@ -852,6 +852,56 @@ span.event-card__title {
   margin-top: 50px;
 }
 
+.warning_event {
+  margin: 40px 20px;
+  width: auto;
+}
+
+.event-top-info {
+  display: flex;
+  justify-content: flex-start;
+  margin: 30px 0 0;
+}
+
+.event-top-info .col {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.event-top-info .col:first-child {
+  margin-right: 50px;
+}
+
+.event-top-info .col:last-child {
+  gap: 10px;
+  display: flex;
+}
+
+.event-top-info img {
+  object-fit: contain;
+}
+
+.event-top-info .info-img {
+  position: relative;
+}
+
+.event-top-info .info-img::after {
+  content: attr(alt);
+  position: absolute;
+  bottom: -25px;
+  font-weight: 700;
+  left: -31px;
+  margin: auto;
+}
+
+.event-top-info .info-img:first-child::after {
+  left: -11px;
+}
+
+.event-top-info .info-img:last-child::after {
+  left: -2px;
+}
+
 /* carousel */
 
 input[type="radio"] {

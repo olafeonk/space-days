@@ -2,7 +2,7 @@ import { Container } from "react-bootstrap";
 import { padTime } from "../core";
 import Image from "react-bootstrap/Image";
 
-const Ticket = (event, slot, ticket) => {
+const Ticket = ({event, slot, ticket}) => {
   const { title, location } = event;
   const dateTime = convertTime(slot.start_time);
   return (
@@ -10,7 +10,7 @@ const Ticket = (event, slot, ticket) => {
       <h1 className="ticket__title">Ваш билет на мероприятие</h1>
       <div className="ticket-wrapper">
         <div>
-          <p className="ticket__number">№ {ticket.ticket_id}</p>
+          <p className="ticket__number">№ {formatTicketId(ticket.ticket_id)}</p>
           <p className="ticket__event">{title}</p>
           <p className="ticket__date">
             <span>Дата: </span>
@@ -28,6 +28,10 @@ const Ticket = (event, slot, ticket) => {
             <span>Адрес: </span>
             {location}
           </p>
+          <p className="ticket__location">
+            <span>Количество участников: </span>
+            {ticket.amount}
+          </p>
           <p className="ticket__info">
             Для того, чтобы пройти на мероприятие — назовите номер билета
           </p>
@@ -42,6 +46,10 @@ const Ticket = (event, slot, ticket) => {
     </Container>
   );
 };
+
+function formatTicketId(ticketId) {
+  return `${ticketId.substr(0, 3)} ${ticketId.substr(3, 3)} ${ticketId.substr(6)}`;
+}
 
 function convertDate(dayOfMonth) {
   return `${padTime(dayOfMonth)}.04.2023`;

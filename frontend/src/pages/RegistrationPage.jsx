@@ -32,16 +32,25 @@ const RegistrationPage = () => {
   const { status, event, slot, setStatus } = useEventLoading();
   const [ticket, setTicket] = useState(null);
   const [form, handleFormChange] = useForm();
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleRegister = async () => {
-    const ticket = await subscribeEvent(slot.slot_id, form);
-    if (ticket) {
+    const result = await subscribeEvent(slot.slot_id, form);
+    if (result.status) {
+      if (result.status === 422) {
+        setErrorMessage("Ошибка в заполнении формы");
+      } else {
+        setErrorMessage(null);
+        setStatus(STATUS_ERROR);
+        setTicket(null);
+      }
+    }
+    else {
+      const ticket = result;
+      setErrorMessage(null);
       setStatus(STATUS_SUCCESS);
       setTicket(ticket);
       saveForm(form);
-    } else {
-      setStatus(STATUS_ERROR);
-      setTicket(null);
     }
   };
 
@@ -49,7 +58,7 @@ const RegistrationPage = () => {
     case STATUS_LOADING:
       return renderLoading();
     case STATUS_LOADED:
-      return renderLoaded(form, event, slot, handleFormChange, handleRegister);
+      return renderLoaded(form, event, slot, errorMessage, handleFormChange, handleRegister);
     case STATUS_SUCCESS:
       return renderSuccess(event, slot, ticket);
     default:
@@ -61,7 +70,7 @@ function renderLoading() {
   return <h1 style={{ textAlign: "center", padding: 20 }}>Загрузка</h1>;
 }
 
-function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
+function renderLoaded(form, event, slot, errorMessage, handleFormChange, handleRegister) {
   const { title, location, description } = event;
   const dateTime = convertTime(slot.start_time);
   const registrationDisabled = !checkFormFilled(form);
@@ -132,6 +141,7 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
             </a>
             .
           </p>
+          <h3 class={"text-danger"} style={{ textAlign: "center", padding: 10 }}>{errorMessage}</h3>
         </Col>
       </Row>
       <Footer />
@@ -140,8 +150,7 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
 }
 
 function renderSuccess(event, slot, ticket) {
-  // {"ticket_id":289977493,"user_id":2,"slot_id":52,"amount":0}
-  return Ticket(event, slot, ticket);
+  return <Ticket event={event} slot={slot} ticket={ticket} />;
 }
 
 function renderError() {
