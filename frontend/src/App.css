@@ -522,6 +522,10 @@ a.date-button_checked:active {
   border: #868686 solid 2px !important;
 }
 
+.time-button.time-button_checked:hover {
+  border: #5e7fd6 solid 2px !important;
+}
+
 .time-button:active {
   border: #5e7fd6 solid 2px !important;
 }
@@ -772,6 +776,80 @@ span.event-card__title {
 
 .policy {
   margin-bottom: 60px;
+}
+
+.ticket {
+  height: 100vh;
+  margin: auto;
+}
+
+.ticket__title {
+  font-size: 70px;
+  font-weight: 700;
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.ticket-wrapper {
+  background: url("../public/image/ticket.png");
+  margin-bottom: 50px;
+  padding: 50px 60px;
+  border-radius: 35px;
+  background-size: 100%;
+}
+
+.ticket-wrapper div {
+  border-radius: 20px;
+  background: #fff;
+}
+
+.ticket p {
+  margin: 0;
+}
+
+.ticket__number {
+  padding: 10px 30px;
+  font-weight: 700;
+  font-size: 60px;
+  border-bottom: #a4a4a4 solid 2px;
+}
+
+.ticket__event {
+  font-size: 25px;
+  font-weight: 700;
+  padding: 25px 30px 15px;
+}
+
+.ticket span {
+  color: #787878;
+  font-size: 16px;
+}
+
+.ticket__date,
+.ticket__time {
+  font-weight: 500;
+  font-size: 18px;
+  padding: 0px 30px 10px;
+}
+
+.ticket__time span:last-child {
+  font-size: 18px;
+  border: #5e7fd6 solid 2px;
+  padding: 5px 10px;
+}
+
+.ticket__location {
+  padding: 0 30px 25px;
+}
+
+.ticket__info {
+  padding: 25px 30px 30px;
+  border-top: #a4a4a4 solid 2px;
+  font-size: 20px;
+}
+
+.ticket .warning {
+  margin-top: 50px;
 }
 
 /* carousel */
@@ -1050,5 +1128,9 @@ input[type="radio"] {
 
   .registration-info {
     margin: 0;
+  }
+
+  .registration {
+    padding: 0 10px 60px;
   }
 }

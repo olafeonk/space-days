@@ -10,6 +10,7 @@ import { getEvent, subscribeEvent } from "../apis/backend";
 import { padTime } from "../core";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Ticket from "../components/Ticket";
 
 const STATUS_LOADING = 0;
 const STATUS_ERROR = -1;
@@ -157,22 +158,7 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
 
 function renderSuccess(event, slot, ticket) {
   // {"ticket_id":289977493,"user_id":2,"slot_id":52,"amount":0}
-  const { title, location } = event;
-  const dateTime = convertTime(slot.start_time);
-
-  return (
-    <>
-      <h1 style={{ textAlign: "center" }}>Ваш билет на мероприятие</h1>
-      <p>№ {ticket.ticket_id}</p>
-      <p>{title}</p>
-      <p>Дата: {convertDate(dateTime.getDate())}</p>
-      <p>
-        Время:{" "}
-        {`${padTime(dateTime.getHours())}:${padTime(dateTime.getMinutes())}`}
-      </p>
-      <p>Адрес: {location}</p>
-    </>
-  );
+  return Ticket(event, slot, ticket);
 }
 
 function renderError() {
