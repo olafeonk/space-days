@@ -200,69 +200,6 @@ function checkFormFilled(form) {
   return false;
 }
 
-function checkFormFilled(form) {
-  const { surname, name, birthdate, phone, email } = form;
-
-  if (
-    surname &&
-    surname.length > 0 &&
-    name &&
-    name.length > 0 &&
-    birthdate &&
-    birthdate.length > 0 &&
-    phone &&
-    phone.length > 0 &&
-    email &&
-    email.length > 0
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
-function checkFormFilled(form) {
-  const { surname, name, birthdate, phone, email } = form;
-
-  if (
-    surname &&
-    surname.length > 0 &&
-    name &&
-    name.length > 0 &&
-    birthdate &&
-    birthdate.length > 0 &&
-    phone &&
-    phone.length > 0 &&
-    email &&
-    email.length > 0
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
-function checkFormFilled(form) {
-  const { surname, name, birthdate, phone, email } = form;
-
-  if (
-    surname &&
-    surname.length > 0 &&
-    name &&
-    name.length > 0 &&
-    birthdate &&
-    birthdate.length > 0 &&
-    phone &&
-    phone.length > 0 &&
-    email &&
-    email.length > 0
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
 function useEventLoading() {
   const { search } = useLocation();
   const query = React.useMemo(() => new URLSearchParams(search), [search]);
