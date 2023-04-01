@@ -31,7 +31,7 @@ const STATUS_SUCCESS = 2;
 const RegistrationPage = () => {
   const { status, event, slot, setStatus } = useEventLoading();
   const [ticket, setTicket] = useState(null);
-  const [form, handleFormChange] = useForm(); 
+  const [form, handleFormChange] = useForm();
 
   const handleRegister = async () => {
     const ticket = await subscribeEvent(slot.slot_id, form);
@@ -58,7 +58,7 @@ const RegistrationPage = () => {
 };
 
 function renderLoading() {
-  return <h1 style={{ textAlign: "center" }}>Загрузка</h1>;
+  return <h1 style={{ textAlign: "center", padding: 20 }}>Загрузка</h1>;
 }
 
 function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
@@ -145,7 +145,11 @@ function renderSuccess(event, slot, ticket) {
 }
 
 function renderError() {
-  return <h1 style={{ textAlign: "center" }}>Ошибка</h1>;
+  return (
+    <>
+      <h1 style={{ textAlign: "center", padding: 20 }}>Ошибка</h1>
+      <div style={{ textAlign: "center" }}><a href="/">На главную</a></div>
+    </>);
 }
 
 function checkFormFilled(form) {

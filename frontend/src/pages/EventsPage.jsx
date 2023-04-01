@@ -17,7 +17,6 @@ const DEFAULT_EVENT_IMAGE = "./image/planet_3.png";
 const STATUS_LOADING = 0;
 const STATUS_ERROR = -1;
 const STATUS_LOADED = 1;
-const STATUS_SUCCESS = 2;
 
 const dayMap = {
   8: "8 апреля, суббота",
@@ -57,15 +56,13 @@ function renderBody(status, content, handleRegister) {
       return renderLoading();
     case STATUS_LOADED:
       return renderLoaded(content, handleRegister);
-    case STATUS_SUCCESS:
-      return renderSuccess();
     default:
       return renderError();
   }
 }
 
 function renderLoading() {
-  return <h1 style={{ textAlign: "center" }}>Загрузка</h1>;
+  return <h1 style={{ textAlign: "center", padding: 20 }}>Загрузка</h1>;
 }
 
 function renderLoaded(content, handleRegister) {
@@ -104,9 +101,8 @@ function renderLoaded(content, handleRegister) {
 function renderDayMenu(day) {
   const days = [8, 9, 10, 11, 12, 13, 14, 15];
   const result = days.map((it, index) => {
-    const className = `date-button rounded-pill ${
-      it === day ? "date-button_checked" : ""
-    }`;
+    const className = `date-button rounded-pill ${it === day ? "date-button_checked" : ""
+      }`;
     return (
       <LinkContainer
         key={index}
@@ -134,9 +130,8 @@ function renderTimeMenu(day, hour) {
   return (
     <Row className="time-row">
       {hours.map((h) => {
-        const className = `time-button rounded-pill ${
-          h === hour ? "time-button_checked" : ""
-        }`;
+        const className = `time-button rounded-pill ${h === hour ? "time-button_checked" : ""
+          }`;
         return (
           <Col key={h}>
             <LinkContainer
@@ -153,12 +148,12 @@ function renderTimeMenu(day, hour) {
   );
 }
 
-function renderSuccess() {
-  return <h1 style={{ textAlign: "center" }}>Успех</h1>;
-}
-
 function renderError() {
-  return <h1 style={{ textAlign: "center" }}>Ошибка</h1>;
+  return (
+    <>
+      <h1 style={{ textAlign: "center", padding: 20 }}>Ошибка</h1>
+      <div style={{ textAlign: "center" }}><a href="/">На главную</a></div>
+    </>);
 }
 
 function useLoading() {
