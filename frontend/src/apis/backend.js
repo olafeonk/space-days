@@ -100,7 +100,9 @@ export async function subscribeEvent(slotId, form, force = false) {
             return result;
         } else {
             console.log("HTTP error: " + response.status);
-            return null;
+            return {
+                status: response.status
+            };
         }
     } else {
         return delay(1000).then(() => sampleTicket);
