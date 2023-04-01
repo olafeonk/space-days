@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import { LinkContainer } from "react-router-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -11,6 +10,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { padTime, pluralize } from "../core";
 import { getEventsByDays, getEventsByHours } from "../apis/backend";
+import Image from "react-bootstrap/Image";
 
 const DEFAULT_EVENT_IMAGE = "./image/planet_3.png";
 
@@ -33,9 +33,12 @@ const dayMap = {
 const EventsPage = () => {
   const { status, content } = useLoading();
   const navigate = useNavigate();
-  const handleRegister = useCallback((event, time) => {
-    navigate(`/registration?eventId=${event.id}&slotId=${time.slotId}`);
-  }, [status, content])
+  const handleRegister = useCallback(
+    (event, time) => {
+      navigate(`/registration?eventId=${event.id}&slotId=${time.slotId}`);
+    },
+    [status, content]
+  );
 
   const body = renderBody(status, content, handleRegister);
 
@@ -62,7 +65,7 @@ function renderBody(status, content, handleRegister) {
 }
 
 function renderLoading() {
-  return <h1 style={{textAlign: "center"}}>Загрузка</h1>;
+  return <h1 style={{ textAlign: "center" }}>Загрузка</h1>;
 }
 
 function renderLoaded(content, handleRegister) {
@@ -72,16 +75,16 @@ function renderLoaded(content, handleRegister) {
     <>
       <Row>
         <Col>
-          <p></p>
+          <a href="./">
+            <Image src="./image/arrow.png" alt="назад"></Image>
+          </a>
         </Col>
       </Row>
       {renderDayMenu(day)}
       <Row>
         <Col>
           <h1 className="day-title">День Открытия Фестиваля</h1>
-          <h2 className="day-title_h2">
-            {dayMap[day]}
-          </h2>
+          <h2 className="day-title_h2">{dayMap[day]}</h2>
         </Col>
       </Row>
       {day === 8 && renderTimeMenu(day, hour)}
@@ -93,68 +96,30 @@ function renderLoaded(content, handleRegister) {
 }
 
 function renderDayMenu(day) {
+  const days = [8, 9, 10, 11, 12, 13, 14, 15];
+  const result = days.map((it, index) => {
+    const className = `date-button rounded-pill ${
+      it === day ? "date-button_checked" : ""
+    }`;
+    return (
+      <LinkContainer
+        key={index}
+        to={{ pathname: "/events", search: `?day=${it}` }}
+      >
+        <Button className={className} variant="outline-dark">
+          {`${it}\u00A0апреля`}
+        </Button>
+      </LinkContainer>
+    );
+  });
   return (
-    <Row className="dates-row">
-      <Col>
-        <LinkContainer to={{ pathname: "/events", search: "?day=8" }}>
-          <Button
-            className="date-button date-button_checked rounded-pill"
-            variant="outline-dark"
-          >
-            8&nbsp;апреля
-          </Button>
-        </LinkContainer>
-      </Col>
-      <Col>
-        <LinkContainer to={{ pathname: "/events", search: "?day=9" }}>
-          <Button className="date-button rounded-pill" variant="outline-dark">
-            9&nbsp;апреля
-          </Button>
-        </LinkContainer>
-      </Col>
-      <Col>
-        <LinkContainer to={{ pathname: "/events", search: "?day=10" }}>
-          <Button className="date-button  rounded-pill" variant="outline-dark">
-            10&nbsp;апреля
-          </Button>
-        </LinkContainer>
-      </Col>
-      <Col>
-        <LinkContainer to={{ pathname: "/events", search: "?day=11" }}>
-          <Button className="date-button  rounded-pill" variant="outline-dark">
-            11&nbsp;апреля
-          </Button>
-        </LinkContainer>
-      </Col>
-      <Col>
-        <LinkContainer to={{ pathname: "/events", search: "?day=12" }}>
-          <Button className="date-button  rounded-pill" variant="outline-dark">
-            12&nbsp;апреля
-          </Button>
-        </LinkContainer>
-      </Col>
-      <Col>
-        <LinkContainer to={{ pathname: "/events", search: "?day=13" }}>
-          <Button className="date-button  rounded-pill" variant="outline-dark">
-            13&nbsp;апреля
-          </Button>
-        </LinkContainer>
-      </Col>
-      <Col>
-        <LinkContainer to={{ pathname: "/events", search: "?day=14" }}>
-          <Button className="date-button  rounded-pill" variant="outline-dark">
-            14&nbsp;апреля
-          </Button>
-        </LinkContainer>
-      </Col>
-      <Col>
-        <LinkContainer to={{ pathname: "/events", search: "?day=15" }}>
-          <Button className="date-button  rounded-pill" variant="outline-dark">
-            15&nbsp;апреля
-          </Button>
-        </LinkContainer>
-      </Col>
-    </Row>
+    <div
+      className="btn-group dates-row row"
+      role="group"
+      aria-label="Basic radio toggle button group"
+    >
+      {result}
+    </div>
   );
 }
 
@@ -162,27 +127,32 @@ function renderTimeMenu(day, hour) {
   const hours = [11, 12, 13, 14, 15];
   return (
     <Row className="time-row">
-      {hours.map((h) => (
-        <Col key={h}>
-          <LinkContainer
-            to={{ pathname: "/events", search: `?day=${day}&hour=${h}` }}
-          >
-            <Button variant="outline-dark" className="time-button rounded-pill">
-              {`${padTime(h)}:00`}
-            </Button>
-          </LinkContainer>
-        </Col>
-      ))}
+      {hours.map((h) => {
+        const className = `time-button rounded-pill ${
+          h === hour ? "time-button_checked" : ""
+        }`;
+        return (
+          <Col key={h}>
+            <LinkContainer
+              to={{ pathname: "/events", search: `?day=${day}&hour=${h}` }}
+            >
+              <Button variant="outline-dark" className={className}>
+                {`${padTime(h)}:00`}
+              </Button>
+            </LinkContainer>
+          </Col>
+        );
+      })}
     </Row>
   );
 }
 
 function renderSuccess() {
-  return <h1 style={{textAlign: "center"}}>Успех</h1>;
+  return <h1 style={{ textAlign: "center" }}>Успех</h1>;
 }
 
 function renderError() {
-  return <h1 style={{textAlign: "center"}}>Ошибка</h1>;
+  return <h1 style={{ textAlign: "center" }}>Ошибка</h1>;
 }
 
 function useLoading() {
@@ -230,7 +200,7 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     const t = {
       time: `${padTime(d.getHours())}:${padTime(d.getMinutes())}`,
       hasSeats: s.available_users > 0,
-      slotId: s.slot_id
+      slotId: s.slot_id,
     };
     return t;
   });

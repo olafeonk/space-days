@@ -9,6 +9,7 @@ import Carousel from "../components/Carousel";
 import InfoList from "../components/InfoInNumbers/InfoList";
 import info from "../components/InfoInNumbers/infoObj";
 import PartnerCarousel from "../components/PartnerCarousel";
+import { LinkContainer } from "react-router-bootstrap";
 
 const HomePage = () => (
   <Container>
@@ -26,13 +27,14 @@ const HomePage = () => (
             Екатеринбурга
           </p>
           <p>Более 100 бесплатных мероприятия за 8 дней + большое открытие</p>
-          <Button
-            variant="outline-primary"
-            className="rounded-pill align-self-start"
-            disabled
-          >
-            Регистрация откроется 1 апреля
-          </Button>
+          <LinkContainer to="/events">
+            <Button
+              variant="outline-primary"
+              className="rounded-pill align-self-start"
+            >
+              Зарегистрироваться
+            </Button>
+          </LinkContainer>
         </Col>
         <Col
           className="d-flex justify-content-center align-items-center"
@@ -42,13 +44,14 @@ const HomePage = () => (
           <Image fluid rounded src="./image/banner_pic.png"></Image>
         </Col>
         <Col>
-          <Button
-            variant="outline-primary"
-            className="rounded-pill align-self-start hidden"
-            disabled
-          >
-            Регистрация откроется 1 апреля
-          </Button>
+          <LinkContainer to="/events">
+            <Button
+              variant="outline-primary"
+              className="rounded-pill align-self-start hidden"
+            >
+              Зарегистрироваться
+            </Button>
+          </LinkContainer>
         </Col>
       </Row>
       <Row className="about justify-content-center align-items-center" md={4}>
@@ -82,7 +85,10 @@ const HomePage = () => (
           <span>01</span>
           <Image fluid src="./image/planet_1.png"></Image>
           <h3>Расписание</h3>
-          <p>Перейдите на страницу с расписанием мероприятий</p>
+          <p>
+            Перейдите на страницу с{" "}
+            <a href="#/events">расписанием мероприятий</a>
+          </p>
         </Col>
         <Col className="map__steps" md={12} lg={3}>
           <span>02</span>
@@ -114,9 +120,11 @@ const HomePage = () => (
       </Row>
       <Row className="registration d-flex justify-content-center">
         <Col>
-          <Button variant="outline-primary" className="rounded-pill" disabled>
-            Регистрация откроется 1 апреля
-          </Button>
+          <LinkContainer to="/events">
+            <Button variant="outline-primary" className="rounded-pill">
+              Зарегистрироваться
+            </Button>
+          </LinkContainer>
         </Col>
       </Row>
     </Container>
