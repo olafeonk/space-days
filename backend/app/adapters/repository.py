@@ -27,7 +27,7 @@ def get_count_table(repository: Repository, name_table: str) -> int:
 
 def get_count_available_tickets(repository: Repository) -> dict[int, int]:
     result_query = (repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT slots.slot_id AS slot_id, amount - COALESCE(sum,0) AS available_ticket FROM slots
+    SELECT slots.slot_id AS slot_id, CAST(amount AS Int64) - COALESCE(sum,0) AS available_ticket FROM slots
     LEFT JOIN (
         SELECT slot_id, SUM(amount) AS sum FROM ticket
         GROUP BY slot_id) as t
@@ -42,16 +42,15 @@ def get_count_available_tickets(repository: Repository) -> dict[int, int]:
 
 
 def generate_ticket_id(repository: Repository) -> int:
-    tickets = set()
-    session = repository.pool.acquire()
-    for sets in session.read_table(YDB_DATABASE + "/ticket"):
-        for row in sets.rows:
-            tickets.add(row.ticket_id)
     for _ in range(20):
-        ticket_tmp = randint(int(1e8), int(1e9) - 1)
-        if ticket_tmp not in tickets:
-            return ticket_tmp
-    repository.pool.release(session)
+        ticket_number = randint(int(1e8), int(1e9) - 1)
+        ticket = repository.execute("""PRAGMA TablePathPrefix("{}");
+            SELECT * FROM ticket
+            WHERE ticket_id = {};
+         """.format(YDB_DATABASE, ticket_number), {})[0].rows
+        if not ticket:
+            return ticket_number
+    raise RecursionError("Can`t generate ticket id")
 
 
 def is_available_slot(repository: Repository, slot_id: int) -> bool:
@@ -60,10 +59,11 @@ def is_available_slot(repository: Repository, slot_id: int) -> bool:
    """.format(YDB_DATABASE, slot_id), {}))[0].rows
 
 
-def is_user_already_registration(repository: Repository, slot_id: int, user_id: int) -> bool:
+def is_user_already_registration(repository: Repository, slot_id: int, user_id: str) -> bool:
+    logger.info(user_id)
     return (repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT * FROM ticket
-        WHERE user_id = {} AND slot_id = {};
+        WHERE user_id = "{}" AND slot_id = {};
     """.format(YDB_DATABASE, user_id, slot_id), {}))[0].rows
 
 
