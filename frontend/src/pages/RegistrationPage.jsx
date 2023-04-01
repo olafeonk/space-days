@@ -31,31 +31,14 @@ const STATUS_SUCCESS = 2;
 const RegistrationPage = () => {
   const { status, event, slot, setStatus } = useEventLoading();
   const [ticket, setTicket] = useState(null);
-
-  const [form, setForm] = useState({
-    surname: "",
-    name: "",
-    birthdate: "",
-    phone: "",
-    email: "",
-    hasChildren: false,
-    children: [
-      {
-        name: "",
-        age: "",
-      },
-    ],
-  });
-
-  const handleFormChange = useCallback((f) => {
-    setForm(f);
-  }, []);
+  const [form, handleFormChange] = useForm(); 
 
   const handleRegister = async () => {
     const ticket = await subscribeEvent(slot.slot_id, form);
     if (ticket) {
       setStatus(STATUS_SUCCESS);
       setTicket(ticket);
+      saveForm(form);
     } else {
       setStatus(STATUS_ERROR);
       setTicket(null);
@@ -184,6 +167,40 @@ function checkFormFilled(form) {
   }
 
   return false;
+}
+
+function useForm() {
+  let savedForm = null;
+  try {
+    const savedFormString = window.localStorage.getItem("form");
+    savedForm = savedFormString && JSON.parse(savedFormString);
+  } catch {
+  }
+  const defaultForm = {
+    surname: "",
+    name: "",
+    birthdate: "",
+    phone: "",
+    email: "",
+    hasChildren: false,
+    children: [
+      {
+        name: "",
+        age: "",
+      },
+    ],
+  };
+  const [form, setForm] = useState(savedForm ? savedForm : defaultForm);
+
+  const handleFormChange = useCallback((f) => {
+    setForm(f);
+  }, []);
+
+  return [form, handleFormChange];
+}
+
+function saveForm(form) {
+  window.localStorage.setItem("form", JSON.stringify(form));
 }
 
 function useEventLoading() {
