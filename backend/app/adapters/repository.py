@@ -5,9 +5,21 @@ from app.config import YDB_DATABASE, YDB_ENDPOINT
 from random import randint
 from datetime import date, timedelta
 import app.domain.model as model
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(py_formatter)
+logger.addHandler(stream_handler)
 
 
 async def get_count_table(repository: Repository, name_table: str) -> int:
+    logger.info(name_table)
     return (await repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT COUNT(*) as count FROM {}; 
     """.format(YDB_DATABASE, name_table), {}))[0].rows[0].count
@@ -23,6 +35,7 @@ async def get_count_available_tickets(repository: Repository) -> dict[int, int]:
 
     """.format(YDB_DATABASE), {}))[0].rows
     available_tickets = {}
+    logger.info(result_query)
     for row in result_query:
         available_tickets[row.slot_id] = row.available_ticket
     return available_tickets
@@ -80,7 +93,7 @@ async def get_user(repository: Repository, phone: str) -> model.User | None:
     WHERE phone = "{}";
     """.format(YDB_DATABASE, phone), {}))[0].rows
     if user:
-        print(user[0])
+        logger.info(user[0])
         return model.User(
             user_id=user[0].user_id,
             first_name=user[0].first_name,
@@ -98,7 +111,7 @@ async def get_user_by_ticket(repository: Repository, ticket_id: int) -> model.Us
         WHERE ticket.ticket_id = {};
         """.format(YDB_DATABASE, ticket_id), {}))[0].rows
     if user:
-        print(user[0])
+        logger.info(user[0])
         return model.User(**user[0])
 
 
@@ -112,7 +125,7 @@ async def get_tg_user(repository: Repository, telegram_id: int) -> model.Telegra
 
 
 async def save_tg_user(repository: Repository, telegram_user: model.TelegramUser) -> None:
-    print(telegram_user.dict())
+    logger.info(telegram_user.dict())
     await repository.execute("""PRAGMA TablePathPrefix("{}");
     
         DECLARE $tgUserData AS List<Struct<
@@ -149,7 +162,7 @@ class Repository:
         return self
 
     async def execute(self, query: str, data: dict):
-        print(query)
+        logger.info(query)
         session = await self.pool.acquire()
         prepared_query = await session.prepare(query)
         result_transaction = await session.transaction(ydb.SerializableReadWrite()).execute(
