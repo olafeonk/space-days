@@ -3,7 +3,7 @@ import ydb
 import ydb.iam
 from app.config import YDB_DATABASE, YDB_ENDPOINT
 from random import randint
-from datetime import date
+from datetime import date, timedelta
 import app.domain.model as model
 
 
@@ -47,6 +47,22 @@ async def is_available_slot(repository: Repository, slot_id: int) -> bool:
    """.format(YDB_DATABASE, slot_id), {}))[0].rows
 
 
+async def is_user_already_registration(repository: Repository, slot_id: int, user_id: int) -> bool:
+    return (await repository.execute("""PRAGMA TablePathPrefix("{}");
+        SELECT * FROM ticket
+        WHERE user_id = {} AND slot_id = {};
+    """.format(YDB_DATABASE, user_id, slot_id), {}))[0].rows
+
+
+async def update_data_user(repository: Repository, email: str, first_name: str, last_name: str, birthdate: date,
+                           phone: str) -> bool:
+    return (await repository.execute("""PRAGMA TablePathPrefix("{}");
+        UPDATE user
+        SET email="{}", first_name="{}", last_name="{}", birthdate = Date("{}")
+        WHERE phone = "{}";
+    """.format(YDB_DATABASE, email, first_name, last_name, birthdate, phone), {}))
+
+
 async def is_children_event(repository: Repository, slot_id: int) -> bool:
     event = (await repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT is_children FROM event
@@ -58,13 +74,20 @@ async def is_children_event(repository: Repository, slot_id: int) -> bool:
     return False
 
 
-async def get_user(repository: Repository, phone: str, birthdate: date) -> model.User | None:
+async def get_user(repository: Repository, phone: str) -> model.User | None:
     user = (await repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT * FROM user
-    WHERE birthdate = CAST("{}" AS Date) AND phone = "{}";
-    """.format(YDB_DATABASE, birthdate.strftime("%Y-%m-%d"), phone), {}))[0].rows
+    WHERE phone = "{}";
+    """.format(YDB_DATABASE, phone), {}))[0].rows
     if user:
-        return model.User(**user[0])
+        print(user[0])
+        return model.User(
+            user_id=user[0].user_id,
+            first_name=user[0].first_name,
+            last_name=user[0].last_name,
+            phone=user[0].phone,
+            email=user[0].email,
+            birthdate=date(1970, 1, 1) + timedelta(days=user[0].birthdate))
 
 
 async def get_user_by_ticket(repository: Repository, ticket_id: int) -> model.User:
