@@ -367,7 +367,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
     booked_tickets = max(len(childs) + (not is_child_event), 1)
     if available_tickets[user.slot_id] < booked_tickets:
         logger.warning(f'available ticket {available_tickets} < booked ticket {booked_tickets}')
-        return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'available ticket {available_tickets} '
+        return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'available ticket {available_tickets[user.slot_id]} '
                                                                           f'< booked ticket {booked_tickets}')
 
     user_n = get_count_table(repository, "user")
@@ -383,6 +383,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
             first_name=child.first_name,
             age=child.age,
         ))
+        child_n += 1
     ticket = model.Ticket(
         ticket_id=generate_ticket_id(repository),
         user_id=user_n,
