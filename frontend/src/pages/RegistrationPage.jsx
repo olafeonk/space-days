@@ -2,8 +2,6 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
-import { LinkContainer } from "react-router-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
@@ -40,10 +38,12 @@ const RegistrationPage = () => {
     phone: "",
     email: "",
     hasChildren: false,
-    children: [{
-      name: "",
-      age: "",
-    }],
+    children: [
+      {
+        name: "",
+        age: "",
+      },
+    ],
   });
 
   const handleFormChange = useCallback((f) => {
@@ -74,11 +74,11 @@ const RegistrationPage = () => {
 };
 
 function renderLoading() {
-  return <h1 style={{textAlign: "center"}}>Загрузка</h1>;
+  return <h1 style={{ textAlign: "center" }}>Загрузка</h1>;
 }
 
 function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
-  const {title, location, description} = event;
+  const { title, location, description } = event;
   const dateTime = convertTime(slot.start_time);
   const registrationDisabled = !checkFormFilled(form);
 
@@ -86,19 +86,39 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
     <Container>
       <Header />
       <Row>
-        <Col>
-          <p>Правила</p>
+        <Col className="rules">
+          <a href="./#/events">
+            <Image src="./image/arrow.png" alt="назад"></Image>
+          </a>
+          <div className="rounded-pill warning">
+            <Image src="./image/warning.png" alt="внимание"></Image>
+            <p>
+              Регистрировать нужно <span>каждого участника</span>, включая
+              детей!
+            </p>
+          </div>
         </Col>
       </Row>
-      <Row>
+      <Row className="registration-info">
         <Col className="registration-form">
           <ParentForm form={form} onChange={handleFormChange} />
         </Col>
-        <Col>
+        <Col className="registration-info__event">
           <h1>{title}</h1>
-          <p>Дата: {convertDate(dateTime.getDate())}</p>
-          <p>Время: {`${padTime(dateTime.getHours())}:${padTime(dateTime.getMinutes())}`}</p>
-          <p>Адрес: {location}</p>
+          <p>
+            <span>Дата: </span>
+            {convertDate(dateTime.getDate())}
+          </p>
+          <p>
+            <span>Время: </span>
+            {`${padTime(dateTime.getHours())}:${padTime(
+              dateTime.getMinutes()
+            )}`}
+          </p>
+          <p>
+            <span>Адрес: </span>
+            {location}
+          </p>
           <p>{description}</p>
         </Col>
       </Row>
@@ -108,7 +128,7 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
             disabled={registrationDisabled}
             variant="outline-primary"
             type="submit"
-            className="rounded-pill d-flex flex-column justify-content-center align-items-center w-100"
+            className="rounded-pill d-flex flex-column justify-content-center align-items-center w-100 registration-page__button"
             onClick={handleRegister}
           >
             Зарегистрироваться
@@ -116,11 +136,17 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
         </Col>
       </Row>
       <Row>
-        <Col className="d-flex flex-column justify-content-center align-items-center w-100">
+        <Col className="d-flex flex-column policy justify-content-center align-items-center w-100">
           <p>
             Нажимая кнопку, вы соглашаетесь с{" "}
-            <a href="#">Политикой конфиденциальности</a> и{" "}
-            <a href="#">Пользовательским соглашением</a>.
+            <a href="https://kantrskrip.ru/privacy_policy">
+              Политикой конфиденциальности
+            </a>{" "}
+            и{" "}
+            <a href="https://kantrskrip.ru/agreement">
+              Пользовательским соглашением
+            </a>
+            .
           </p>
         </Col>
       </Row>
@@ -131,40 +157,44 @@ function renderLoaded(form, event, slot, handleFormChange, handleRegister) {
 
 function renderSuccess(event, slot, ticket) {
   // {"ticket_id":289977493,"user_id":2,"slot_id":52,"amount":0}
-  const {title, location} = event;
+  const { title, location } = event;
   const dateTime = convertTime(slot.start_time);
-  
+
   return (
-  <>
-    <h1 style={{textAlign: "center"}}>Ваш билет на мероприятие</h1>
-    <p>№ {ticket.ticket_id}</p>
-    <p>{title}</p>
-    <p>Дата: {convertDate(dateTime.getDate())}</p>
-    <p>Время: {`${padTime(dateTime.getHours())}:${padTime(dateTime.getMinutes())}`}</p>
-    <p>Адрес: {location}</p>
-  </>
+    <>
+      <h1 style={{ textAlign: "center" }}>Ваш билет на мероприятие</h1>
+      <p>№ {ticket.ticket_id}</p>
+      <p>{title}</p>
+      <p>Дата: {convertDate(dateTime.getDate())}</p>
+      <p>
+        Время:{" "}
+        {`${padTime(dateTime.getHours())}:${padTime(dateTime.getMinutes())}`}
+      </p>
+      <p>Адрес: {location}</p>
+    </>
   );
 }
 
 function renderError() {
-  return <h1 style={{textAlign: "center"}}>Ошибка</h1>;
+  return <h1 style={{ textAlign: "center" }}>Ошибка</h1>;
 }
 
 function checkFormFilled(form) {
-  const {
-    surname,
-    name,
-    birthdate,
-    phone,
-    email,
-  } = form;
+  const { surname, name, birthdate, phone, email } = form;
 
-  if (surname && surname.length > 0
-    && name && name.length > 0
-    && birthdate && birthdate.length > 0
-    && phone && phone.length > 0
-    && email && email.length > 0) {
-      return true;
+  if (
+    surname &&
+    surname.length > 0 &&
+    name &&
+    name.length > 0 &&
+    birthdate &&
+    birthdate.length > 0 &&
+    phone &&
+    phone.length > 0 &&
+    email &&
+    email.length > 0
+  ) {
+    return true;
   }
 
   return false;
@@ -201,7 +231,12 @@ function useEventLoading() {
     run();
   }, [query]);
 
-  return { status, event: eventAndSlot.event, slot: eventAndSlot.slot, setStatus };
+  return {
+    status,
+    event: eventAndSlot.event,
+    slot: eventAndSlot.slot,
+    setStatus,
+  };
 }
 
 function convertDate(dayOfMonth) {

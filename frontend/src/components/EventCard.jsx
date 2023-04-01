@@ -3,7 +3,7 @@ import Image from "react-bootstrap/Image";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
-const EventCard = ({event, onRegister}) => {
+const EventCard = ({ event, onRegister }) => {
   const [slot, setSlot] = useState(null);
   const handleRegister = () => {
     slot && onRegister && onRegister(event, slot);
@@ -11,7 +11,9 @@ const EventCard = ({event, onRegister}) => {
 
   return (
     <Col className="event-card" as={"article"}>
-      <Image fluid rounded src={event.image}></Image>
+      <div className="img-wrapper">
+        <Image fluid rounded src={event.image}></Image>
+      </div>
       <div>
         <h3>{event.title}</h3>
         <hr></hr>
@@ -65,19 +67,17 @@ function renderSlots(times, slot, setSlot) {
         >
           {it.time}
         </span>
-      )
+      );
     }
 
-    const className = `event-card__time time-button rounded-pill ${it.slotId === (slot && slot.slotId) ? ' time-button_checked' : ''}`;
+    const className = `event-card__time time-button rounded-pill ${
+      it.slotId === (slot && slot.slotId) ? " time-button_checked" : ""
+    }`;
     return (
-      <span
-        key={index}
-        className={className}
-        onClick={() => setSlot(it)}
-      >
+      <span key={index} className={className} onClick={() => setSlot(it)}>
         {it.time}
       </span>
-    )
+    );
   });
 
   return result;

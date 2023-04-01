@@ -509,13 +509,13 @@ a.date-button_checked:active {
 }
 
 .time-button.time-button_disabled {
-  border:  #cccccc solid 2px !important;
+  border: #cccccc solid 2px !important;
   background-color: #eeeeee;
   color: #cccccc !important;
 }
 
 .time-button.time-button_disabled:hover {
-  border:  #cccccc solid 2px !important;
+  border: #cccccc solid 2px !important;
   background-color: #eeeeee;
   color: #cccccc !important;
 }
@@ -545,13 +545,22 @@ a.date-button_checked:active {
   margin-bottom: 5px;
 }
 
-.event-card img {
+.event-card .img-wrapper {
   position: absolute;
+  display: flex;
   height: 100px;
   width: 100px;
-  object-fit: contain;
   top: -17px;
   left: -62px;
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 50%;
+  border: rgba(164, 164, 164, 0.5) solid 2px;
+  overflow: hidden;
+}
+
+.event-card img {
+  object-fit: contain;
 }
 
 .event-card h3 {
@@ -649,6 +658,98 @@ span.event-card__title {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.registration-info {
+  justify-content: space-between;
+  margin: 0 30px 0;
+}
+
+.registration-info__event {
+  margin: 0 0 0 30px;
+  background-color: #f8f8f8;
+  height: fit-content;
+  padding: 30px;
+  border-radius: 30px;
+  max-width: 550px;
+}
+
+.registration-info__event h1 {
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.registration-info__event p {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.registration-info__event p span {
+  font-size: 16px;
+  color: #787878;
+}
+
+.registration-info__event p:last-child {
+  font-weight: 400;
+  margin-bottom: 0;
+  background-color: #ffffff80;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.registration-page__button {
+  margin-bottom: 20px;
+}
+
+.rules {
+  display: flex;
+  width: 100%;
+  margin: 60px 0 30px;
+}
+
+.rules a {
+  width: 50px;
+  height: 100%;
+  margin-right: 35px;
+  display: flex;
+}
+
+.rules a img {
+  object-fit: contain;
+}
+
+.warning {
+  display: flex;
+  width: 100%;
+  padding: 20px 23px;
+  align-items: center;
+  gap: 16px;
+  background-color: #f8f8f8;
+  margin-right: 30px;
+}
+
+.warning img {
+  width: 35px;
+  height: 35px;
+}
+
+.warning p {
+  margin-bottom: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.warning p span {
+  color: #5e7fd6;
+  font-weight: 700;
+}
+
+.registration-form .warning {
+  margin-bottom: 40px;
+}
+
+.policy {
+  margin-bottom: 60px;
 }
 
 /* carousel */
@@ -825,6 +926,16 @@ input[type="radio"] {
     width: 100%;
   }
 
+  .registration-info__event {
+    margin: 0 0 30px 0;
+    min-width: 100%;
+    order: 1;
+  }
+
+  .registration-form {
+    order: 2;
+  }
+
   .banner button.hidden {
     display: block;
     width: 100%;
@@ -913,5 +1024,9 @@ input[type="radio"] {
 
   .present {
     gap: 50px;
+  }
+
+  .registration-info {
+    margin: 0;
   }
 }
