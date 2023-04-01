@@ -377,6 +377,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
     booked_tickets = max(len(childs) + (not is_child_event), 1)
     if available_tickets[user.slot_id] < booked_tickets:
         logger.warning(f'available ticket {available_tickets[user.slot_id]} < booked ticket {booked_tickets}')
+        response.status_code = status.HTTP_409_CONFLICT
         return HTTPException(status_code=status.HTTP_409_CONFLICT,
                              detail=f'available ticket {available_tickets[user.slot_id]} '
                                     f'< booked ticket {booked_tickets}',
