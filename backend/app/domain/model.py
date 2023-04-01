@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 
+
 class Email(BaseModel):
     id: int
     email: str
@@ -25,22 +26,22 @@ class Slot(BaseModel):
 
 class Ticket(BaseModel):
     ticket_id: int
-    user_id: int
+    user_id: str
     slot_id: int
     amount: int
     user_data: str
 
 
 class Child(BaseModel):
-    child_id: int
-    user_id: int
+    child_id: str
+    user_id: str
     slot_id: int
     first_name: str
     age: int
 
 
 class User(BaseModel):
-    user_id: int
+    user_id: str
     first_name: str
     last_name: str
     phone: str
@@ -50,7 +51,7 @@ class User(BaseModel):
 
 class TelegramUser(BaseModel):
     tg_user_id: int
-    user_id: int
+    user_id: str
     type_user: str
     telegram_id: int
     username: str

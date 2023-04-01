@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import uuid
 
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response, status, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,7 +21,6 @@ from ..adapters.repository import (
 )
 import app.domain.model as model
 import aiohttp
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -80,7 +80,7 @@ class TicketRequest(BaseModel):
 class UserEventsRequest(BaseModel):
     event_id: int
     slot_id: int
-    user_id: int
+    user_id: str
     title: str
     location: str
     summary: str
@@ -125,10 +125,9 @@ SELECT
 FROM AS_TABLE($slotData);
 """
 
-
 ADD_USER_QUERY = """PRAGMA TablePathPrefix("{}");
 DECLARE $userData AS List<Struct<
-    user_id: Uint64,
+    user_id: Utf8,
     first_name: Utf8,
     last_name: Utf8,
     phone: Utf8,
@@ -136,17 +135,17 @@ DECLARE $userData AS List<Struct<
     email: Utf8>>;
 
 DECLARE $childData AS List<Struct<
-    child_id: Uint64,
-    user_id: Uint64,
+    child_id: Utf8,
+    user_id: Utf8,
     slot_id: Uint64,
     first_name: Utf8,
-    age: Uint8>>;
+    age: Uint64>>;
 
 DECLARE $ticketData AS List<Struct<
     ticket_id: Uint64,
     slot_id: Uint64,
-    user_id: Uint64,
-    amount: Uint64,
+    user_id: Utf8,
+    amount: Int64,
     user_data: Utf8>>;
     
 UPSERT INTO user
@@ -247,7 +246,8 @@ def add_email(request: Request, email: EmailRequest, response: Response):
 
 
 @router.get("/api/events/", response_model=list[EventRequest])
-def get_events(request: Request, id: int | None = None, days: list[int] | None = Query(None), hours: list[int] | None = Query(None)):
+def get_events(request: Request, id: int | None = None, days: list[int] | None = Query(None),
+               hours: list[int] | None = Query(None)):
     logger.info(f"Get events, id: {id}, days: {days}, hours: {hours}")
     repository: Repository = request.app.repository
     query = """PRAGMA TablePathPrefix("{}");
@@ -290,7 +290,7 @@ def get_events(request: Request, id: int | None = None, days: list[int] | None =
     result.pop(0)
     result.sort(key=lambda x: x.slots[0].start_time)
     logger.info(f"Get events success\nresult: {result}")
-    return result
+    return result  # TODO: return is_available_child
 
 
 # @router.post("/api/event")
@@ -367,23 +367,22 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
     booked_tickets = max(len(childs) + (not is_child_event), 1)
     if available_tickets[user.slot_id] < booked_tickets:
         logger.warning(f'available ticket {available_tickets} < booked ticket {booked_tickets}')
-        return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'available ticket {available_tickets[user.slot_id]} '
-                                                                          f'< booked ticket {booked_tickets}')
+        return HTTPException(status_code=status.HTTP_409_CONFLICT,
+                             detail=f'available ticket {available_tickets[user.slot_id]} '
+                                    f'< booked ticket {booked_tickets}')
 
-    user_n = get_count_table(repository, "user")
+    user_n = str(uuid.uuid4())
     if old_user:
         user_n = old_user.user_id
-    child_n = get_count_table(repository, "child")
     children = []
     for child in childs:
         children.append(model.Child(
-            child_id=child_n,
+            child_id=str(uuid.uuid4()),
             user_id=user_n,
             slot_id=user.slot_id,
             first_name=child.first_name,
             age=child.age,
         ))
-        child_n += 1
     ticket = model.Ticket(
         ticket_id=generate_ticket_id(repository),
         user_id=user_n,
@@ -401,11 +400,11 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
     )
     logger.info(f"children: {children}, user: {user}, ticket: {ticket}")
     repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
-                             {
-                                 "$childData": children,
-                                 "$userData": [user],
-                                 "$ticketData": [ticket],
-                             })
+                       {
+                           "$childData": children,
+                           "$userData": [user],
+                           "$ticketData": [ticket],
+                       })
     logger.info("Success Query")
     return ticket
 
