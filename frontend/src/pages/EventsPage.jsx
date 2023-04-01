@@ -73,11 +73,43 @@ function renderLoaded(content, handleRegister) {
 
   return (
     <>
-      <Row>
+      <Row className="event-top-info">
         <Col>
           <a href="./">
             <Image src="./image/arrow.png" alt="назад"></Image>
           </a>
+        </Col>
+        <Col>
+          <div className="info-img" alt="1&nbsp;человек">
+            <Image src="./image/icon1.png" alt="1 человек"></Image>
+          </div>
+          <Image src="./image/line.png" alt="разделитель"></Image>
+          <div className="info-img" alt="1&nbsp;мерориятие">
+            <Image
+              src="./image/icon2.png"
+              alt="1 мерориятие"
+              className="info-img"
+            ></Image>
+          </div>
+          <Image src="./image/line.png" alt="разделитель"></Image>
+          <div className="info-img" alt="1&nbsp;время">
+            <Image
+              src="./image/icon3.png"
+              alt="1 время"
+              className="info-img"
+            ></Image>
+          </div>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <div className="rounded-pill warning warning_event">
+            <Image src="./image/warning.png" alt="внимание"></Image>
+            <p>
+              Регистрироваться нужно на <span>каждое</span> мероприятие{" "}
+              <span>строго на то время</span>, в которое вы хотите посетить!
+            </p>
+          </div>
         </Col>
       </Row>
       {renderDayMenu(day)}
@@ -91,6 +123,24 @@ function renderLoaded(content, handleRegister) {
           ) : (
             <h1 className="day-title">{dayMap[day]}</h1>
           )}
+          <div className="rounded-pill warning warning_event">
+            <Image src="./image/warning.png" alt="внимание"></Image>
+            <p>
+              <b>Обратите внимание</b> на{" "}
+              <span>время начала и окончания мастер класса.</span>
+              <br />
+              <b>Проверьте</b>, чтобы мероприятия, на которые вы
+              зарегистрировались, <span>не пересекались по времени!</span>
+            </p>
+          </div>
+          <div className="rounded-pill warning warning_event">
+            <Image src="./image/warning.png" alt="внимание"></Image>
+            <p>
+              <b>Обратите внимание</b>, мероприятия имеют{" "}
+              <span>возрастные ограничения</span>. Вход на мастер классы строго
+              в соответствии с ними!
+            </p>
+          </div>
         </Col>
       </Row>
       {day === 8 && renderTimeMenu(day, hour)}
