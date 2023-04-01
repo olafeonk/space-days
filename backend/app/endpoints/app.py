@@ -17,10 +17,20 @@ from ..adapters.repository import (
     is_children_event, get_user,
     is_available_slot,
     is_user_already_registration,
-    update_data_user
 )
 import app.domain.model as model
 import aiohttp
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(py_formatter)
+logger.addHandler(stream_handler)
+
 router = APIRouter()
 
 
@@ -188,30 +198,37 @@ async def send_email(email: str, first_name: str, last_name: str, ticket: int):
             "ticket": ticket,
         }
     }
-    async with aiohttp.ClientSession() as session:
-        async with session.post('https://api.notisend.ru/v1/email/templates/782569/messages',
-                                headers=headers, json=data) as r:
-            result = await r.json()
-            print(result)
+    logger.info(f"Send email to {email}, data {data}, headers {headers}")
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post('https://api.notisend.ru/v1/email/templates/782569/messages',
+                                    headers=headers, json=data) as r:
+                result = await r.json()
+                logger.info(result)
+    except Exception:
+        logger.error("Fail sending", exc_info=True)
+        raise
+    else:
+        logger.info("Successful send")
 
 
 @router.get("/api/test")
-async def test():
+def test():
     return "Hello, world"
 
 
 @router.post("/api/emails/subscribe", status_code=status.HTTP_201_CREATED)
-async def add_email(request: Request, email: EmailRequest, response: Response):
+def add_email(request: Request, email: EmailRequest, response: Response):
     repository: Repository = request.app.repository
-    email_id = await get_count_table(repository, 'emails')
-    emails = (await repository.execute("""PRAGMA TablePathPrefix("{}");
+    email_id = get_count_table(repository, 'emails')
+    emails = (repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT * FROM emails
         WHERE email = '{}';
     """.format(YDB_DATABASE, email.email), {}))[0].rows
     if emails:
         response.status_code = status.HTTP_200_OK
         return
-    await repository.execute(
+    repository.execute(
         """PRAGMA TablePathPrefix("{}");
         DECLARE $emailData AS List<Struct<
             id: Uint64,
@@ -230,7 +247,8 @@ async def add_email(request: Request, email: EmailRequest, response: Response):
 
 
 @router.get("/api/events/", response_model=list[EventRequest])
-async def get_events(request: Request, id: int | None = None, days: list[int] | None = Query(None), hours: list[int] | None = Query(None)):
+def get_events(request: Request, id: int | None = None, days: list[int] | None = Query(None), hours: list[int] | None = Query(None)):
+    logger.info(f"Get events, id: {id}, days: {days}, hours: {hours}")
     repository: Repository = request.app.repository
     query = """PRAGMA TablePathPrefix("{}");
     SELECT * FROM event
@@ -249,8 +267,8 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
             query += " AND "
         query += "DateTime::GetHour(slots.start_time) IN {}\n".format(hours)
     query += "\tORDER BY event_id, start_time;"
-    result_sets = await repository.execute(query, {})
-    available_tickets = await get_count_available_tickets(repository)
+    result_sets = repository.execute(query, {})
+    available_tickets = get_count_available_tickets(repository)
     event_id = 0
     result = []
     event = EventRequest(
@@ -271,6 +289,7 @@ async def get_events(request: Request, id: int | None = None, days: list[int] | 
     result.append(event)
     result.pop(0)
     result.sort(key=lambda x: x.slots[0].start_time)
+    logger.info(f"Get events success\nresult: {result}")
     return result
 
 
@@ -317,41 +336,46 @@ def refactor_phone(phone: str) -> str:
 
 
 @router.post('/api/events/subscribe')
-async def add_user(request: Request, user: UserRequest, response: Response, force_registration: bool = False):
+def add_user(request: Request, user: UserRequest, response: Response, force_registration: bool = False):
+    logging.info(f"Add registration, user: {user}, force_registration: {force_registration}")
     repository: Repository = request.app.repository
     user_response = user.__repr__()
-    print(user_response)
+    childs = user.child or []
     try:
         phone = refactor_phone(user.phone)
-    except TypeError as err:
+    except TypeError:
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        print("ERROR:", err, "phone:", user.phone)
+        logger.error("Invalid phone:", user.phone, exc_info=True)
         return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='invalid phone')
-    if len(user.child) > 3:
+    if len(childs) > 3:
         response.status_code = status.HTTP_400_BAD_REQUEST
+        logger.warning(f"Count child: {len(childs)} > 3")
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='too more child')
-    if not await is_available_slot(repository, slot_id=user.slot_id):
+    if not is_available_slot(repository, slot_id=user.slot_id):
         response.status_code = status.HTTP_400_BAD_REQUEST
+        logger.warning(f"Slot not exists {user.slot_id}")
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='slot not available')
-    old_user = await get_user(repository, phone)
-    if old_user and await is_user_already_registration(repository, user.slot_id, old_user.user_id):
+    old_user = get_user(repository, phone)
+    logger.info(old_user)
+    if old_user and is_user_already_registration(repository, user.slot_id, old_user.user_id):
         if not force_registration:
             response.status_code = status.HTTP_409_CONFLICT
+            logger.warning(f"User {old_user.user_id} already registered on slot {user.slot_id}")
             return HTTPException(status_code=status.HTTP_409_CONFLICT, detail='user already registered')
-    is_child_event = await is_children_event(repository, user.slot_id)
-    available_tickets = await get_count_available_tickets(repository)
-    booked_tickets = max(len(user.child) + (not is_child_event), 1)
+    is_child_event = is_children_event(repository, user.slot_id)
+    available_tickets = get_count_available_tickets(repository)
+    booked_tickets = max(len(childs) + (not is_child_event), 1)
     if available_tickets[user.slot_id] < booked_tickets:
+        logger.warning(f'available ticket {available_tickets} < booked ticket {booked_tickets}')
         return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'available ticket {available_tickets} '
                                                                           f'< booked ticket {booked_tickets}')
 
-    user_n = await get_count_table(repository, "user")
+    user_n = get_count_table(repository, "user")
     if old_user:
         user_n = old_user.user_id
-    print(old_user)
-    child_n = await get_count_table(repository, "child")
+    child_n = get_count_table(repository, "child")
     children = []
-    for child in user.child:
+    for child in childs:
         children.append(model.Child(
             child_id=child_n,
             user_id=user_n,
@@ -360,7 +384,7 @@ async def add_user(request: Request, user: UserRequest, response: Response, forc
             age=child.age,
         ))
     ticket = model.Ticket(
-        ticket_id=await generate_ticket_id(repository),
+        ticket_id=generate_ticket_id(repository),
         user_id=user_n,
         slot_id=user.slot_id,
         amount=booked_tickets,
@@ -374,36 +398,35 @@ async def add_user(request: Request, user: UserRequest, response: Response, forc
         birthdate=user.birthdate.strftime('%Y-%m-%d'),
         email=user.email,
     )
-    print(children)
-    print(user)
-    print(ticket)
-    await repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
+    logger.info(f"children: {children}, user: {user}, ticket: {ticket}")
+    repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
                              {
                                  "$childData": children,
                                  "$userData": [user],
                                  "$ticketData": [ticket],
                              })
+    logger.info("Success Query")
     return ticket
 
 
 @router.post('/api/tickets/my')
-async def get_user_events(request: Request, body: TicketRequest):
+def get_user_events(request: Request, body: TicketRequest):
     repository: Repository = request.app.repository
-    user = await get_user(repository, body.phone, body.birthdate)
+    user = get_user(repository, body.phone, body.birthdate)
     if not user:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no user")
     result = []
 
-    for row in (await repository.execute(GET_USER_EVENTS.format(YDB_DATABASE, user.user_id), {}))[0].rows:
-        print(f"result: {row}")
+    for row in (repository.execute(GET_USER_EVENTS.format(YDB_DATABASE, user.user_id), {}))[0].rows:
+        logger.info(f"result: {row}")
         result.append(UserEventsRequest(**row))
     return result
 
 
-async def main():
+def main():
     load_dotenv()
 
-    print('Starting app...')
+    logger.info('Starting app...')
     app = FastAPI()
     origins = ["*"]
 
@@ -415,11 +438,11 @@ async def main():
         allow_headers=["*"],
     )
     repository = Repository()
-    await repository.connect()
+    repository.connect()
     app.repository = repository
 
     app.include_router(router)
 
     config = uvicorn.Config(app, host='0.0.0.0', port=8080)
     server = uvicorn.Server(config)
-    await server.serve()
+    server.run()

@@ -5,16 +5,28 @@ from app.config import YDB_DATABASE, YDB_ENDPOINT
 from random import randint
 from datetime import date, timedelta
 import app.domain.model as model
+import logging
 
 
-async def get_count_table(repository: Repository, name_table: str) -> int:
-    return (await repository.execute("""PRAGMA TablePathPrefix("{}");
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(py_formatter)
+logger.addHandler(stream_handler)
+
+
+def get_count_table(repository: Repository, name_table: str) -> int:
+    logger.info(name_table)
+    return (repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT COUNT(*) as count FROM {}; 
     """.format(YDB_DATABASE, name_table), {}))[0].rows[0].count
 
 
-async def get_count_available_tickets(repository: Repository) -> dict[int, int]:
-    result_query = (await repository.execute("""PRAGMA TablePathPrefix("{}");
+def get_count_available_tickets(repository: Repository) -> dict[int, int]:
+    result_query = (repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT slots.slot_id AS slot_id, amount - COALESCE(sum,0) AS available_ticket FROM slots
     LEFT JOIN (
         SELECT slot_id, SUM(amount) AS sum FROM ticket
@@ -23,48 +35,49 @@ async def get_count_available_tickets(repository: Repository) -> dict[int, int]:
 
     """.format(YDB_DATABASE), {}))[0].rows
     available_tickets = {}
+    logger.info(result_query)
     for row in result_query:
         available_tickets[row.slot_id] = row.available_ticket
     return available_tickets
 
 
-async def generate_ticket_id(repository: Repository) -> int:
+def generate_ticket_id(repository: Repository) -> int:
     tickets = set()
-    session = await repository.pool.acquire()
-    async for sets in await session.read_table(YDB_DATABASE + "/ticket"):
+    session = repository.pool.acquire()
+    for sets in session.read_table(YDB_DATABASE + "/ticket"):
         for row in sets.rows:
             tickets.add(row.ticket_id)
     for _ in range(20):
         ticket_tmp = randint(int(1e8), int(1e9) - 1)
         if ticket_tmp not in tickets:
             return ticket_tmp
-    await repository.pool.release(session)
+    repository.pool.release(session)
 
 
-async def is_available_slot(repository: Repository, slot_id: int) -> bool:
-    return (await repository.execute("""PRAGMA TablePathPrefix("{}");
+def is_available_slot(repository: Repository, slot_id: int) -> bool:
+    return (repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT slot_id FROM slots WHERE slot_id = {};
    """.format(YDB_DATABASE, slot_id), {}))[0].rows
 
 
-async def is_user_already_registration(repository: Repository, slot_id: int, user_id: int) -> bool:
-    return (await repository.execute("""PRAGMA TablePathPrefix("{}");
+def is_user_already_registration(repository: Repository, slot_id: int, user_id: int) -> bool:
+    return (repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT * FROM ticket
         WHERE user_id = {} AND slot_id = {};
     """.format(YDB_DATABASE, user_id, slot_id), {}))[0].rows
 
 
-async def update_data_user(repository: Repository, email: str, first_name: str, last_name: str, birthdate: date,
+def update_data_user(repository: Repository, email: str, first_name: str, last_name: str, birthdate: date,
                            phone: str) -> bool:
-    return (await repository.execute("""PRAGMA TablePathPrefix("{}");
+    return (repository.execute("""PRAGMA TablePathPrefix("{}");
         UPDATE user
         SET email="{}", first_name="{}", last_name="{}", birthdate = Date("{}")
         WHERE phone = "{}";
     """.format(YDB_DATABASE, email, first_name, last_name, birthdate, phone), {}))
 
 
-async def is_children_event(repository: Repository, slot_id: int) -> bool:
-    event = (await repository.execute("""PRAGMA TablePathPrefix("{}");
+def is_children_event(repository: Repository, slot_id: int) -> bool:
+    event = (repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT is_children FROM event
         INNER JOIN slots
         ON event.event_id = slots.event_id
@@ -74,13 +87,13 @@ async def is_children_event(repository: Repository, slot_id: int) -> bool:
     return False
 
 
-async def get_user(repository: Repository, phone: str) -> model.User | None:
-    user = (await repository.execute("""PRAGMA TablePathPrefix("{}");
+def get_user(repository: Repository, phone: str) -> model.User | None:
+    user = (repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT * FROM user
     WHERE phone = "{}";
     """.format(YDB_DATABASE, phone), {}))[0].rows
     if user:
-        print(user[0])
+        logger.info(user[0])
         return model.User(
             user_id=user[0].user_id,
             first_name=user[0].first_name,
@@ -90,20 +103,20 @@ async def get_user(repository: Repository, phone: str) -> model.User | None:
             birthdate=date(1970, 1, 1) + timedelta(days=user[0].birthdate))
 
 
-async def get_user_by_ticket(repository: Repository, ticket_id: int) -> model.User:
-    user = (await repository.execute("""PRAGMA TablePathPrefix("{}");
+def get_user_by_ticket(repository: Repository, ticket_id: int) -> model.User:
+    user = (repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT DISTINCT user.user_id AS user_id, first_name, last_name, phone, birthdate, email FROM ticket
         INNER JOIN user
         ON user.user_id = ticket.user_id
         WHERE ticket.ticket_id = {};
         """.format(YDB_DATABASE, ticket_id), {}))[0].rows
     if user:
-        print(user[0])
+        logger.info(user[0])
         return model.User(**user[0])
 
 
-async def get_tg_user(repository: Repository, telegram_id: int) -> model.TelegramUser | None:
-    tg_user = (await repository.execute("""PRAGMA TablePathPrefix("{}");
+def get_tg_user(repository: Repository, telegram_id: int) -> model.TelegramUser | None:
+    tg_user = (repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT * FROM tg_user
         WHERE telegram_id = {};
     """.format(YDB_DATABASE, telegram_id), {}))[0].rows
@@ -111,9 +124,9 @@ async def get_tg_user(repository: Repository, telegram_id: int) -> model.Telegra
         return model.TelegramUser(**tg_user[0])
 
 
-async def save_tg_user(repository: Repository, telegram_user: model.TelegramUser) -> None:
-    print(telegram_user.dict())
-    await repository.execute("""PRAGMA TablePathPrefix("{}");
+def save_tg_user(repository: Repository, telegram_user: model.TelegramUser) -> None:
+    logger.info(telegram_user.dict())
+    repository.execute("""PRAGMA TablePathPrefix("{}");
     
         DECLARE $tgUserData AS List<Struct<
             tg_user_id: Uint64,
@@ -139,23 +152,23 @@ async def save_tg_user(repository: Repository, telegram_user: model.TelegramUser
 
 class Repository:
     def __init__(self):
-        self.driver = ydb.aio.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
-                                     credentials=ydb.iam.ServiceAccountCredentials.from_file(
+        self.driver = ydb.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
+                                 credentials=ydb.iam.ServiceAccountCredentials.from_file(
                                          'service-key.json'))
-        self.pool = ydb.aio.SessionPool(self.driver, size=10)
+        self.pool = ydb.SessionPool(self.driver, size=10)
 
-    async def connect(self):
-        await self.driver.wait(fail_fast=True)
+    def connect(self):
+        self.driver.wait(fail_fast=True)
         return self
 
-    async def execute(self, query: str, data: dict):
-        print(query)
-        session = await self.pool.acquire()
-        prepared_query = await session.prepare(query)
-        result_transaction = await session.transaction(ydb.SerializableReadWrite()).execute(
+    def execute(self, query: str, data: dict):
+        logger.info(query)
+        session = self.pool.acquire()
+        prepared_query = session.prepare(query)
+        result_transaction = session.transaction(ydb.SerializableReadWrite()).execute(
             prepared_query,
             data,
             commit_tx=True,
         )
-        await self.pool.release(session)
+        self.pool.release(session)
         return result_transaction
