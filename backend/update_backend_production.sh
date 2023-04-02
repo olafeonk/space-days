@@ -48,7 +48,7 @@ yc sls container revisions deploy \
     --cores 1 \
     --execution-timeout 30s \
     --concurrency 8 \
-    --min-instances 0 \
+    --min-instances 1 \
     --environment ENDPOINT=${ENDPOINT},DB=${DB},SA_KEY_FILE=${YDB_SERVICE_ACCOUNT_KEY_FILE_CREDENTIALS} \
     --service-account-id ${SERVICE_ACCOUNT_ID} \
     --image "$new_image_name";

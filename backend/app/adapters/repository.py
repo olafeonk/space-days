@@ -161,8 +161,9 @@ class Repository:
         self.driver.wait(fail_fast=True)
         return self
 
-    def execute(self, query: str, data: dict):
+    def executeOld(self, query: str, data: dict):
         logger.info(query)
+
         session = self.pool.acquire()
         prepared_query = session.prepare(query)
         result_transaction = session.transaction(ydb.SerializableReadWrite()).execute(
@@ -172,3 +173,23 @@ class Repository:
         )
         self.pool.release(session)
         return result_transaction
+    
+    def execute(self, query: str, data: dict):
+        def executeInSession(session):
+            prepared_query = session.prepare(query)
+
+            ## Пример с явной транзакцией из нескольких запросов
+            ## Обязательное условие для выполнения транзакции: сначала все чтения, затем все записи
+            ## Пример отсюда: https://github.com/ydb-platform/ydb-python-sdk/blob/main/examples/basic_example_v1/basic_example.py
+            # tx = session.transaction(ydb.SerializableReadWrite()).begin()
+            # tx.execute(prepared_query, data)
+            # tx.commit()
+
+            return session.transaction().execute(
+                prepared_query,
+                data,
+                commit_tx=True)
+
+        logger.info(query)
+        result = self.pool.retry_operation_sync(executeInSession)
+        return result
