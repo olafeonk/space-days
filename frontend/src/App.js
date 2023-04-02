@@ -4,7 +4,7 @@ import HomePage from "./pages/HomePage";
 import EventsPage from "./pages/EventsPage";
 import RegistrationPage from "./pages/RegistrationPage";
 
-import "./App1.css";
+import "./App.css";
 
 const App = () => {
   return (
