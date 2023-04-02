@@ -909,6 +909,10 @@ span.event-card__title {
   left: -2px;
 }
 
+.registration-info__button {
+  margin: 0 35px;
+}
+
 /* carousel */
 
 input[type="radio"] {
@@ -1193,7 +1197,6 @@ input[type="radio"] {
   }
 
   .day-title {
-    margin: 0;
     font-size: 3rem;
   }
 
@@ -1207,6 +1210,10 @@ input[type="radio"] {
 
   .events-row {
     background: none;
+  }
+
+  .warning {
+    border-radius: 20px !important;
   }
 }
 
@@ -1251,10 +1258,18 @@ input[type="radio"] {
   }
 
   .registration-info {
-    margin: 0;
+    margin: 0 10px;
   }
 
   .registration {
     padding: 0 10px 60px;
+  }
+
+  .registration-info__button {
+    margin: 0 10px;
+  }
+
+  label.form-check-label {
+    font-size: 25px;
   }
 }

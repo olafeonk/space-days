@@ -160,7 +160,7 @@ function renderLoaded(
           <p>{description}</p>
         </Col>
       </Row>
-      <Row>
+      <Row className="registration-info__button">
         <Col>
           <Button
             disabled={registrationDisabled}
@@ -173,7 +173,7 @@ function renderLoaded(
           </Button>
         </Col>
       </Row>
-      <Row>
+      <Row className="mx-4">
         <Col className="d-flex flex-column policy justify-content-center align-items-center w-100">
           <p>
             Нажимая кнопку, вы соглашаетесь с{" "}
