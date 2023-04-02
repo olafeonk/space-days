@@ -11,6 +11,7 @@ import Footer from "../components/Footer";
 import { padTime, pluralize } from "../core";
 import { getEventsByDays, getEventsByHours } from "../apis/backend";
 import Image from "react-bootstrap/Image";
+import Loader from "../components/Loader";
 
 const DEFAULT_EVENT_IMAGE = "./image/planet_3.png";
 
@@ -42,7 +43,10 @@ const EventsPage = () => {
   const body = renderBody(status, content, handleRegister);
 
   return (
-    <Container className="p-0">
+    <Container
+      className="p-0"
+      style={{ display: "flex", "flex-direction": "column", height: "100vh" }}
+    >
       <Header />
       {body}
       <Footer />
@@ -62,7 +66,7 @@ function renderBody(status, content, handleRegister) {
 }
 
 function renderLoading() {
-  return <h1 style={{ textAlign: "center", padding: 20 }}>Загрузка</h1>;
+  return <Loader />;
 }
 
 function renderLoaded(content, handleRegister) {
@@ -151,8 +155,9 @@ function renderLoaded(content, handleRegister) {
 function renderDayMenu(day) {
   const days = [8, 9, 10, 11, 12, 13, 14, 15];
   const result = days.map((it, index) => {
-    const className = `date-button rounded-pill ${it === day ? "date-button_checked" : ""
-      }`;
+    const className = `date-button rounded-pill ${
+      it === day ? "date-button_checked" : ""
+    }`;
     return (
       <LinkContainer
         key={index}
@@ -180,8 +185,9 @@ function renderTimeMenu(day, hour) {
   return (
     <Row className="time-row">
       {hours.map((h) => {
-        const className = `time-button rounded-pill ${h === hour ? "time-button_checked" : ""
-          }`;
+        const className = `time-button rounded-pill ${
+          h === hour ? "time-button_checked" : ""
+        }`;
         return (
           <Col key={h}>
             <LinkContainer
@@ -202,8 +208,11 @@ function renderError() {
   return (
     <>
       <h1 style={{ textAlign: "center", padding: 20 }}>Ошибка</h1>
-      <div style={{ textAlign: "center" }}><a href="/">На главную</a></div>
-    </>);
+      <div style={{ textAlign: "center" }}>
+        <a href="/">На главную</a>
+      </div>
+    </>
+  );
 }
 
 function useLoading() {

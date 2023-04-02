@@ -11,6 +11,7 @@ import { padTime, pluralize } from "../core";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Ticket from "../components/Ticket";
+import Loader from "../components/Loader";
 
 const STATUS_LOADING = 0;
 const STATUS_ERROR = -1;
@@ -46,12 +47,19 @@ const RegistrationPage = () => {
     }
 
     if (result.status === 409) {
-      const reason = result.body && result.body.headers && result.body.headers.reason;
-      const amount = result.body && result.body.headers && result.body.headers.amount;
+      const reason =
+        result.body && result.body.headers && result.body.headers.reason;
+      const amount =
+        result.body && result.body.headers && result.body.headers.amount;
       if (reason === "already_registered") {
         setErrorMessage("Вы уже регистрировались на это мероприятие");
       } else if (reason === "no_tickets") {
-        const msg = `${pluralize(amount, 'Остался', 'Осталось', 'Осталось')} только ${amount} ${pluralize(amount, 'билет', 'билета', 'билетов')}`;
+        const msg = `${pluralize(
+          amount,
+          "Остался",
+          "Осталось",
+          "Осталось"
+        )} только ${amount} ${pluralize(amount, "билет", "билета", "билетов")}`;
         setErrorMessage(msg);
       } else {
         setErrorMessage("Конфликт при регистрации");
@@ -73,7 +81,14 @@ const RegistrationPage = () => {
     case STATUS_LOADING:
       return renderLoading();
     case STATUS_LOADED:
-      return renderLoaded(form, event, slot, errorMessage, handleFormChange, handleRegister);
+      return renderLoaded(
+        form,
+        event,
+        slot,
+        errorMessage,
+        handleFormChange,
+        handleRegister
+      );
     case STATUS_SUCCESS:
       return renderSuccess(event, slot, ticket);
     default:
@@ -82,10 +97,25 @@ const RegistrationPage = () => {
 };
 
 function renderLoading() {
-  return <h1 style={{ textAlign: "center", padding: 20 }}>Загрузка</h1>;
+  return (
+    <div
+      style={{ display: "flex", "flex-direction": "column", height: "100vh" }}
+    >
+      <Header />
+      <Loader />
+      <Footer />
+    </div>
+  );
 }
 
-function renderLoaded(form, event, slot, errorMessage, handleFormChange, handleRegister) {
+function renderLoaded(
+  form,
+  event,
+  slot,
+  errorMessage,
+  handleFormChange,
+  handleRegister
+) {
   const { title, location, description } = event;
   const dateTime = convertTime(slot.start_time);
   const registrationDisabled = !checkFormFilled(form);
@@ -156,7 +186,12 @@ function renderLoaded(form, event, slot, errorMessage, handleFormChange, handleR
             </a>
             .
           </p>
-          <h3 className={"text-danger"} style={{ textAlign: "center", padding: 10 }}>{errorMessage}</h3>
+          <h3
+            className={"text-danger"}
+            style={{ textAlign: "center", padding: 10 }}
+          >
+            {errorMessage}
+          </h3>
         </Col>
       </Row>
       <Footer />
@@ -172,8 +207,11 @@ function renderError() {
   return (
     <>
       <h1 style={{ textAlign: "center", padding: 20 }}>Ошибка</h1>
-      <div style={{ textAlign: "center" }}><a href="/">На главную</a></div>
-    </>);
+      <div style={{ textAlign: "center" }}>
+        <a href="/">На главную</a>
+      </div>
+    </>
+  );
 }
 
 function checkFormFilled(form) {
@@ -202,8 +240,7 @@ function useForm() {
   try {
     const savedFormString = window.localStorage.getItem("form");
     savedForm = savedFormString && JSON.parse(savedFormString);
-  } catch {
-  }
+  } catch {}
   const defaultForm = {
     surname: "",
     name: "",

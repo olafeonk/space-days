@@ -72,6 +72,7 @@
   box-shadow: 0px 5px 20px 0px rgb(32 32 32 / 10%);
   padding: 30px 10px;
   text-transform: uppercase;
+  flex: 0 0 auto;
 }
 
 .header .col {
@@ -1028,6 +1029,73 @@ input[type="radio"] {
   transform: translatex(0) scale(1);
   z-index: 2;
   filter: none;
+}
+
+/* loader */
+
+.loader {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.solar-system {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 80;
+  margin: auto;
+}
+
+#mercury {
+  animation: mercury 1s infinite linear;
+}
+
+#venus {
+  animation: venus 2.56s infinite linear;
+}
+
+#earth {
+  animation: earth 4.15s infinite linear;
+}
+
+#mars {
+  animation: mars 7.805s infinite linear;
+}
+
+@keyframes mercury {
+  from {
+    transform: rotate(0deg) translateX(-35px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(-35px) rotate(-360deg);
+  }
+}
+
+@keyframes venus {
+  from {
+    transform: rotate(0deg) translateX(-55px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(-55px) rotate(-360deg);
+  }
+}
+
+@keyframes earth {
+  from {
+    transform: rotate(0deg) translateX(-75px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(-75px) rotate(-360deg);
+  }
+}
+
+@keyframes mars {
+  from {
+    transform: rotate(0deg) translateX(-95px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(-95px) rotate(-360deg);
+  }
 }
 
 @media screen and (max-width: 1400px) {
