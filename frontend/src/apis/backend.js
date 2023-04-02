@@ -2,11 +2,13 @@ import { API_BASE_URL } from "../constants";
 
 export async function getEvent(id) {
     if (API_BASE_URL) {
-        let response = await getEventInternal(id);
-        if (response.status === 500) {
-            await delay(1000);
-            response = await getEventInternal(id);
-        }
+        const response = await fetch(`${API_BASE_URL}/events/?id=${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
         if (response.ok) {
             const result = await response.json();
             return result;
@@ -19,23 +21,15 @@ export async function getEvent(id) {
     }
 }
 
-async function getEventInternal(id) {
-    const response = await fetch(`${API_BASE_URL}/events/?id=${id}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-    return response;
-}
-
 export async function getEventsByDays(days) {
     if (API_BASE_URL) {
-        let response = await getEventsByDaysInternal(days);
-        if (response.status === 500) {
-            await delay(1000);
-            response = await getEventsByDaysInternal(days);
-        }
+        const daysQuery = days.map(d => `days=${d}`).join('&');
+        const response = await fetch(`${API_BASE_URL}/events/?${daysQuery}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
 
         if (response.ok) {
             const result = await response.json();
@@ -49,24 +43,15 @@ export async function getEventsByDays(days) {
     }
 }
 
-async function getEventsByDaysInternal(days) {
-    const daysQuery = days.map(d => `days=${d}`).join('&');
-    const response = await fetch(`${API_BASE_URL}/events/?${daysQuery}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-    return response;
-}
-
 export async function getEventsByHours(day, hours) {
     if (API_BASE_URL) {
-        let response = await getEventsByHoursInternal(day, hours);
-        if (response.status === 500) {
-            await delay(1000);
-            response = await getEventsByHoursInternal(day, hours);
-        }
+        const hoursQuery = hours.map(d => `hours=${d}`).join('&');
+        const response = await fetch(`${API_BASE_URL}/events/?days=${day}&${hoursQuery}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
 
         if (response.ok) {
             const result = await response.json();
@@ -78,17 +63,6 @@ export async function getEventsByHours(day, hours) {
     } else {
         return delay(1000).then(() => sampleByHoursEvents);
     }
-}
-
-async function getEventsByHoursInternal(day, hours) {
-    const hoursQuery = hours.map(d => `hours=${d}`).join('&');
-    const response = await fetch(`${API_BASE_URL}/events/?days=${day}&${hoursQuery}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-    return response;
 }
 
 export async function subscribeEvent(slotId, form, force = false) {
