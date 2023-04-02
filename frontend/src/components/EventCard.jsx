@@ -51,7 +51,7 @@ const EventCard = ({ event, onRegister }) => {
         className="rounded-pill event-card__button"
         onClick={handleRegister}
       >
-        Зарегистрироваться
+        {slot ? "Зарегистрироваться" : "Выберите время"}
       </Button>
     </Col>
   );
