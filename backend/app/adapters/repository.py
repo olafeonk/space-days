@@ -87,6 +87,22 @@ def is_children_event(repository: Repository, slot_id: int) -> bool:
     return False
 
 
+def save_mailing(repository: Repository, mailing: model.Mailing):
+    repository.execute("""PRAGMA TablePathPrefix("{}");
+        DECLARE $mailingData AS List<Struct<
+            mailing_id: Utf8,
+            user_id: Utf8,
+            response: Utf8>>
+        
+        INSERT INTO mailings
+        SELECT 
+            mailing_id,
+            user_id,
+            response
+        FROM AS_TABLE($mailingData);
+    """, {"$mailingData": [mailing]})
+
+
 def get_user(repository: Repository, phone: str) -> model.User | None:
     user = (repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT * FROM user

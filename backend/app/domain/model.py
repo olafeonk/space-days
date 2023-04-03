@@ -57,3 +57,9 @@ class TelegramUser(BaseModel):
     username: str
     first_name: str
     last_name: str | None
+
+
+class Mailing(BaseModel):
+    mailing_id: str
+    user_id: str
+    response: str

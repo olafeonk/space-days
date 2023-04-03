@@ -3,12 +3,14 @@ from __future__ import annotations
 import logging
 import uuid
 
+import requests
+from requests import request
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import uvicorn
 from pydantic import BaseModel, EmailStr
-from datetime import datetime, date
+from datetime import datetime, date, time
 from ..config import YDB_DATABASE, API_TOKEN
 from ..adapters.repository import (
     get_count_table,
@@ -18,6 +20,7 @@ from ..adapters.repository import (
     is_children_event, get_user,
     is_available_slot,
     is_user_already_registration,
+    save_mailing, get_slot
 )
 import app.domain.model as model
 import aiohttp
@@ -196,26 +199,46 @@ WHERE user_id = {}
 """
 
 
-async def send_email(email: str, first_name: str, last_name: str, ticket: int):
+def send_email(
+        repository: Repository,
+        email: str,
+        first_name: str,
+        last_name: str,
+        ticket: int,
+        user_id: str,
+        date_event: str,
+        time_event: str,
+        location: str,
+        adult_count: int,
+        child_count: int,
+):
+    """
+        Notisend api
+        https://notisend.ru/dev/email/api/#TOC_d7a6319e563f08691be55897faac38c2
+    """
     headers = {'Authorization': f'Bearer {API_TOKEN}', 'Content-Type': 'application/json'}
     data = {
         "to": email,
+        "payment": "credit",
         "params": {
             "first_name": first_name,
             "last_name": last_name,
             "ticket": ticket,
+            "date": date_event,
+            "time": time_event,
+            "address": location,
+            "adult_count": adult_count,
+            "child_count": child_count,
         }
     }
     logger.info(f"Send email to {email}, data {data}, headers {headers}")
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post('https://api.notisend.ru/v1/email/templates/782569/messages',
-                                    headers=headers, json=data) as r:
-                result = await r.json()
-                logger.info(result)
+        resp = requests.post('https://api.notisend.ru/v1/email/templates/782569/messages', headers=headers, json=data)
+        logger.info(resp.json())
+        save_mailing(repository, model.Mailing(mailing_id=uuid.uuid4(), user_id=user_id, response=str(resp.json())))
+        resp.raise_for_status()
     except Exception:
         logger.error("Fail sending", exc_info=True)
-        raise
     else:
         logger.info("Successful send")
 
@@ -411,6 +434,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         email=user.email,
     )
     logger.info(f"children: {children}, user: {user}, ticket: {ticket}")
+    slot = get_slot(repository, ticket.slot_id)
     repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
                        {
                            "$childData": children,
@@ -418,6 +442,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
                            "$ticketData": [ticket],
                        })
     logger.info("Success Query")
+    send_email(repository, user.email, user.first_name, user.last_name, ticket.ticket_id, user.user_id)
     return TicketResponse(
         ticket_id=ticket.ticket_id,
         user_id=ticket.user_id,
