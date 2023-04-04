@@ -985,6 +985,63 @@ span.event-card__title {
   transform: rotateZ(180deg);
 }
 
+.tickets-page {
+  width: 100%;
+  padding: 30px 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.tickets-page_with-tickets .tickets-page__form {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.tickets-page_with-tickets input {
+  width: 300px;
+}
+
+.tickets-page_with-tickets button {
+  height: 50px;
+  margin: 24px 0 12px;
+}
+
+.tickets-page__form {
+  max-width: 320px;
+}
+
+.tickets-page__form input {
+  height: 50px;
+  margin-bottom: 20px;
+}
+
+.tickets-page .ticket-wrapper {
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tickets-page .ticket-wrapper div {
+  border: #f8f8f8 solid 2px;
+  box-shadow: 0px 5px 20px 0px rgb(32 32 32 / 10%);
+}
+
+.tickets-page_with-tickets .ticket__number {
+  font-size: 2rem;
+}
+
+.tickets-page_with-tickets .ticket__info {
+  margin: 0;
+}
+
 /* carousel */
 
 input[type="radio"] {
@@ -1295,6 +1352,16 @@ input[type="radio"] {
 
   .error .btn {
     font-size: 18px;
+  }
+
+  .tickets-page_with-tickets .tickets-page__form {
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  .tickets-page_with-tickets .tickets-page__form button {
+    margin: 0 0 20px;
+    width: 300px;
   }
 }
 
