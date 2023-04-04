@@ -19,7 +19,7 @@ const EventCard = ({ event, onRegister }) => {
         <hr></hr>
         <div>
           <span className="event-card__title">Дата:</span>{" "}
-          <span>{event.date}</span>
+          <span className="event-card__title-date">{event.date}</span>
         </div>
         <div className="slots">
           <span className="event-card__title">Время:</span>{" "}
