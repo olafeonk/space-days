@@ -948,6 +948,43 @@ span.event-card__title {
   color: #5e7fd6;
 }
 
+.partners .marquee-container {
+  overflow-x: scroll !important;
+}
+
+.partners .marquee-container::-webkit-scrollbar {
+  display: none;
+}
+
+.partners .marquee-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.partners .col:last-child {
+  position: relative;
+}
+
+.partners .col:last-child::before,
+.partners .col:last-child::after {
+  background: linear-gradient(to right, #fff, #fff0);
+  content: "";
+  height: 100%;
+  position: absolute;
+  width: 20px;
+  z-index: 3;
+}
+
+.partners .col:last-child::before {
+  left: -1px;
+}
+
+.partners .col:last-child::after {
+  right: -1px;
+  top: 0;
+  transform: rotateZ(180deg);
+}
+
 /* carousel */
 
 input[type="radio"] {

@@ -82,15 +82,14 @@ const RegistrationPage = () => {
     case STATUS_LOADING:
       return renderLoading();
     case STATUS_LOADED:
-      return renderLoading();
-    // return renderLoaded(
-    //   form,
-    //   event,
-    //   slot,
-    //   errorMessage,
-    //   handleFormChange,
-    //   handleRegister
-    // );
+      return renderLoaded(
+        form,
+        event,
+        slot,
+        errorMessage,
+        handleFormChange,
+        handleRegister
+      );
     case STATUS_SUCCESS:
       return renderSuccess(event, slot, ticket);
     default:

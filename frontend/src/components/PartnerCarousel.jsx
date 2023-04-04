@@ -3,7 +3,7 @@ import Image from "react-bootstrap/Image";
 
 function PartnerCarousel() {
   return (
-    <Marquee pauseOnHover={true} speed={60} gradientWidth={20}>
+    <Marquee pauseOnHover={true} speed={60} gradient={false}>
       <a href="https://zsfond.ru">
         <Image
           src="./image/partners/zolotoesechenie.png"
