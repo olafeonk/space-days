@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Image from "react-bootstrap/Image";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import partnersLinks from "../partnersLinks";
 
 const EventCard = ({ event, onRegister }) => {
   const [slot, setSlot] = useState(null);
@@ -11,15 +12,17 @@ const EventCard = ({ event, onRegister }) => {
 
   return (
     <Col className="event-card" as={"article"}>
-      <div className="img-wrapper">
-        <Image fluid rounded src={event.image}></Image>
-      </div>
+      <a href={partnersLinks[event.id_partner]}>
+        <div className="img-wrapper">
+          <Image fluid rounded src={event.image}></Image>
+        </div>
+      </a>
       <div>
         <h3>{event.title}</h3>
         <hr></hr>
         <div>
           <span className="event-card__title">Дата:</span>{" "}
-          <span>{event.date}</span>
+          <span className="event-card__title-date">{event.date}</span>
         </div>
         <div className="slots">
           <span className="event-card__title">Время:</span>{" "}
@@ -31,7 +34,7 @@ const EventCard = ({ event, onRegister }) => {
             {renderSlots(event.times, slot, setSlot)}
           </div>
         </div>
-        <div>
+        <div className="event-card__age">
           <span className="event-card__title">Возраст:</span>{" "}
           <span>{event.age}</span>
         </div>
@@ -43,7 +46,7 @@ const EventCard = ({ event, onRegister }) => {
           <span className="event-card__title">Место мероприятия:</span>{" "}
           <span>{event.location}</span>
         </div>
-        <p>{event.summary}</p>
+        <p className="event-card__description">{event.description}</p>
       </div>
       <Button
         disabled={!slot}

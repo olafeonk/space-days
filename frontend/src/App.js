@@ -3,6 +3,7 @@ import { Routes, Route, HashRouter } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import EventsPage from "./pages/EventsPage";
 import RegistrationPage from "./pages/RegistrationPage";
+import TicketsPage from "./pages/TicketsPage";
 
 import "./App.css";
 
@@ -18,6 +19,7 @@ const App = () => {
             <RegistrationPage />
           }
         />
+        <Route path="/tickets" element={<TicketsPage />} />
       </Routes>
     </HashRouter>
   );

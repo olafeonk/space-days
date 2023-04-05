@@ -25,13 +25,19 @@ from ..adapters.repository import (
 import app.domain.model as model
 import aiohttp
 
+from pythonjsonlogger import jsonlogger
+
+class YcLoggingFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super(YcLoggingFormatter, self).add_fields(log_record, record, message_dict)
+        log_record['logger'] = record.name
+        log_record['level'] = str.replace(str.replace(record.levelname, "WARNING", "WARN"), "CRITICAL", "FATAL")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-
 stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(py_formatter)
+stream_handler.setFormatter(YcLoggingFormatter('%(message)s %(level)s %(logger)s'))
 logger.addHandler(stream_handler)
 
 router = APIRouter()
@@ -333,16 +339,20 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         phone = refactor_phone(user.phone)
     except TypeError:
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        logger.error("Invalid phone:", user.phone, exc_info=True)
+        logger.warning(f"Invalid phone: {user.phone}", exc_info=True)
         return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='invalid phone')
     if len(childs) > 3:
         response.status_code = status.HTTP_400_BAD_REQUEST
         logger.warning(f"Count child: {len(childs)} > 3")
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='too more child')
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail='too more child',
+                             headers={'reason': 'too more child'})
     if not is_available_slot(repository, slot_id=user.slot_id):
         response.status_code = status.HTTP_400_BAD_REQUEST
         logger.warning(f"Slot not exists {user.slot_id}")
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='slot not available')
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail='slot not available',
+                             headers={'reason': 'slot not available'})
     old_user = get_user(repository, phone)
     logger.info(old_user)
     if old_user and is_user_already_registration(repository, user.slot_id, old_user.user_id):

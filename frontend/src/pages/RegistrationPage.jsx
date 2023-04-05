@@ -12,6 +12,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Ticket from "../components/Ticket";
 import Loader from "../components/Loader";
+import Error from "../components/Error";
 
 const STATUS_LOADING = 0;
 const STATUS_ERROR = -1;
@@ -72,6 +73,19 @@ const RegistrationPage = () => {
       return;
     }
 
+    if (result.status === 400) {
+      const reason =
+        result.body && result.body.headers && result.body.headers.reason;
+      if (reason === "too more child") {
+        setErrorMessage("Добавлено более 3-х детей");
+      } else if (reason === "slot not available") {
+        setErrorMessage("Время недоступно");
+      } else {
+        setErrorMessage("Некорретные данные");
+      }
+      return;
+    }
+
     setErrorMessage(null);
     setStatus(STATUS_ERROR);
     setTicket(null);
@@ -98,13 +112,13 @@ const RegistrationPage = () => {
 
 function renderLoading() {
   return (
-    <div
+    <Container
       style={{ display: "flex", "flex-direction": "column", height: "100vh" }}
     >
       <Header />
       <Loader />
       <Footer />
-    </div>
+    </Container>
   );
 }
 
@@ -204,14 +218,7 @@ function renderSuccess(event, slot, ticket) {
 }
 
 function renderError() {
-  return (
-    <>
-      <h1 style={{ textAlign: "center", padding: 20 }}>Ошибка</h1>
-      <div style={{ textAlign: "center" }}>
-        <a href="/">На главную</a>
-      </div>
-    </>
-  );
+  return <Error />;
 }
 
 function checkFormFilled(form) {

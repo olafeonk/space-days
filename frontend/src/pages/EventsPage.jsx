@@ -12,6 +12,7 @@ import { padTime, pluralize } from "../core";
 import { getEventsByDays, getEventsByHours } from "../apis/backend";
 import Image from "react-bootstrap/Image";
 import Loader from "../components/Loader";
+import Error from "../components/Error";
 
 const DEFAULT_EVENT_IMAGE = "./image/planet_3.png";
 
@@ -85,7 +86,7 @@ function renderLoaded(content, handleRegister) {
             <Image src="./image/icon1.png" alt="1 человек"></Image>
           </div>
           <Image src="./image/line.png" alt="разделитель"></Image>
-          <div className="info-img" alt="1&nbsp;мерориятие">
+          <div className="info-img" alt="1&nbsp;мероприятие">
             <Image
               src="./image/icon2.png"
               alt="1 мерориятие"
@@ -205,14 +206,7 @@ function renderTimeMenu(day, hour) {
 }
 
 function renderError() {
-  return (
-    <>
-      <h1 style={{ textAlign: "center", padding: 20 }}>Ошибка</h1>
-      <div style={{ textAlign: "center" }}>
-        <a href="/">На главную</a>
-      </div>
-    </>
-  );
+  return <Error />;
 }
 
 function useLoading() {
@@ -270,6 +264,7 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     : DEFAULT_EVENT_IMAGE;
 
   const result = {
+    id_partner: backendEvent.id_partner,
     id: backendEvent.event_id,
     title: backendEvent.title,
     image: image,
