@@ -1,9 +1,8 @@
 import logging
-import uuid
 
 import requests
 
-from .model import Mailing, MailingData
+from .model import SendingLog, MailingData
 from .repository import Repository, get_data_mailing, save_mailing
 from .config import API_TOKEN
 from datetime import datetime, timedelta
@@ -36,10 +35,14 @@ def get_noun(number: int, one: str, two: str, five: str) -> str:
     return five
 
 
+def get_datetime_now() -> str:
+    return (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 def send_email(
     repository: Repository,
     mailing: MailingData,
-) -> int:
+):
     """
         Notisend api
         https://notisend.ru/dev/email/api/#TOC_d7a6319e563f08691be55897faac38c2
@@ -67,7 +70,8 @@ def send_email(
         resp = requests.post('https://api.notisend.ru/v1/email/templates/782569/messages', headers=headers, json=data)
         logger.info(resp.json())
         save_mailing(repository,
-                     Mailing(mailing_id=mailing.mailing_id, user_id=mailing.user_id, response=str(resp.json())),
+                     SendingLog(mailing_id=mailing.mailing_id, user_id=mailing.user_id, response=str(resp.json()),
+                                created_at=get_datetime_now()),
                      mailing.ticket_id)
         resp.raise_for_status()
     except Exception:

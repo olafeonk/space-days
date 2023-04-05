@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import date
+from datetime import date, datetime
 
 
 class Email(BaseModel):
@@ -30,6 +30,7 @@ class Ticket(BaseModel):
     slot_id: int
     amount: int
     user_data: str
+    created_at: str
 
 
 class Child(BaseModel):
@@ -59,15 +60,17 @@ class TelegramUser(BaseModel):
     last_name: str | None
 
 
-class Mailing(BaseModel):
+class SendingLog(BaseModel):
     mailing_id: str
     user_id: str
     response: str
+    created_at: str
 
 
-class NewMailing(BaseModel):
+class Mailing(BaseModel):
     mailing_id: str
     adult_count: int
     child_count: int
     ticket_id: int
     is_send: bool
+    created_at: str | None

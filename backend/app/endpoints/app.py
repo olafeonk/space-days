@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import uvicorn
 from pydantic import BaseModel, EmailStr
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from ..config import YDB_DATABASE, API_TOKEN
 from ..adapters.repository import (
     get_count_table,
@@ -27,11 +27,13 @@ import aiohttp
 
 from pythonjsonlogger import jsonlogger
 
+
 class YcLoggingFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
-        super(YcLoggingFormatter, self).add_fields(log_record, record, message_dict)
+        super().add_fields(log_record, record, message_dict)
         log_record['logger'] = record.name
         log_record['level'] = str.replace(str.replace(record.levelname, "WARNING", "WARN"), "CRITICAL", "FATAL")
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -164,7 +166,8 @@ DECLARE $ticketData AS List<Struct<
     slot_id: Uint64,
     user_id: Utf8,
     amount: Int64,
-    user_data: Utf8>>;
+    user_data: Utf8,
+    created_at: Utf8>>;
     
 UPSERT INTO user
 SELECT
@@ -191,7 +194,8 @@ SELECT
     user_id,
     slot_id,
     amount,
-    user_data
+    user_data,
+    CAST(created_at AS Datetime) AS created_at
 FROM AS_TABLE($ticketData);
 """
 
@@ -203,6 +207,10 @@ INNER JOIN event
 ON event.event_id = slots.event_id
 WHERE user_id = {}
 """
+
+
+def get_datetime_now() -> str:
+    return (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 @router.get("/api/test")
@@ -390,6 +398,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         slot_id=user.slot_id,
         amount=booked_tickets,
         user_data=user_response,
+        created_at=get_datetime_now(),
     )
     user = model.User(
         user_id=user_n,
@@ -407,12 +416,13 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
                            "$ticketData": [ticket],
                        })
     logger.info("Success Query")
-    save_new_mailing(repository, model.NewMailing(
+    save_new_mailing(repository, model.SendingLog(
         mailing_id=str(uuid.uuid4()),
         child_count=len(childs),
         adult_count=ticket.amount - len(childs),
         ticket_id=ticket.ticket_id,
         is_send=False,
+        created_at=get_datetime_now(),
     ))
     return TicketResponse(
         ticket_id=ticket.ticket_id,

@@ -4,7 +4,7 @@ import ydb
 import ydb.iam
 
 from .config import YDB_ENDPOINT, YDB_DATABASE
-from .model import MailingData, Mailing
+from .model import MailingData, SendingLog
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -18,9 +18,9 @@ logger.addHandler(stream_handler)
 
 def get_data_mailing(repository: Repository) -> list[MailingData]:
     mailing_data = repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT mailing_id, user.user_id AS user_id, first_name, last_name, ticket.ticket_id AS ticket_id, title, email, start_time, duration, location, adult_count, child_count FROM new_mailing
+    SELECT mailing_id, user.user_id AS user_id, first_name, last_name, ticket.ticket_id AS ticket_id, title, email, start_time, duration, location, adult_count, child_count FROM mailing
     INNER JOIN ticket
-    ON ticket.ticket_id=new_mailing.ticket_id
+    ON ticket.ticket_id=mailings.ticket_id
     INNER JOIN slots
     ON ticket.slot_id = slots.slot_id
     INNER JOIN user
@@ -36,24 +36,26 @@ def get_data_mailing(repository: Repository) -> list[MailingData]:
     return mailings
 
 
-def save_mailing(repository: Repository, mailing: Mailing, ticket_id: int):
+def save_mailing(repository: Repository, mailing: SendingLog, ticket_id: int):
     repository.execute("""PRAGMA TablePathPrefix("{}");
-        DECLARE $mailingData AS List<Struct<
+        DECLARE $logData AS List<Struct<
             mailing_id: Utf8,
             user_id: Utf8,
-            response: Utf8>>;
+            response: Utf8,
+            created_at: Utf8>>;
 
-        INSERT INTO mailings
+        INSERT INTO sending_log
         SELECT 
             mailing_id,
             user_id,
-            response
-        FROM AS_TABLE($mailingData);
+            response,
+            CAST(created_at AS Datetime) AS created_at
+        FROM AS_TABLE($logData);
 
-        UPDATE new_mailing
+        UPDATE mailings
         SET is_send=true
         WHERE ticket_id={};
-    """.format(YDB_DATABASE, ticket_id), {"$mailingData": [mailing]})
+    """.format(YDB_DATABASE, ticket_id), {"$logData": [mailing]})
 
 
 class Repository:

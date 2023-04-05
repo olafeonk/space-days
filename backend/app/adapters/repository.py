@@ -87,24 +87,26 @@ def is_children_event(repository: Repository, slot_id: int) -> bool:
     return False
 
 
-def save_new_mailing(repository: Repository, mailing: model.NewMailing):
+def save_new_mailing(repository: Repository, mailing: model.SendingLog):
     repository.execute("""PRAGMA TablePathPrefix("{}");
-        DECLARE $new_mailingData AS List<Struct<
+        DECLARE $mailingData AS List<Struct<
             mailing_id: Utf8,
             adult_count: Int64,
             child_count: Int64,
             ticket_id: Uint64,
-            is_send: bool>>;
+            is_send: bool,
+            created_at: Utf8>>;
 
-        INSERT INTO new_mailing
+        INSERT INTO mailings
         SELECT 
             mailing_id,
             adult_count,
             child_count,
             ticket_id,
             is_send,
-        FROM AS_TABLE($new_mailingData);
-    """.format(YDB_DATABASE), {"$new_mailingData": [mailing]})
+            CAST(created_at AS Datetime) AS created_at
+        FROM AS_TABLE($mailingData);
+    """.format(YDB_DATABASE), {"$mailingData": [mailing]})
 
 
 def get_user(repository: Repository, phone: str) -> model.User | None:

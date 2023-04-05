@@ -1,10 +1,11 @@
 from pydantic import BaseModel
 
 
-class Mailing(BaseModel):
+class SendingLog(BaseModel):
     mailing_id: str
     user_id: str
     response: str
+    created_at: str
 
 
 class MailingData(BaseModel):
