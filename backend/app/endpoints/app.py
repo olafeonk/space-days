@@ -33,8 +33,6 @@ class YcLoggingFormatter(jsonlogger.JsonFormatter):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(YcLoggingFormatter('%(message)s %(level)s %(logger)s'))
 logger.addHandler(stream_handler)
