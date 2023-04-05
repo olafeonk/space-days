@@ -22,13 +22,21 @@ from ..adapters.repository import (
 import app.domain.model as model
 import aiohttp
 
+from pythonjsonlogger import jsonlogger
+
+class YcLoggingFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super(YcLoggingFormatter, self).add_fields(log_record, record, message_dict)
+        log_record['logger'] = record.name
+        log_record['level'] = str.replace(str.replace(record.levelname, "WARNING", "WARN"), "CRITICAL", "FATAL")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
 
 stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(py_formatter)
+stream_handler.setFormatter(YcLoggingFormatter('%(message)s %(level)s %(logger)s'))
 logger.addHandler(stream_handler)
 
 router = APIRouter()
