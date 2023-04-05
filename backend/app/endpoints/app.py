@@ -409,13 +409,6 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         email=user.email,
     )
     logger.info(f"children: {children}, user: {user}, ticket: {ticket}")
-    repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
-                       {
-                           "$childData": children,
-                           "$userData": [user],
-                           "$ticketData": [ticket],
-                       })
-    logger.info("Success Query")
     save_new_mailing(repository, model.Mailing(
         mailing_id=str(uuid.uuid4()),
         child_count=len(childs),
@@ -424,6 +417,13 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         is_send=False,
         created_at=get_datetime_now(),
     ))
+    repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
+                       {
+                           "$childData": children,
+                           "$userData": [user],
+                           "$ticketData": [ticket],
+                       })
+    logger.info("Success Query")
     return TicketResponse(
         ticket_id=ticket.ticket_id,
         user_id=ticket.user_id,
