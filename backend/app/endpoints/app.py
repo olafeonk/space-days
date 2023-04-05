@@ -360,7 +360,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         phone = refactor_phone(user.phone)
     except TypeError:
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        logger.error(f"Invalid phone: {user.phone}", exc_info=True)
+        logger.warning(f"Invalid phone: {user.phone}", exc_info=True)
         return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='invalid phone')
     if len(childs) > 3:
         response.status_code = status.HTTP_400_BAD_REQUEST
