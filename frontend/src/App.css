@@ -1042,6 +1042,24 @@ span.event-card__title {
   margin: 0;
 }
 
+.event-card__description {
+  overflow-y: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.event-card__location {
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.event-card__age span,
+.event-card__duration span,
+.event-card__location span {
+  font-size: 16px;
+}
+
 /* carousel */
 
 input[type="radio"] {

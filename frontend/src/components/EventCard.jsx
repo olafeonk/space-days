@@ -31,7 +31,7 @@ const EventCard = ({ event, onRegister }) => {
             {renderSlots(event.times, slot, setSlot)}
           </div>
         </div>
-        <div>
+        <div className="event-card__age">
           <span className="event-card__title">Возраст:</span>{" "}
           <span>{event.age}</span>
         </div>
@@ -43,7 +43,7 @@ const EventCard = ({ event, onRegister }) => {
           <span className="event-card__title">Место мероприятия:</span>{" "}
           <span>{event.location}</span>
         </div>
-        <p>{event.summary}</p>
+        <p className="event-card__description">{event.description}</p>
       </div>
       <Button
         disabled={!slot}
