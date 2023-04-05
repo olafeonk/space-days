@@ -63,3 +63,11 @@ class Mailing(BaseModel):
     mailing_id: str
     user_id: str
     response: str
+
+
+class NewMailing(BaseModel):
+    mailing_id: str
+    adult_count: int
+    child_count: int
+    ticket_id: int
+    is_send: bool

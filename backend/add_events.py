@@ -73,12 +73,13 @@ def timestamp_to_str(start_time):
 
 
 def get_data() -> tuple[list[Event], list[Slot]]:
-    data = pd.read_excel("space_days2.xlsx")
+    data = pd.read_excel("space_days5.xlsx")
     print(data)
     events = []
     slot_counter = 0
     slots = []
     for index, row in data.iterrows():
+        print(row)
         event = Event(
             event_id=row['id'],
             description=row['Полное описание'],
