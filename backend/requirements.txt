@@ -6,3 +6,4 @@ python-dotenv~=1.0.0
 ydb[yc]
 email_validator
 aiogram
+python-json-logger==2.0.4
