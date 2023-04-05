@@ -416,7 +416,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
                            "$ticketData": [ticket],
                        })
     logger.info("Success Query")
-    save_new_mailing(repository, model.SendingLog(
+    save_new_mailing(repository, model.Mailing(
         mailing_id=str(uuid.uuid4()),
         child_count=len(childs),
         adult_count=ticket.amount - len(childs),
