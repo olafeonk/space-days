@@ -62,7 +62,7 @@ def is_available_slot(repository: Repository, slot_id: int) -> bool:
 def is_user_already_registration(repository: Repository, slot_id: int, user_id: str) -> bool:
     logger.info(user_id)
     return (repository.execute("""PRAGMA TablePathPrefix("{}");
-        SELECT * FROM ticket
+        SELECT * FROM ticket VIEW slot_id_index
         WHERE user_id = "{}" AND slot_id = {};
     """.format(YDB_DATABASE, user_id, slot_id), {}))[0].rows
 
