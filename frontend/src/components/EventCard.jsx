@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Image from "react-bootstrap/Image";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import partnersLinks from "../partnersLinks";
 
 const EventCard = ({ event, onRegister }) => {
   const [slot, setSlot] = useState(null);
@@ -11,9 +12,11 @@ const EventCard = ({ event, onRegister }) => {
 
   return (
     <Col className="event-card" as={"article"}>
-      <div className="img-wrapper">
-        <Image fluid rounded src={event.image}></Image>
-      </div>
+      <a href={partnersLinks[event.id_partner]}>
+        <div className="img-wrapper">
+          <Image fluid rounded src={event.image}></Image>
+        </div>
+      </a>
       <div>
         <h3>{event.title}</h3>
         <hr></hr>

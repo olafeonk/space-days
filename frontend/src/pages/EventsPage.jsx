@@ -264,6 +264,7 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     : DEFAULT_EVENT_IMAGE;
 
   const result = {
+    id_partner: backendEvent.id_partner,
     id: backendEvent.event_id,
     title: backendEvent.title,
     image: image,
