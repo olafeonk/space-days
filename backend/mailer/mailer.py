@@ -6,6 +6,7 @@ from .model import SendingLog, MailingData
 from .repository import Repository, get_data_mailing, save_mailing
 from .config import API_TOKEN
 from datetime import datetime, timedelta
+import time
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -66,18 +67,15 @@ def send_email(
         }
     }
     logger.info(f"Send email to {mailing.email}, data {data}, headers {headers}")
-    try:
-        resp = requests.post('https://api.notisend.ru/v1/email/templates/782569/messages', headers=headers, json=data)
-        logger.info(resp.json())
-        save_mailing(repository,
-                     SendingLog(mailing_id=mailing.mailing_id, user_id=mailing.user_id, response=str(resp.json()),
-                                created_at=get_datetime_now()),
-                     mailing.ticket_id)
-        resp.raise_for_status()
-    except Exception:
-        logger.error("Fail sending", exc_info=True)
-    else:
-        logger.info("Successful send")
+    resp = requests.post('https://api.notisend.ru/v1/email/templates/782569/messages', headers=headers, json=data)
+    logger.info(resp.json())
+    if resp.status_code // 100 != 2:
+        logger.critical(f"{resp.status_code} {resp.json()}")
+        exit(0)
+    save_mailing(repository,
+                 SendingLog(mailing_id=mailing.mailing_id, user_id=mailing.user_id, response=str(resp.json()),
+                            created_at=get_datetime_now()),
+                 mailing.ticket_id)
 
 
 def main():
@@ -86,3 +84,4 @@ def main():
     mailings = get_data_mailing(repository)
     for mailing in mailings:
         send_email(repository, mailing)
+        time.sleep(2)

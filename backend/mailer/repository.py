@@ -28,7 +28,7 @@ def get_data_mailing(repository: Repository) -> list[MailingData]:
     INNER JOIN event
     ON event.event_id = slots.event_id
     WHERE is_send = FALSE
-    LIMIT 20;
+    LIMIT 6;
     """.format(YDB_DATABASE), {})[0].rows
     mailings = []
     for mailing in mailing_data:
