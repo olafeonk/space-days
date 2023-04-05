@@ -367,11 +367,15 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
     if len(childs) > 3:
         response.status_code = status.HTTP_400_BAD_REQUEST
         logger.warning(f"Count child: {len(childs)} > 3")
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='too more child')
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail='too more child',
+                             headers={'reason': 'too more child'})
     if not is_available_slot(repository, slot_id=user.slot_id):
         response.status_code = status.HTTP_400_BAD_REQUEST
         logger.warning(f"Slot not exists {user.slot_id}")
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='slot not available')
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail='slot not available',
+                             headers={'reason': 'slot not available'})
     old_user = get_user(repository, phone)
     logger.info(old_user)
     if old_user and is_user_already_registration(repository, user.slot_id, old_user.user_id):
