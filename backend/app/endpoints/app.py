@@ -97,17 +97,19 @@ class TicketResponse(BaseModel):
     child: int
 
 
-class UserEventsRequest(BaseModel):
-    event_id: int
-    slot_id: int
+class UserEventsResponse(BaseModel):
+    ticket_id: int
+    amount: int
     user_id: str
+    slot_id: int
+    start_time: datetime
+    event_id: int
     title: str
     location: str
-    summary: str
     age: str | None
     duration: str | None
-    description: str
-    start_time: datetime
+    child: int
+
 
 
 ADD_EVENT_QUERY = """PRAGMA TablePathPrefix("{}");
@@ -200,12 +202,31 @@ FROM AS_TABLE($ticketData);
 """
 
 GET_USER_EVENTS = """PRAGMA TablePathPrefix("{}");
-SELECT slots.event_id AS event_id, slots.slot_id AS slot_id, title, location, age, duration, summary, description, start_time, user_id FROM slots
-INNER JOIN ticket
-ON ticket.slot_id = slots.slot_id
-INNER JOIN event
-ON event.event_id = slots.event_id
-WHERE user_id = {}
+SELECT
+ticket_id,
+SOME(ticket_x.amount) AS amount,
+SOME(ticket_x.user_id) AS user_id,
+
+SOME(slots.slot_id) AS slot_id,
+SOME(start_time) AS start_time,
+
+SOME(event.event_id) AS event_id,
+SOME(title) AS title,
+SOME(location) AS location,
+SOME(event.age) AS age,
+SOME(duration) AS duration,
+
+COUNT(*) AS child
+
+
+FROM ticket VIEW user_slot_index AS ticket_x
+INNER JOIN slots ON slots.slot_id = ticket_x.slot_id
+INNER JOIN child VIEW user_slot_index AS child_x ON child_x.slot_id = ticket_x.slot_id AND child_x.user_id = ticket_x.user_id
+INNER JOIN event ON event.event_id = slots.event_id
+
+WHERE ticket_x.user_id = "{}"
+
+GROUP BY ticket_x.ticket_id AS ticket_id
 """
 
 
@@ -435,16 +456,26 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
 
 
 @router.post('/api/tickets/my')
-def get_user_events(request: Request, body: TicketRequest):
+def get_user_events(request: Request, response: Response, body: TicketRequest):
     repository: Repository = request.app.repository
-    user = get_user(repository, body.phone, body.birthdate)
+    try:
+        phone = refactor_phone(body.phone)
+    except TypeError:
+        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        logger.warning(f"Invalid phone at my tickets: {body.phone}", exc_info=True)
+        return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='invalid phone')
+
+    user = get_user(repository, phone)
     if not user:
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no user")
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
+    if user.birthdate != body.birthdate:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
+
     result = []
 
     for row in (repository.execute(GET_USER_EVENTS.format(YDB_DATABASE, user.user_id), {}))[0].rows:
         logger.info(f"result: {row}")
-        result.append(UserEventsRequest(**row))
+        result.append(UserEventsResponse(**row))
     return result
 
 
