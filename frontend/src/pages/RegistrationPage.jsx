@@ -73,6 +73,19 @@ const RegistrationPage = () => {
       return;
     }
 
+    if (result.status === 400) {
+      const reason =
+        result.body && result.body.headers && result.body.headers.reason;
+      if (reason === "too more child") {
+        setErrorMessage("Добавлено более 3-х детей");
+      } else if (reason === "slot not available") {
+        setErrorMessage("Время недоступно");
+      } else {
+        setErrorMessage("Некорретные данные");
+      }
+      return;
+    }
+
     setErrorMessage(null);
     setStatus(STATUS_ERROR);
     setTicket(null);

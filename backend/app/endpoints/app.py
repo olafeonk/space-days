@@ -3,12 +3,14 @@ from __future__ import annotations
 import logging
 import uuid
 
+import requests
+from requests import request
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import uvicorn
 from pydantic import BaseModel, EmailStr
-from datetime import datetime, date
+from datetime import datetime, date, time, timedelta
 from ..config import YDB_DATABASE, API_TOKEN
 from ..adapters.repository import (
     get_count_table,
@@ -18,17 +20,26 @@ from ..adapters.repository import (
     is_children_event, get_user,
     is_available_slot,
     is_user_already_registration,
+    save_new_mailing
 )
 import app.domain.model as model
 import aiohttp
 
+from pythonjsonlogger import jsonlogger
+
+
+class YcLoggingFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super().add_fields(log_record, record, message_dict)
+        log_record['logger'] = record.name
+        log_record['level'] = str.replace(str.replace(record.levelname, "WARNING", "WARN"), "CRITICAL", "FATAL")
+
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-
 stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(py_formatter)
+stream_handler.setFormatter(YcLoggingFormatter('%(message)s %(level)s %(logger)s'))
 logger.addHandler(stream_handler)
 
 router = APIRouter()
@@ -155,7 +166,8 @@ DECLARE $ticketData AS List<Struct<
     slot_id: Uint64,
     user_id: Utf8,
     amount: Int64,
-    user_data: Utf8>>;
+    user_data: Utf8,
+    created_at: Utf8>>;
     
 UPSERT INTO user
 SELECT
@@ -182,7 +194,8 @@ SELECT
     user_id,
     slot_id,
     amount,
-    user_data
+    user_data,
+    CAST(created_at AS Datetime) AS created_at
 FROM AS_TABLE($ticketData);
 """
 
@@ -196,28 +209,8 @@ WHERE user_id = {}
 """
 
 
-async def send_email(email: str, first_name: str, last_name: str, ticket: int):
-    headers = {'Authorization': f'Bearer {API_TOKEN}', 'Content-Type': 'application/json'}
-    data = {
-        "to": email,
-        "params": {
-            "first_name": first_name,
-            "last_name": last_name,
-            "ticket": ticket,
-        }
-    }
-    logger.info(f"Send email to {email}, data {data}, headers {headers}")
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post('https://api.notisend.ru/v1/email/templates/782569/messages',
-                                    headers=headers, json=data) as r:
-                result = await r.json()
-                logger.info(result)
-    except Exception:
-        logger.error("Fail sending", exc_info=True)
-        raise
-    else:
-        logger.info("Successful send")
+def get_datetime_now() -> str:
+    return (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 @router.get("/api/test")
@@ -354,16 +347,20 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         phone = refactor_phone(user.phone)
     except TypeError:
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        logger.error("Invalid phone:", user.phone, exc_info=True)
+        logger.warning(f"Invalid phone: {user.phone}", exc_info=True)
         return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='invalid phone')
     if len(childs) > 3:
         response.status_code = status.HTTP_400_BAD_REQUEST
         logger.warning(f"Count child: {len(childs)} > 3")
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='too more child')
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail='too more child',
+                             headers={'reason': 'too more child'})
     if not is_available_slot(repository, slot_id=user.slot_id):
         response.status_code = status.HTTP_400_BAD_REQUEST
         logger.warning(f"Slot not exists {user.slot_id}")
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='slot not available')
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail='slot not available',
+                             headers={'reason': 'slot not available'})
     old_user = get_user(repository, phone)
     logger.info(old_user)
     if old_user and is_user_already_registration(repository, user.slot_id, old_user.user_id):
@@ -401,6 +398,7 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         slot_id=user.slot_id,
         amount=booked_tickets,
         user_data=user_response,
+        created_at=get_datetime_now(),
     )
     user = model.User(
         user_id=user_n,
@@ -411,6 +409,14 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         email=user.email,
     )
     logger.info(f"children: {children}, user: {user}, ticket: {ticket}")
+    save_new_mailing(repository, model.Mailing(
+        mailing_id=str(uuid.uuid4()),
+        child_count=len(childs),
+        adult_count=ticket.amount - len(childs),
+        ticket_id=ticket.ticket_id,
+        is_send=False,
+        created_at=get_datetime_now(),
+    ))
     repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
                        {
                            "$childData": children,

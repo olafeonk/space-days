@@ -62,7 +62,7 @@ def is_available_slot(repository: Repository, slot_id: int) -> bool:
 def is_user_already_registration(repository: Repository, slot_id: int, user_id: str) -> bool:
     logger.info(user_id)
     return (repository.execute("""PRAGMA TablePathPrefix("{}");
-        SELECT * FROM ticket
+        SELECT * FROM ticket VIEW slot_id_index
         WHERE user_id = "{}" AND slot_id = {};
     """.format(YDB_DATABASE, user_id, slot_id), {}))[0].rows
 
@@ -85,6 +85,28 @@ def is_children_event(repository: Repository, slot_id: int) -> bool:
     if event:
         return event[0].is_children
     return False
+
+
+def save_new_mailing(repository: Repository, mailing: model.SendingLog):
+    repository.execute("""PRAGMA TablePathPrefix("{}");
+        DECLARE $mailingData AS List<Struct<
+            mailing_id: Utf8,
+            adult_count: Int64,
+            child_count: Int64,
+            ticket_id: Uint64,
+            is_send: bool,
+            created_at: Utf8>>;
+
+        INSERT INTO mailings
+        SELECT 
+            mailing_id,
+            adult_count,
+            child_count,
+            ticket_id,
+            is_send,
+            CAST(created_at AS Datetime) AS created_at
+        FROM AS_TABLE($mailingData);
+    """.format(YDB_DATABASE), {"$mailingData": [mailing]})
 
 
 def get_user(repository: Repository, phone: str) -> model.User | None:
