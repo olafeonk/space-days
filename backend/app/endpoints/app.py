@@ -216,13 +216,13 @@ SOME(location) AS location,
 SOME(event.age) AS age,
 SOME(duration) AS duration,
 
-COUNT(*) AS child
+COUNT(child_id) AS child
 
 
 FROM ticket VIEW user_slot_index AS ticket_x
 INNER JOIN slots ON slots.slot_id = ticket_x.slot_id
-INNER JOIN child VIEW user_slot_index AS child_x ON child_x.slot_id = ticket_x.slot_id AND child_x.user_id = ticket_x.user_id
 INNER JOIN event ON event.event_id = slots.event_id
+LEFT JOIN child VIEW user_slot_index AS child_x ON child_x.slot_id = ticket_x.slot_id AND child_x.user_id = ticket_x.user_id
 
 WHERE ticket_x.user_id = "{}"
 
