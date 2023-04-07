@@ -8,7 +8,7 @@ import Col from "react-bootstrap/Col";
 import EventList from "../components/EventList";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { padTime, pluralize } from "../core";
+import { padTime, pluralize, convertDate, convertTime } from "../core";
 import { getEventsByDays, getEventsByHours } from "../apis/backend";
 import Image from "react-bootstrap/Image";
 import Loader from "../components/Loader";
@@ -46,7 +46,7 @@ const EventsPage = () => {
   return (
     <Container
       className="p-0"
-      style={{ display: "flex", "flex-direction": "column", height: "100vh" }}
+      style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
       <Header />
       {body}
@@ -284,15 +284,6 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
   };
 
   return result;
-}
-
-function convertDate(dayOfMonth) {
-  return `${padTime(dayOfMonth)}.04.2023`;
-}
-
-function convertTime(time) {
-  const t = time.split("+")[0];
-  return new Date(t);
 }
 
 export default EventsPage;

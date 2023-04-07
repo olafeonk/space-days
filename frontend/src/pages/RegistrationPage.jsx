@@ -7,7 +7,7 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import ParentForm from "../components/ParentForm";
 import { getEvent, subscribeEvent } from "../apis/backend";
-import { padTime, pluralize } from "../core";
+import { padTime, pluralize, convertDate, convertTime } from "../core";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Ticket from "../components/Ticket";
@@ -18,6 +18,8 @@ const STATUS_LOADING = 0;
 const STATUS_ERROR = -1;
 const STATUS_LOADED = 1;
 const STATUS_SUCCESS = 2;
+
+// TODO блокировать кнопку регистрации во время кручения!
 
 // todo
 // - Навести красоту + описание мероприятия
@@ -113,7 +115,7 @@ const RegistrationPage = () => {
 function renderLoading() {
   return (
     <Container
-      style={{ display: "flex", "flex-direction": "column", height: "100vh" }}
+      style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
       <Header />
       <Loader />
@@ -312,15 +314,6 @@ function useEventLoading() {
     slot: eventAndSlot.slot,
     setStatus,
   };
-}
-
-function convertDate(dayOfMonth) {
-  return `${padTime(dayOfMonth)}.04.2023`;
-}
-
-function convertTime(time) {
-  const t = time.split("+")[0];
-  return new Date(t);
 }
 
 export default RegistrationPage;

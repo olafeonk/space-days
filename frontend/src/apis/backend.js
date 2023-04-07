@@ -65,6 +65,40 @@ export async function getEventsByHours(day, hours) {
     }
 }
 
+export async function getMyTickets(phone, birthdate) {
+    if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/tickets/my`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                phone,
+                birthdate
+            })
+        });
+
+        if (response.ok || response.status === 409 || response.status === 422) {
+            return {
+                ok: response.ok,
+                status: response.status,
+                body: await response.json()
+            };
+        } else {
+            console.log("HTTP error: " + response.status);
+            return {
+                status: response.status
+            };
+        }
+    } else {
+        return delay(1000).then(() => ({
+            ok: true,
+            status: 200,
+            body: []
+        }));
+    }
+}
+
 export async function subscribeEvent(slotId, form, force = false) {
     if (API_BASE_URL) {
         const body = {
@@ -108,7 +142,11 @@ export async function subscribeEvent(slotId, form, force = false) {
             };
         }
     } else {
-        return delay(1000).then(() => sampleTicket);
+        return delay(1000).then(() => ({
+            ok: true,
+            status: 200,
+            body: sampleTicket
+        }));
     }
 }
 

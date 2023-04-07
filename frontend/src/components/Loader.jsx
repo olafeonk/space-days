@@ -2,7 +2,7 @@ import Container from "react-bootstrap/Container";
 
 const Loader = () => (
   <Container className="loader">
-    <svg class="solar-system" width="200" height="200">
+    <svg className="solar-system" width="200" height="200">
       <circle id="sun" cx="100" cy="100" r="16" stroke="none" fill="#FFE581" />
 
       <circle
@@ -27,7 +27,7 @@ const Loader = () => (
         r="35"
         fill="none"
         stroke="#5e7ed64d"
-        stroke-width="0.5"
+        strokeWidth="0.5"
       />
 
       <circle
@@ -37,7 +37,7 @@ const Loader = () => (
         r="55"
         fill="none"
         stroke="#5e7ed64d"
-        stroke-width="0.5"
+        strokeWidth="0.5"
       />
 
       <circle
@@ -47,7 +47,7 @@ const Loader = () => (
         r="75"
         fill="none"
         stroke="#5e7ed64d"
-        stroke-width="0.5"
+        strokeWidth="0.5"
       />
 
       <circle
@@ -57,7 +57,7 @@ const Loader = () => (
         r="95"
         fill="none"
         stroke="#5e7ed64d"
-        stroke-width="0.5"
+        strokeWidth="0.5"
       />
     </svg>
   </Container>

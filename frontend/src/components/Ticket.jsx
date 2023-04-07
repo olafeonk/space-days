@@ -1,7 +1,9 @@
 import { Container } from "react-bootstrap";
-import { padTime, pluralize } from "../core";
+import { padTime, pluralize, formatTicketId, convertDate, convertTime } from "../core";
 import Image from "react-bootstrap/Image";
 
+// TODO начать использовать child детей при показе билета на фронте
+// TODO А еще передавать event.duration и event.age
 const Ticket = ({ event, slot, ticket }) => {
   const { title, location } = event;
   const dateTime = convertTime(slot.start_time);
@@ -48,19 +50,5 @@ const Ticket = ({ event, slot, ticket }) => {
     </Container>
   );
 };
-
-function formatTicketId(ticketId) {
-  const str = `${ticketId}`;
-  return `${str.substr(0, 3)} ${str.substr(3, 3)} ${str.substr(6)}`;
-}
-
-function convertDate(dayOfMonth) {
-  return `${padTime(dayOfMonth)}.04.2023`;
-}
-
-function convertTime(time) {
-  const t = time.split("+")[0];
-  return new Date(t);
-}
 
 export default Ticket;
