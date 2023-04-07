@@ -94,6 +94,27 @@
   margin-right: 0;
 }
 
+.button-to-tickets {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-to-tickets a {
+  margin: 0;
+}
+
+.button-to-tickets button {
+  width: 100%;
+}
+
+.button-to-tickets p {
+  font-size: 10px;
+  margin: 0;
+  font-weight: 700;
+  color: #5e7fd6;
+  text-transform: none;
+}
+
 .vertical-hr {
   height: 55px;
   width: 2px;
