@@ -227,6 +227,7 @@ INNER JOIN event ON event.event_id = slots.event_id
 WHERE ticket_x.user_id = "{}"
 
 GROUP BY ticket_x.ticket_id AS ticket_id
+ORDER BY start_time
 """
 
 
@@ -467,8 +468,10 @@ def get_user_events(request: Request, response: Response, body: TicketRequest):
 
     user = get_user(repository, phone)
     if not user:
+        response.status_code = status.HTTP_404_NOT_FOUND
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
     if user.birthdate != body.birthdate:
+        response.status_code = status.HTTP_404_NOT_FOUND
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
 
     result = []
