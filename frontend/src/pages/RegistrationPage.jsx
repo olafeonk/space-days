@@ -135,6 +135,8 @@ function renderLoaded(
   const { title, location, description } = event;
   const dateTime = convertTime(slot.start_time);
   const registrationDisabled = !checkFormFilled(form);
+  const slotFromEvent = event.slots.filter(s => s.slot_id === slot.slot_id)[0];
+  const available = slotFromEvent && slotFromEvent.available_users || "неизвестно"
 
   return (
     <Container>
@@ -172,6 +174,10 @@ function renderLoaded(
           <p>
             <span>Адрес: </span>
             {location}
+          </p>
+          <p>
+            <span>Осталось мест: </span>
+            {available}
           </p>
           <p>{description}</p>
         </Col>
