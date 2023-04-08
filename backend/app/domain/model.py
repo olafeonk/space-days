@@ -49,6 +49,13 @@ class User(BaseModel):
     birthdate: date
     email: str
 
+class UserToSave(BaseModel):
+    user_id: str
+    first_name: str
+    last_name: str
+    phone: str
+    birthdate_str: str
+    email: str
 
 class TelegramUser(BaseModel):
     tg_user_id: int
