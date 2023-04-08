@@ -636,6 +636,7 @@ span.event-card__title {
 }
 
 .event-card__time.time-button {
+  position: relative;
   cursor: pointer;
   font-size: 18px !important;
   font-weight: 500 !important;
@@ -1095,7 +1096,7 @@ span.event-card__title {
 
 .time-button_checked::after {
   padding: 0 5px;
-  content: "осталось 5 мест";
+  content: attr(data-seats);
   position: absolute;
   align-items: center;
   display: flex;

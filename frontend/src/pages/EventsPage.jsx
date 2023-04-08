@@ -254,6 +254,7 @@ function convertEvent(backendEvent, dayOfMonthNumber) {
     const t = {
       time: `${padTime(d.getHours())}:${padTime(d.getMinutes())}`,
       hasSeats: s.available_users > 0,
+      seats: s.available_users,
       slotId: s.slot_id,
     };
     return t;

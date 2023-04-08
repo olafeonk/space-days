@@ -3,6 +3,7 @@ import Image from "react-bootstrap/Image";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import partnersLinks from "../partnersLinks";
+import { pluralize } from "../core";
 
 const EventCard = ({ event, onRegister }) => {
   const [slot, setSlot] = useState(null);
@@ -77,7 +78,17 @@ function renderSlots(times, slot, setSlot) {
       it.slotId === (slot && slot.slotId) ? " time-button_checked" : ""
     }`;
     return (
-      <span key={index} className={className} onClick={() => setSlot(it)}>
+      <span
+        key={index}
+        className={className}
+        data-seats={`осталось ${it.seats} ${pluralize(
+          it.seats,
+          "место",
+          "места",
+          "мест"
+        )}`}
+        onClick={() => setSlot(it)}
+      >
         {it.time}
       </span>
     );
