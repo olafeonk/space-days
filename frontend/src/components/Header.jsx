@@ -15,7 +15,7 @@ const Header = () => (
       </a>
       {/* <a href="https://kantrskrip.ru/about">О&nbsp;школе</a> */}
     </Col>
-    <div className="vertical-hr"></div>
+    <div className="vertical-hr first"></div>
     <Col className="hochu-v-nauku">
       <a href="http://kantrskrip.ru/?utm_source=website&amp;utm_medium=header&amp;utm_campaign=logo">
         <Image src="./image/partners/hochuvnauku-simple.png"></Image>
@@ -23,7 +23,7 @@ const Header = () => (
       <a href="https://vnauku.ru/">хочу&nbsp;в&nbsp;науку</a>
       {/* <a href="https://vnauku.ru/">О&nbsp;фонде</a> */}
     </Col>
-    <div className="vertical-hr"></div>
+    <div className="vertical-hr second"></div>
     <Col className="molodeznaya">
       <a href="http://kantrskrip.ru/?utm_source=website&amp;utm_medium=header&amp;utm_campaign=logo">
         <Image src="./image/partners/molodeznayapolicy-simple.png"></Image>

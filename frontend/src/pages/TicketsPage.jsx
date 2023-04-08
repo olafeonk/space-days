@@ -7,7 +7,13 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
-import { padTime, pluralize, formatTicketId, convertDate, convertTime } from "../core";
+import {
+  padTime,
+  pluralize,
+  formatTicketId,
+  convertDate,
+  convertTime,
+} from "../core";
 import { getMyTickets } from "../apis/backend";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
@@ -21,8 +27,9 @@ const TicketsPage = () => {
   const savedForm = savedFormString && JSON.parse(savedFormString);
 
   const [form, setForm] = useState({
-    phone: savedForm && savedForm.phone || "",
-    birthdate: savedForm && savedForm.birthdate || "" });
+    phone: (savedForm && savedForm.phone) || "",
+    birthdate: (savedForm && savedForm.birthdate) || "",
+  });
   const [errorMessage, setErrorMessage] = useState(null);
   const [status, setStatus] = useState(STATUS_LOADED);
   const [tickets, setTickets] = useState([]);
@@ -84,19 +91,24 @@ const TicketsPage = () => {
           <div className="rounded-pill warning">
             <Image src="./image/warning.png" alt="внимание"></Image>
             <p>
-              Используйте номер телефона и дату рождения, которые вы указали при регистрации!
+              Используйте номер телефона и дату рождения, которые вы указали при
+              регистрации!
             </p>
           </div>
         </Col>
       </Row>
       <Container className="tickets-page tickets-page_with-tickets">
         {renderForm(form, status, handleFormChange, handleSubmit)}
-        <h3
-          className={"text-danger"}
-          style={{ textAlign: "center", padding: 10 }}
-        >
-          {errorMessage}
-        </h3>
+        {errorMessage ? (
+          <h3
+            className={"text-danger"}
+            style={{ textAlign: "center", padding: 10 }}
+          >
+            {errorMessage}
+          </h3>
+        ) : (
+          <></>
+        )}
         {status === STATUS_LOADING ? <Loader /> : renderTickets(tickets)}
       </Container>
       <Footer />
@@ -118,7 +130,9 @@ function renderForm(form, status, handleFormChange, handleShowTickets) {
           type="tel"
           className="rounded"
           value={form.phone}
-          onChange={(event) => handleFormChange({ ...form, phone: event.target.value })}
+          onChange={(event) =>
+            handleFormChange({ ...form, phone: event.target.value })
+          }
         />
       </Form.Group>
       <Form.Group controlId="formBirthday">
@@ -160,16 +174,21 @@ function renderTickets(tickets) {
           </p>
           <p className="ticket__time">
             <span>Время: </span>
-            <span className="rounded-pill">{`${padTime(dateTime.getHours())}:${padTime(
-              dateTime.getMinutes()
-            )}`}</span>
+            <span className="rounded-pill">{`${padTime(
+              dateTime.getHours()
+            )}:${padTime(dateTime.getMinutes())}`}</span>
           </p>
           <p className="ticket__location">
             <span>Адрес: </span>
             {ticket.location}
           </p>
           <p className="ticket__seats">
-            {`${ticket.amount} ${pluralize(ticket.amount, 'участник', 'участника', 'участников')}`}
+            {`${ticket.amount} ${pluralize(
+              ticket.amount,
+              "участник",
+              "участника",
+              "участников"
+            )}`}
           </p>
           <p className="ticket__info">
             Для того, чтобы пройти на мероприятие — назовите номер билета
@@ -183,12 +202,7 @@ function renderTickets(tickets) {
 function checkFormFilled(form) {
   const { birthdate, phone } = form;
 
-  if (
-    birthdate &&
-    birthdate.length > 0 &&
-    phone &&
-    phone.length > 0
-  ) {
+  if (birthdate && birthdate.length > 0 && phone && phone.length > 0) {
     return true;
   }
 
