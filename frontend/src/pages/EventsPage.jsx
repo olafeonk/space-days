@@ -82,29 +82,6 @@ function renderLoaded(content, handleRegister) {
           </a>
         </Col>
         <Col>
-          <div className="info-img" alt="1&nbsp;человек">
-            <Image src="./image/icon1.png" alt="1 человек"></Image>
-          </div>
-          <Image src="./image/line.png" alt="разделитель"></Image>
-          <div className="info-img" alt="1&nbsp;мероприятие">
-            <Image
-              src="./image/icon2.png"
-              alt="1 мерориятие"
-              className="info-img"
-            ></Image>
-          </div>
-          <Image src="./image/line.png" alt="разделитель"></Image>
-          <div className="info-img" alt="1&nbsp;время">
-            <Image
-              src="./image/icon3.png"
-              alt="1 время"
-              className="info-img"
-            ></Image>
-          </div>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
           <div className="rounded-pill warning warning_event">
             <Image src="./image/warning.png" alt="внимание"></Image>
             <p>
@@ -113,6 +90,9 @@ function renderLoaded(content, handleRegister) {
             </p>
           </div>
         </Col>
+      </Row>
+      <Row>
+        <Col></Col>
       </Row>
       {renderDayMenu(day)}
       <Row>

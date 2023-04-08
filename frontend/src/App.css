@@ -889,7 +889,7 @@ span.event-card__title {
 .event-top-info {
   display: flex;
   justify-content: flex-start;
-  margin: 30px 0 0;
+  margin: 30px 0;
 }
 
 .event-top-info .col {
@@ -897,13 +897,20 @@ span.event-card__title {
   width: auto;
 }
 
+.event-top-info .warning_event {
+  margin: 0 !important;
+  width: 100%;
+}
+
 .event-top-info .col:first-child {
+  align-self: center;
   margin-right: 50px;
 }
 
 .event-top-info .col:last-child {
   gap: 10px;
   display: flex;
+  flex: 1 0 auto;
 }
 
 .event-top-info img {
@@ -1029,7 +1036,6 @@ span.event-card__title {
 }
 
 .tickets-page_with-tickets .tickets-page__form {
-  flex-wrap: wrap;
   display: flex;
   width: 100%;
   max-width: 100%;
@@ -1045,6 +1051,7 @@ span.event-card__title {
 .tickets-page_with-tickets button {
   margin: 24px 0 12px;
   font-size: 20px;
+  white-space: nowrap;
 }
 
 .tickets-page__form {
@@ -1397,6 +1404,10 @@ input[type="radio"] {
 
   .map__steps p {
     max-width: 100%;
+  }
+
+  .tickets-page_with-tickets .tickets-page__form {
+    flex-wrap: wrap;
   }
 }
 

@@ -132,11 +132,14 @@ function renderLoaded(
   handleFormChange,
   handleRegister
 ) {
-  const { title, location, description } = event;
+  const { title, location, description, duration, age } = event;
   const dateTime = convertTime(slot.start_time);
   const registrationDisabled = !checkFormFilled(form);
-  const slotFromEvent = event.slots.filter(s => s.slot_id === slot.slot_id)[0];
-  const available = slotFromEvent && slotFromEvent.available_users || "неизвестно"
+  const slotFromEvent = event.slots.filter(
+    (s) => s.slot_id === slot.slot_id
+  )[0];
+  const available =
+    (slotFromEvent && slotFromEvent.available_users) || "неизвестно";
 
   return (
     <Container>
@@ -170,6 +173,13 @@ function renderLoaded(
             {`${padTime(dateTime.getHours())}:${padTime(
               dateTime.getMinutes()
             )}`}
+          </p>
+          <p>
+            <span className="event-card__title">Возраст:</span> {age}
+          </p>
+          <p>
+            <span className="event-card__title">Продолжительность:</span>{" "}
+            {`${duration} ${pluralize(duration, "минута", "минуты", "минут")}`}
           </p>
           <p>
             <span>Адрес: </span>
