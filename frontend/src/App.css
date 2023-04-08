@@ -1118,6 +1118,27 @@ span.event-card__title {
   height: 20px;
 }
 
+.event-card.present-15 {
+  min-height: fit-content;
+}
+
+.present-15 .event-card__title-date {
+  margin-left: 18px;
+}
+
+.present-15 .event-card__description {
+  -webkit-line-clamp: unset;
+}
+
+.present-15 .event-card__button {
+  color: #787878 !important;
+  border-color: #787878 !important;
+}
+
+.present-15 .img-wrapper {
+  align-items: center;
+}
+
 /* carousel */
 
 input[type="radio"] {

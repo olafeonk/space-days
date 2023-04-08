@@ -128,6 +128,44 @@ function renderLoaded(content, handleRegister) {
       {day === 8 && renderTimeMenu(day, hour)}
       <Row className="events-row justify-content-between">
         <EventList events={events} onRegister={handleRegister} />
+        {day === 15 && (
+          <Col className="event-card present-15" as={"article"}>
+            <div className="img-wrapper">
+              <Image fluid rounded src="./image/present_logo.png"></Image>
+            </div>
+
+            <div>
+              <h3>Вручение призов</h3>
+              <hr></hr>
+              <div>
+                <span className="event-card__title">Дата:</span>{" "}
+                <span className="event-card__title-date">15.04.2023</span>
+              </div>
+              <div className="">
+                <span className="event-card__title">Время:</span>{" "}
+                <span> с 09:00 до 16:00</span>
+              </div>
+
+              <div className="event-card__location">
+                <span className="event-card__title">Адрес:</span>{" "}
+                <span> ул. Мамина-Сибиряка, 193</span>
+              </div>
+              <p className="event-card__description">
+                За каждую 5 собранную наклейку — вручаем подарок.Соберите 15
+                наклеек и получите БОЛЬШОЙ ПОДАРОК от Школы астрономии
+                KantrSkrip и партнеров!
+              </p>
+            </div>
+            <Button
+              disabled={true}
+              variant="outline-primary"
+              className="rounded-pill event-card__button"
+              onClick={handleRegister}
+            >
+              Вход свободный
+            </Button>
+          </Col>
+        )}
       </Row>
     </>
   );
