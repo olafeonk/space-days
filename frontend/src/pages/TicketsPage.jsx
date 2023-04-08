@@ -4,6 +4,9 @@ import Footer from "../components/Footer";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Image from "react-bootstrap/Image";
 import { padTime, pluralize, formatTicketId, convertDate, convertTime } from "../core";
 import { getMyTickets } from "../apis/backend";
 import Loader from "../components/Loader";
@@ -73,6 +76,19 @@ const TicketsPage = () => {
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
       <Header />
+      <Row>
+        <Col className="rules">
+          <a href="./#/events">
+            <Image src="./image/arrow.png" alt="назад"></Image>
+          </a>
+          <div className="rounded-pill warning">
+            <Image src="./image/warning.png" alt="внимание"></Image>
+            <p>
+              Используйте номер телефона и дату рождения, которые вы указали при регистрации!
+            </p>
+          </div>
+        </Col>
+      </Row>
       <Container className="tickets-page tickets-page_with-tickets">
         {renderForm(form, status, handleFormChange, handleSubmit)}
         <h3
