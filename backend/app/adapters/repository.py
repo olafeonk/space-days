@@ -6,6 +6,7 @@ from random import randint
 from datetime import date, timedelta
 import app.domain.model as model
 import logging
+from ..core import dateFromYdbDate, strFromDate, dateFromStr
 
 
 logger = logging.getLogger(__name__)
@@ -71,9 +72,9 @@ def update_data_user(repository: Repository, email: str, first_name: str, last_n
                            phone: str) -> bool:
     return (repository.execute("""PRAGMA TablePathPrefix("{}");
         UPDATE user
-        SET email="{}", first_name="{}", last_name="{}", birthdate = Date("{}")
+        SET email="{}", first_name="{}", last_name="{}", birthdate_str = "{}"
         WHERE phone = "{}";
-    """.format(YDB_DATABASE, email, first_name, last_name, birthdate, phone), {}))
+    """.format(YDB_DATABASE, email, first_name, last_name, strFromDate(birthdate), phone), {}))
 
 
 def is_children_event(repository: Repository, slot_id: int) -> bool:
@@ -116,25 +117,35 @@ def get_user(repository: Repository, phone: str) -> model.User | None:
     """.format(YDB_DATABASE, phone), {}))[0].rows
     if user:
         logger.info(user[0])
+        birthdate = dateFromStr(user[0].birthdate_str) if user[0].birthdate_str \
+            else dateFromYdbDate(user[0].birthdate)
         return model.User(
             user_id=user[0].user_id,
             first_name=user[0].first_name,
             last_name=user[0].last_name,
             phone=user[0].phone,
             email=user[0].email,
-            birthdate=date(1970, 1, 1) + timedelta(days=user[0].birthdate))
+            birthdate=birthdate)
 
 
 def get_user_by_ticket(repository: Repository, ticket_id: int) -> model.User:
     user = (repository.execute("""PRAGMA TablePathPrefix("{}");
-        SELECT DISTINCT user.user_id AS user_id, first_name, last_name, phone, birthdate, email FROM ticket
+        SELECT DISTINCT user.user_id AS user_id, first_name, last_name, phone, birthdate, birthdate_str, email FROM ticket
         INNER JOIN user
         ON user.user_id = ticket.user_id
         WHERE ticket.ticket_id = {};
         """.format(YDB_DATABASE, ticket_id), {}))[0].rows
     if user:
         logger.info(user[0])
-        return model.User(**user[0])
+        birthdate = dateFromStr(user[0].birthdate_str) if user[0].birthdate_str \
+            else dateFromYdbDate(user[0].birthdate)
+        return model.User(
+            user_id=user[0].user_id,
+            first_name=user[0].first_name,
+            last_name=user[0].last_name,
+            phone=user[0].phone,
+            email=user[0].email,
+            birthdate=birthdate)
 
 
 def get_tg_user(repository: Repository, telegram_id: int) -> model.TelegramUser | None:

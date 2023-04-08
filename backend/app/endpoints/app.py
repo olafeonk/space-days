@@ -20,8 +20,9 @@ from ..adapters.repository import (
     is_children_event, get_user,
     is_available_slot,
     is_user_already_registration,
-    save_new_mailing
+    save_new_mailing,
 )
+from ..core import dateFromYdbDate, strFromDate, dateFromStr
 import app.domain.model as model
 import aiohttp
 
@@ -153,7 +154,7 @@ DECLARE $userData AS List<Struct<
     first_name: Utf8,
     last_name: Utf8,
     phone: Utf8,
-    birthdate: Date,
+    birthdate_str: Utf8,
     email: Utf8>>;
 
 DECLARE $childData AS List<Struct<
@@ -177,7 +178,7 @@ SELECT
     first_name,
     last_name,
     phone,
-    birthdate,
+    birthdate_str,
     email
 FROM AS_TABLE($userData);
 
@@ -422,12 +423,12 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         user_data=user_response,
         created_at=get_datetime_now(),
     )
-    user = model.User(
+    user = model.UserToSave(
         user_id=user_n,
         first_name=user.first_name,
         last_name=user.last_name,
         phone=phone,
-        birthdate=user.birthdate.strftime('%Y-%m-%d'),
+        birthdate_str=strFromDate(user.birthdate),
         email=user.email,
     )
     logger.info(f"children: {children}, user: {user}, ticket: {ticket}")
