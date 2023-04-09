@@ -143,12 +143,12 @@ function renderLoaded(content, handleRegister) {
               </div>
               <div className="">
                 <span className="event-card__title">Время:</span>{" "}
-                <span> с 09:00 до 16:00</span>
+                <span> с 13:00 до 16:00</span>
               </div>
 
               <div className="event-card__location">
                 <span className="event-card__title">Адрес:</span>{" "}
-                <span> ул. Мамина-Сибиряка, 193</span>
+                <span> Библиотечный Центр «Екатеринбург», ул. Мамина-Сибиряка, 193</span>
               </div>
               <p className="event-card__description">
                 За каждую 5 собранную наклейку — вручаем подарок. Соберите 15
