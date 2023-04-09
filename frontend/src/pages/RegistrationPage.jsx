@@ -45,7 +45,7 @@ const RegistrationPage = () => {
       setErrorMessage(null);
       setStatus(STATUS_SUCCESS);
       setTicket(ticket);
-      saveForm(form);
+      saveRegistrationForm(form);
       return;
     }
 
@@ -261,11 +261,7 @@ function checkFormFilled(form) {
 }
 
 function useForm() {
-  let savedForm = null;
-  try {
-    const savedFormString = window.localStorage.getItem("form");
-    savedForm = savedFormString && JSON.parse(savedFormString);
-  } catch {}
+  const savedForm = tryLoadRegistrationForm();
   const defaultForm = {
     surname: "",
     name: "",
@@ -289,8 +285,19 @@ function useForm() {
   return [form, handleFormChange];
 }
 
-function saveForm(form) {
+function saveRegistrationForm(form) {
   window.localStorage.setItem("form", JSON.stringify(form));
+  window.localStorage.setItem("searchForm", null);
+}
+
+function tryLoadRegistrationForm() {
+  try {
+    const formString = window.localStorage.getItem("form");
+    const form = formString ? JSON.parse(formString) : null;
+    return form;
+  } catch {
+    return null;
+  }
 }
 
 function useEventLoading() {

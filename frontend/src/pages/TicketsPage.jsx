@@ -23,12 +23,11 @@ const STATUS_ERROR = -1;
 const STATUS_LOADED = 1;
 
 const TicketsPage = () => {
-  const savedFormString = window.localStorage.getItem("form");
-  const savedForm = savedFormString && JSON.parse(savedFormString);
+  const savedSearchForm = tryLoadSearchForm();
 
   const [form, setForm] = useState({
-    phone: (savedForm && savedForm.phone) || "",
-    birthdate: (savedForm && savedForm.birthdate) || "",
+    phone: (savedSearchForm && savedSearchForm.phone) || "",
+    birthdate: (savedSearchForm && savedSearchForm.birthdate) || "",
   });
   const [errorMessage, setErrorMessage] = useState(null);
   const [status, setStatus] = useState(STATUS_LOADED);
@@ -45,6 +44,7 @@ const TicketsPage = () => {
       setErrorMessage(null);
       setStatus(STATUS_LOADED);
       setTickets(result.body || []);
+      saveSearchForm(form);
       return;
     }
 
@@ -207,6 +207,24 @@ function checkFormFilled(form) {
   }
 
   return false;
+}
+
+function saveSearchForm(searchForm) {
+  window.localStorage.setItem("searchForm", JSON.stringify(searchForm));
+}
+
+function tryLoadSearchForm() {
+  try {
+    const registrationFormString = window.localStorage.getItem("form");
+    const registrationForm = registrationFormString ? JSON.parse(registrationFormString) : null;
+
+    const searchFormString = window.localStorage.getItem("searchForm");
+    const searchForm = searchFormString ? JSON.parse(searchFormString) : null;
+
+    return searchForm || registrationForm;
+  } catch {
+    return null;
+  }
 }
 
 export default TicketsPage;
