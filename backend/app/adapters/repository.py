@@ -25,22 +25,19 @@ def get_count_table(repository: Repository, name_table: str) -> int:
     SELECT COUNT(*) as count FROM {}; 
     """.format(YDB_DATABASE, name_table), {}))[0].rows[0].count
 
-
-def get_count_available_tickets(repository: Repository) -> dict[int, int]:
+def get_count_available_ticket_by_slot(repository: Repository, slot_id: int) -> dict[int, int]:
     result_query = (repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT slots.slot_id AS slot_id, CAST(amount AS Int64) - COALESCE(sum,0) AS available_ticket FROM slots
-    LEFT JOIN (
-        SELECT slot_id, SUM(amount) AS sum FROM ticket
-        GROUP BY slot_id) as t
-    ON slots.slot_id = t.slot_id;
-
-    """.format(YDB_DATABASE), {}))[0].rows
-    available_tickets = {}
+    SELECT
+        slots.slot_id AS slot_id,
+        CAST(SOME(slots.amount) AS Int64) - COALESCE(SUM(ticket.amount), 0) AS available_ticket
+    FROM slots LEFT JOIN ticket VIEW slot_id_index AS ticket ON slots.slot_id = ticket.slot_id
+    WHERE slots.slot_id={}
+    GROUP BY slots.slot_id;
+    """.format(YDB_DATABASE, slot_id), {}))[0].rows
     logger.info(result_query)
     for row in result_query:
-        available_tickets[row.slot_id] = row.available_ticket
-    return available_tickets
-
+        return row.available_ticket
+    return 0
 
 def generate_ticket_id(repository: Repository) -> int:
     for _ in range(20):
@@ -52,7 +49,6 @@ def generate_ticket_id(repository: Repository) -> int:
         if not ticket:
             return ticket_number
     raise RecursionError("Can`t generate ticket id")
-
 
 def is_available_slot(repository: Repository, slot_id: int) -> bool:
     return (repository.execute("""PRAGMA TablePathPrefix("{}");

@@ -16,7 +16,7 @@ from ..adapters.repository import (
     get_count_table,
     generate_ticket_id,
     Repository,
-    get_count_available_tickets,
+    get_count_available_ticket_by_slot,
     is_children_event, get_user,
     is_available_slot,
     is_user_already_registration,
@@ -275,10 +275,34 @@ def get_events(request: Request, id: int | None = None, days: list[int] | None =
                hours: list[int] | None = Query(None)):
     logger.info(f"Get events, id: {id}, days: {days}, hours: {hours}")
     repository: Repository = request.app.repository
+
+    slotsView = "slots"
+    ticketView = "ticket"
+    if days or hours:
+        slotsView = "slots VIEW start_time_index AS slots"
+        ticketView = "ticket VIEW slot_id_index AS ticket"
+    if id is not None:
+        slotsView = "slots VIEW event_id_index AS slots"
+        ticketView = "ticket VIEW slot_id_index AS ticket"
+
     query = """PRAGMA TablePathPrefix("{}");
-    SELECT * FROM event
-    INNER JOIN slots
-    ON event.event_id = slots.event_id\n""".format(YDB_DATABASE)
+    SELECT
+        slots.slot_id AS slot_id,
+        SOME(slots.start_time) AS start_time,
+        SOME(slots.amount) AS amount,
+        CAST(SOME(slots.amount) AS Int64) - COALESCE(SUM(ticket.amount), 0) AS available_ticket,
+        SOME(event.event_id) AS event_id,
+        SOME(event.age) AS age,
+        SOME(event.description) AS description, 
+        SOME(event.duration) AS duration,
+        SOME(event.id_partner) AS id_partner,
+        SOME(event.is_children) AS is_children,
+        SOME(event.location) AS location,
+        SOME(event.summary) AS summary,
+        SOME(event.title) AS title
+    FROM {} LEFT JOIN {} ON slots.slot_id = ticket.slot_id
+    INNER JOIN event ON event.event_id = slots.event_id\n""".format(YDB_DATABASE, slotsView, ticketView)
+
     if id is not None or days or hours:
         query += " WHERE "
     if id is not None:
@@ -291,9 +315,10 @@ def get_events(request: Request, id: int | None = None, days: list[int] | None =
         if id is not None or days:
             query += " AND "
         query += "DateTime::GetHour(slots.start_time) IN {}\n".format(hours)
-    query += "\tORDER BY event_id, start_time;"
+    query += "\tGROUP BY slots.slot_id ORDER BY event_id, start_time;"
+
     result_sets = repository.execute(query, {})
-    available_tickets = get_count_available_tickets(repository)
+
     event_id = 0
     result = []
     event = EventRequest(
@@ -309,14 +334,17 @@ def get_events(request: Request, id: int | None = None, days: list[int] | None =
             event_id = row.event_id
             result.append(event)
             event = EventRequest(slots=[], **row)
-        event.slots.append(SlotRequest(available_users=available_tickets[row.slot_id], **row))
+        event.slots.append(SlotRequest(
+            slot_id=row.slot_id,
+            amount=row.amount,
+            start_time=row.start_time,
+            available_users=row.available_ticket))
 
     result.append(event)
     result.pop(0)
     result.sort(key=lambda x: x.slots[0].start_time)
     logger.info(f"Get events success\nresult: {result}")
     return result  # TODO: return is_available_child
-
 
 # @router.post("/api/event")
 # async def add_event(event: EventRequest) -> None:
@@ -393,15 +421,15 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
             return HTTPException(status_code=status.HTTP_409_CONFLICT, detail='user already registered',
                                  headers={'reason': 'already_registered'})
     is_child_event = is_children_event(repository, user.slot_id)
-    available_tickets = get_count_available_tickets(repository)
+    available_ticket = get_count_available_ticket_by_slot(repository, user.slot_id)
     booked_tickets = max(len(childs) + (not is_child_event), 1)
-    if available_tickets[user.slot_id] < booked_tickets:
-        logger.warning(f'available ticket {available_tickets[user.slot_id]} < booked ticket {booked_tickets}')
+    if available_ticket < booked_tickets:
+        logger.warning(f'available ticket {available_ticket} < booked ticket {booked_tickets}')
         response.status_code = status.HTTP_409_CONFLICT
         return HTTPException(status_code=status.HTTP_409_CONFLICT,
-                             detail=f'available ticket {available_tickets[user.slot_id]} '
+                             detail=f'available ticket {available_ticket} '
                                     f'< booked ticket {booked_tickets}',
-                             headers={'reason': 'no_tickets', 'amount': available_tickets[user.slot_id]})
+                             headers={'reason': 'no_tickets', 'amount': available_ticket})
 
     user_n = str(uuid.uuid4())
     if old_user:
