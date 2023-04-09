@@ -139,7 +139,7 @@ function renderLoaded(
     (s) => s.slot_id === slot.slot_id
   )[0];
   const available =
-    (slotFromEvent && slotFromEvent.available_users) || "неизвестно";
+    (slotFromEvent && slotFromEvent.available_users) || "0";
 
   return (
     <Container>
