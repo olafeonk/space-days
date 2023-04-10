@@ -14,12 +14,13 @@ import Ticket from "../components/Ticket";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
 
-const STATUS_LOADING = 0;
-const STATUS_ERROR = -1;
-const STATUS_LOADED = 1;
-const STATUS_SUCCESS = 2;
+const STATUS_PAGE_LOADING = 0;
+const STATUS_PAGE_ERROR = -1;
+const STATUS_PAGE_LOADED = 1;
+const STATUS_REGISTRATION_LOADING = 2;
+const STATUS_REGISTRATION_LOADED = 3;
 
-// TODO блокировать кнопку регистрации во время кручения!
+
 const RegistrationPage = () => {
   const { status, event, slot, setStatus } = useEventLoading();
   const [ticket, setTicket] = useState(null);
@@ -27,11 +28,12 @@ const RegistrationPage = () => {
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleRegister = async () => {
+    setStatus(STATUS_REGISTRATION_LOADING);
     const result = await subscribeEvent(slot.slot_id, form);
     if (result.ok) {
       const ticket = result.body;
       setErrorMessage(null);
-      setStatus(STATUS_SUCCESS);
+      setStatus(STATUS_REGISTRATION_LOADED);
       setTicket(ticket);
       saveRegistrationForm(form);
       return;
@@ -77,15 +79,17 @@ const RegistrationPage = () => {
     }
 
     setErrorMessage(null);
-    setStatus(STATUS_ERROR);
+    setStatus(STATUS_PAGE_ERROR);
     setTicket(null);
   };
 
   switch (status) {
-    case STATUS_LOADING:
+    case STATUS_PAGE_LOADING:
       return renderLoading();
-    case STATUS_LOADED:
-      return renderLoaded(
+    case STATUS_PAGE_LOADED:
+    case STATUS_REGISTRATION_LOADING:
+      return renderRegistrationForm(
+        status,
         form,
         event,
         slot,
@@ -93,8 +97,8 @@ const RegistrationPage = () => {
         handleFormChange,
         handleRegister
       );
-    case STATUS_SUCCESS:
-      return renderSuccess(event, slot, ticket);
+    case STATUS_REGISTRATION_LOADED:
+      return renderTicket(event, slot, ticket);
     default:
       return renderError();
   }
@@ -112,7 +116,8 @@ function renderLoading() {
   );
 }
 
-function renderLoaded(
+function renderRegistrationForm(
+  status,
   form,
   event,
   slot,
@@ -122,7 +127,7 @@ function renderLoaded(
 ) {
   const { title, location, description, duration, age } = event;
   const dateTime = convertTime(slot.start_time);
-  const registrationDisabled = !checkFormFilled(form);
+  const registrationDisabled = !checkFormFilled(form) || status === STATUS_REGISTRATION_LOADING;
   const slotFromEvent = event.slots.filter(
     (s) => s.slot_id === slot.slot_id
   )[0];
@@ -219,7 +224,7 @@ function renderLoaded(
   );
 }
 
-function renderSuccess(event, slot, ticket) {
+function renderTicket(event, slot, ticket) {
   return <Ticket event={event} slot={slot} ticket={ticket} />;
 }
 
@@ -291,7 +296,7 @@ function tryLoadRegistrationForm() {
 function useEventLoading() {
   const { search } = useLocation();
   const query = React.useMemo(() => new URLSearchParams(search), [search]);
-  const [status, setStatus] = useState(STATUS_LOADING);
+  const [status, setStatus] = useState(STATUS_PAGE_LOADING);
   const [eventAndSlot, setEventAndSlot] = useState({ event: null, slot: null });
 
   useEffect(() => {
@@ -302,18 +307,18 @@ function useEventLoading() {
       const events = (await getEvent(eventId)) || [];
       const event = events[0];
       if (!event) {
-        setStatus(STATUS_ERROR);
+        setStatus(STATUS_PAGE_ERROR);
         return;
       }
 
       const slot = event.slots.filter((s) => s.slot_id === slotId)[0];
       if (!slot) {
-        setStatus(STATUS_ERROR);
+        setStatus(STATUS_PAGE_ERROR);
         return;
       }
 
       setEventAndSlot({ event, slot });
-      setStatus(STATUS_LOADED);
+      setStatus(STATUS_PAGE_LOADED);
     }
 
     run();

@@ -18,9 +18,9 @@ import { getMyTickets } from "../apis/backend";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
 
-const STATUS_LOADING = 0;
-const STATUS_ERROR = -1;
-const STATUS_LOADED = 1;
+const STATUS_PAGE_ERROR = -1;
+const STATUS_TICKETS_LOADING = 2;
+const STATUS_TICKETS_LOADED = 3;
 
 const TicketsPage = () => {
   const savedSearchForm = tryLoadSearchForm();
@@ -30,7 +30,7 @@ const TicketsPage = () => {
     birthdate: (savedSearchForm && savedSearchForm.birthdate) || "",
   });
   const [errorMessage, setErrorMessage] = useState(null);
-  const [status, setStatus] = useState(STATUS_LOADED);
+  const [status, setStatus] = useState(STATUS_TICKETS_LOADED);
   const [tickets, setTickets] = useState([]);
 
   const handleFormChange = useCallback((f) => {
@@ -38,11 +38,11 @@ const TicketsPage = () => {
   }, []);
 
   const handleSubmit = async () => {
-    setStatus(STATUS_LOADING);
+    setStatus(STATUS_TICKETS_LOADING);
     const result = await getMyTickets(form.phone, form.birthdate);
     if (result.ok) {
       setErrorMessage(null);
-      setStatus(STATUS_LOADED);
+      setStatus(STATUS_TICKETS_LOADED);
       setTickets(result.body || []);
       saveSearchForm(form);
       return;
@@ -50,20 +50,20 @@ const TicketsPage = () => {
 
     if (result.status === 422) {
       setErrorMessage("Ошибка в заполнении формы");
-      setStatus(STATUS_LOADED);
+      setStatus(STATUS_TICKETS_LOADED);
       setTickets([]);
       return;
     }
 
     if (result.status === 404) {
       setErrorMessage("Пользователь не найден");
-      setStatus(STATUS_LOADED);
+      setStatus(STATUS_TICKETS_LOADED);
       setTickets([]);
       return;
     }
 
     setErrorMessage(null);
-    setStatus(STATUS_ERROR);
+    setStatus(STATUS_PAGE_ERROR);
     setTickets([]);
   };
 
@@ -75,7 +75,7 @@ const TicketsPage = () => {
   //   autoSubmitRef.current = true;
   // }
 
-  if (status === STATUS_ERROR) {
+  if (status === STATUS_PAGE_ERROR) {
     return renderError();
   }
   return (
@@ -109,7 +109,7 @@ const TicketsPage = () => {
         ) : (
           <></>
         )}
-        {status === STATUS_LOADING ? <Loader /> : renderTickets(tickets)}
+        {status === STATUS_TICKETS_LOADING ? <Loader /> : renderTickets(tickets)}
       </Container>
       <Footer />
     </Container>
@@ -121,7 +121,7 @@ function renderError() {
 }
 
 function renderForm(form, status, handleFormChange, handleShowTickets) {
-  const submitDisabled = !checkFormFilled(form) || status === STATUS_LOADING;
+  const submitDisabled = !checkFormFilled(form) || status === STATUS_TICKETS_LOADING;
   return (
     <Form className="tickets-page__form">
       <Form.Group controlId="formPhone">
