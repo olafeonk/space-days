@@ -358,16 +358,16 @@ def refactor_phone(phone: str) -> str:
 
 
 @router.post('/api/events/subscribe')
-def add_user(request: Request, user: UserRequest, response: Response, force_registration: bool = False):
-    logging.info(f"Add registration, user: {user}, force_registration: {force_registration}")
+def add_user(request: Request, userRequest: UserRequest, response: Response, force_registration: bool = False):
+    logging.info(f"Add registration, user: {userRequest}, force_registration: {force_registration}")
     repository: Repository = request.app.repository
-    user_response = user.__repr__()
-    childs = user.child or []
+    user_response = userRequest.__repr__()
+    childs = userRequest.child or []
     try:
-        phone = refactor_phone(user.phone)
+        phone = refactor_phone(userRequest.phone)
     except TypeError:
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        logger.warning(f"Invalid phone: {user.phone}", exc_info=True)
+        logger.warning(f"Invalid phone: {userRequest.phone}", exc_info=True)
         return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='invalid phone')
     if len(childs) > 3:
         response.status_code = status.HTTP_400_BAD_REQUEST
@@ -375,30 +375,23 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                              detail='too more child',
                              headers={'reason': 'too more child'})
-    if not is_available_slot(repository, slot_id=user.slot_id):
+    if not is_available_slot(repository, slot_id=userRequest.slot_id):
         response.status_code = status.HTTP_400_BAD_REQUEST
-        logger.warning(f"Slot not exists {user.slot_id}")
+        logger.warning(f"Slot not exists {userRequest.slot_id}")
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                              detail='slot not available',
                              headers={'reason': 'slot not available'})
     old_user = get_user(repository, phone)
     logger.info(old_user)
-    if old_user and is_user_already_registration(repository, user.slot_id, old_user.user_id):
+    if old_user and is_user_already_registration(repository, userRequest.slot_id, old_user.user_id):
         if not force_registration:
             response.status_code = status.HTTP_409_CONFLICT
-            logger.warning(f"User {old_user.user_id} already registered on slot {user.slot_id}")
+            logger.warning(f"User {old_user.user_id} already registered on slot {userRequest.slot_id}")
             return HTTPException(status_code=status.HTTP_409_CONFLICT, detail='user already registered',
                                  headers={'reason': 'already_registered'})
-    is_child_event = is_children_event(repository, user.slot_id)
-    available_ticket = get_count_available_ticket_by_slot(repository, user.slot_id)
+    is_child_event = is_children_event(repository, userRequest.slot_id)
     booked_tickets = max(len(childs) + (not is_child_event), 1)
-    if available_ticket < booked_tickets:
-        logger.warning(f'available ticket {available_ticket} < booked ticket {booked_tickets}')
-        response.status_code = status.HTTP_409_CONFLICT
-        return HTTPException(status_code=status.HTTP_409_CONFLICT,
-                             detail=f'available ticket {available_ticket} '
-                                    f'< booked ticket {booked_tickets}',
-                             headers={'reason': 'no_tickets', 'amount': available_ticket})
+    slot_id = userRequest.slot_id
 
     user_n = str(uuid.uuid4())
     if old_user:
@@ -408,27 +401,47 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         children.append(model.Child(
             child_id=str(uuid.uuid4()),
             user_id=user_n,
-            slot_id=user.slot_id,
+            slot_id=userRequest.slot_id,
             first_name=child.first_name,
             age=child.age,
         ))
     ticket = model.Ticket(
         ticket_id=generate_ticket_id(repository),
         user_id=user_n,
-        slot_id=user.slot_id,
+        slot_id=userRequest.slot_id,
         amount=booked_tickets,
         user_data=user_response,
         created_at=get_datetime_now(),
     )
     user = model.UserToSave(
         user_id=user_n,
-        first_name=user.first_name,
-        last_name=user.last_name,
+        first_name=userRequest.first_name,
+        last_name=userRequest.last_name,
         phone=phone,
-        birthdate_str=strFromDate(user.birthdate),
-        email=user.email,
+        birthdate_str=strFromDate(userRequest.birthdate),
+        email=userRequest.email,
     )
+
+    available_ticket = get_count_available_ticket_by_slot(repository, slot_id)
+    if available_ticket < booked_tickets:
+        logger.warning(f'available ticket {available_ticket} < booked ticket {booked_tickets}')
+        response.status_code = status.HTTP_409_CONFLICT
+        return HTTPException(status_code=status.HTTP_409_CONFLICT,
+                             detail=f'available ticket {available_ticket} '
+                                    f'< booked ticket {booked_tickets}',
+                             headers={'reason': 'no_tickets', 'amount': available_ticket})
+
     logger.info(f"children: {children}, user: {user}, ticket: {ticket}")
+
+    # TODO Дополнительная проверка доступности места должна быть частью транзакции по подписке
+    repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
+                       {
+                           "$childData": children,
+                           "$userData": [user],
+                           "$ticketData": [ticket],
+                       })
+    logger.info("Success subscription")
+
     save_new_mailing(repository, model.Mailing(
         mailing_id=str(uuid.uuid4()),
         child_count=len(childs),
@@ -437,13 +450,8 @@ def add_user(request: Request, user: UserRequest, response: Response, force_regi
         is_send=False,
         created_at=get_datetime_now(),
     ))
-    repository.execute(ADD_USER_QUERY.format(YDB_DATABASE),
-                       {
-                           "$childData": children,
-                           "$userData": [user],
-                           "$ticketData": [ticket],
-                       })
-    logger.info("Success Query")
+    logger.info("Success mailing")
+
     return TicketResponse(
         ticket_id=ticket.ticket_id,
         user_id=ticket.user_id,
