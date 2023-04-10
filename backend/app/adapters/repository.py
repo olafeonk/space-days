@@ -66,10 +66,10 @@ def is_user_already_registration(repository: Repository, slot_id: int, user_id: 
 
 def is_children_event(repository: Repository, slot_id: int) -> bool:
     event = (repository.execute("""PRAGMA TablePathPrefix("{}");
-        SELECT is_children FROM event
-        INNER JOIN slots
-        ON event.event_id = slots.event_id
-        where slot_id = {};""".format(YDB_DATABASE, slot_id), {}))[0].rows
+        SELECT is_children
+        FROM slots
+        INNER JOIN event ON event.event_id = slots.event_id
+        WHERE slot_id = {};""".format(YDB_DATABASE, slot_id), {}))[0].rows
     if event:
         return event[0].is_children
     return False
@@ -99,7 +99,7 @@ def save_new_mailing(repository: Repository, mailing: model.SendingLog):
 
 def get_user(repository: Repository, phone: str) -> model.User | None:
     user = (repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT * FROM user
+    SELECT * FROM user VIEW phone_index
     WHERE phone = "{}";
     """.format(YDB_DATABASE, phone), {}))[0].rows
     if user:
