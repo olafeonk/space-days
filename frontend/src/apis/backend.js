@@ -104,9 +104,9 @@ export async function subscribeEvent(slotId, form, force = false) {
         const body = {
             first_name: form.name,
             last_name: form.surname,
-            phone: form.phone, // TODO format
-            birthdate: form.birthdate, // TODO format "2023-03-24"
-            email: form.email, // TODO format
+            phone: form.phone,
+            birthdate: form.birthdate,
+            email: form.email,
             child: form.hasChildren
                 ? form.children.map((it) => ({
                     first_name: it.name,

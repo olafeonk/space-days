@@ -2,8 +2,7 @@ import { Container } from "react-bootstrap";
 import { padTime, pluralize, formatTicketId, convertDate, convertTime } from "../core";
 import Image from "react-bootstrap/Image";
 
-// TODO начать использовать child детей при показе билета на фронте
-// TODO А еще передавать event.duration и event.age
+
 const Ticket = ({ event, slot, ticket }) => {
   const { title, location } = event;
   const dateTime = convertTime(slot.start_time);
