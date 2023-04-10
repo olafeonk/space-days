@@ -238,8 +238,11 @@ function useLoading() {
       const dayParameter = query.get("day");
       const hourParameter = query.get("hour");
 
+      const now = new Date(Date.now());
+      const defaultDay = new Date(2023, 4 - 1, 8) <= now && now < new Date(2023, 4 - 1, 15 + 1) ? now.getDate() : 8;
+
       const day =
-        dayParameter && !hourParameter ? parseInt(dayParameter, 10) : 8;
+        dayParameter && !hourParameter ? parseInt(dayParameter, 10) : defaultDay;
       const hour = hourParameter ? parseInt(hourParameter, 10) : null;
 
       const backendEvents = hour
