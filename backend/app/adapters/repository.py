@@ -64,15 +64,6 @@ def is_user_already_registration(repository: Repository, slot_id: int, user_id: 
     """.format(YDB_DATABASE, user_id, slot_id), {}))[0].rows
 
 
-def update_data_user(repository: Repository, email: str, first_name: str, last_name: str, birthdate: date,
-                           phone: str) -> bool:
-    return (repository.execute("""PRAGMA TablePathPrefix("{}");
-        UPDATE user
-        SET email="{}", first_name="{}", last_name="{}", birthdate_str = "{}"
-        WHERE phone = "{}";
-    """.format(YDB_DATABASE, email, first_name, last_name, strFromDate(birthdate), phone), {}))
-
-
 def is_children_event(repository: Repository, slot_id: int) -> bool:
     event = (repository.execute("""PRAGMA TablePathPrefix("{}");
         SELECT is_children FROM event
@@ -122,61 +113,6 @@ def get_user(repository: Repository, phone: str) -> model.User | None:
             phone=user[0].phone,
             email=user[0].email,
             birthdate=birthdate)
-
-
-def get_user_by_ticket(repository: Repository, ticket_id: int) -> model.User:
-    user = (repository.execute("""PRAGMA TablePathPrefix("{}");
-        SELECT DISTINCT user.user_id AS user_id, first_name, last_name, phone, birthdate, birthdate_str, email FROM ticket
-        INNER JOIN user
-        ON user.user_id = ticket.user_id
-        WHERE ticket.ticket_id = {};
-        """.format(YDB_DATABASE, ticket_id), {}))[0].rows
-    if user:
-        logger.info(user[0])
-        birthdate = dateFromStr(user[0].birthdate_str) if user[0].birthdate_str \
-            else dateFromYdbDate(user[0].birthdate)
-        return model.User(
-            user_id=user[0].user_id,
-            first_name=user[0].first_name,
-            last_name=user[0].last_name,
-            phone=user[0].phone,
-            email=user[0].email,
-            birthdate=birthdate)
-
-
-def get_tg_user(repository: Repository, telegram_id: int) -> model.TelegramUser | None:
-    tg_user = (repository.execute("""PRAGMA TablePathPrefix("{}");
-        SELECT * FROM tg_user
-        WHERE telegram_id = {};
-    """.format(YDB_DATABASE, telegram_id), {}))[0].rows
-    if tg_user:
-        return model.TelegramUser(**tg_user[0])
-
-
-def save_tg_user(repository: Repository, telegram_user: model.TelegramUser) -> None:
-    logger.info(telegram_user.dict())
-    repository.execute("""PRAGMA TablePathPrefix("{}");
-    
-        DECLARE $tgUserData AS List<Struct<
-            tg_user_id: Uint64,
-            user_id: Uint64,
-            first_name: Utf8,
-            last_name: Utf8?,
-            telegram_id: Int64,
-            username: Utf8,
-            type_user: Utf8>>;
-        
-        INSERT INTO tg_user
-        SELECT
-            tg_user_id,
-            user_id,
-            first_name,
-            last_name,
-            telegram_id,
-            username,
-            type_user
-        FROM AS_TABLE($tgUserData);
-    """.format(YDB_DATABASE), {"$tgUserData": [telegram_user]})
 
 
 class Repository:

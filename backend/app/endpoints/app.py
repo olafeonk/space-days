@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 import uuid
 
-import requests
-from requests import request
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -345,35 +343,6 @@ def get_events(request: Request, id: int | None = None, days: list[int] | None =
     result.sort(key=lambda x: x.slots[0].start_time)
     logger.info(f"Get events success\nresult: {result}")
     return result  # TODO: return is_available_child
-
-# @router.post("/api/event")
-# async def add_event(event: EventRequest) -> None:
-#     driver = ydb.aio.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
-#                             credentials=ydb.iam.ServiceAccountCredentials.from_file('service-key.json'))
-#     count = await get_count_table("event")
-#     count2 = await get_count_table("slots")
-#     async with driver:
-#         await driver.wait(fail_fast=True)
-#         async with ydb.aio.SessionPool(driver, size=10) as pool:
-#             session = await pool.acquire()
-#             prepared_query = await session.prepare(ADD_EVENT_QUERY.format(YDB_DATABASE))
-#             slots = []
-#             for i, slot in enumerate(event.slots):
-#                 slots.append(model.Slot(slot_id=count2 + 1 + i,
-#                                         event_id=count + 1,
-#                                         start_time=slot.start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
-#                                         end_time=slot.end_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
-#                                         amount=slot.amount
-#                                         ))
-#             await session.transaction(ydb.SerializableReadWrite()).execute(
-#                 prepared_query,
-#                 {
-#                     "$eventData": [model.Event(event_id=count + 1, description=event.description)],
-#                     "$slotData": slots,
-#                 },
-#                 commit_tx=True,
-#             )
-#             await pool.release(session)
 
 
 def refactor_phone(phone: str) -> str:
