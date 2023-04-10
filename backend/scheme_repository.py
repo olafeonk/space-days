@@ -7,7 +7,10 @@ queries = [
     """
     CREATE table `event` (
         `event_id` Uint64,
+        `age` Utf8,
         `description` Utf8,
+        `duration` Utf8,
+        `id_partner` Utf8,
         `is_children` bool,
         `location` Utf8,
         `summary` Utf8,
@@ -21,28 +24,31 @@ queries = [
         `event_id` Uint64,
         `start_time` Datetime,
         `amount` Uint64,
-        PRIMARY KEY (`slot_id`, `event_id`)
+        PRIMARY KEY (`slot_id`)
     )
-    """,
+    """, # event_id_index: event_id; start_time_index: start_time
     """
     CREATE table `ticket` (
         `ticket_id` Uint64,
         `user_id` Uint64,
         `slot_id` Uint64,
-        PRIMARY KEY (`ticket_id`, `user_id`, `slot_id`)
+        `amount` Int64,
+        `created_at` Datetime,
+        `is_come` Bool,
+        `user_data` Utf8,
+        PRIMARY KEY (`ticket_id`)
     )
-    """,
+    """, # slot_id_index: slot_id; user_id_index: user_id; user_slot_index: user_id, slot_id
     """
     CREATE table `child` (
         `child_id` Uint64,
         `user_id` Uint64,
         `slot_id` Uint64,
         `first_name` Utf8,
-        `last_name` Utf8,
         `age` Uint8,
-        PRIMARY KEY (`child_id`, `user_id`)
+        PRIMARY KEY (`child_id`)
     )
-    """,
+    """, # user_slot_index: user_id, slot_id
     """
     CREATE table `user` (
         `user_id` Uint64,
@@ -50,22 +56,11 @@ queries = [
         `last_name` Utf8,
         `phone` Utf8,
         `birthdate` Date,
+        `birthdate_str` Utf8,
         `email` Utf8,
-        PRIMARY KEY (`user_id`, `phone`, `email`)
+        PRIMARY KEY (`user_id`)
     )
-    """,
-    """
-    CREATE table `tg_user` (
-        `tg_user_id` Uint64,
-        `user_id` Uint64,
-        `type_user` Utf8,
-        `telegram_id` Uint64,
-        `username` Utf8,
-        `first_name` Utf8,
-        `last_name` Utf8,
-        PRIMARY KEY (`tg_user_id`, `user_id`)
-    )
-    """,
+    """, # phone_index: phone
     """
     CREATE table `emails` (
         `id` Uint64,
@@ -74,7 +69,8 @@ queries = [
     )
     """
 ]
-
+# mailings: mailing_id Utf8; adult_count: Int64; child_count: Int64; created_at: Datetime; is_send: Bool; ticket_id: Int64
+# sending_log: mailing_id Utf8; created_at: Datetime; response: Utf8; user_id: Utf8
 
 async def _init_db(session: ydb.Session, query: str):
     try: 
