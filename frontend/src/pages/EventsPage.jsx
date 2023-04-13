@@ -143,15 +143,15 @@ function renderLoaded(content, handleRegister) {
               </div>
               <div className="">
                 <span className="event-card__title">Время:</span>{" "}
-                <span> с 09:00 до 16:00</span>
+                <span> с 13:00 до 16:00</span>
               </div>
 
               <div className="event-card__location">
                 <span className="event-card__title">Адрес:</span>{" "}
-                <span> ул. Мамина-Сибиряка, 193</span>
+                <span> Библиотечный Центр «Екатеринбург», ул. Мамина-Сибиряка, 193</span>
               </div>
               <p className="event-card__description">
-                За каждую 5 собранную наклейку — вручаем подарок.Соберите 15
+                За каждую 5 собранную наклейку — вручаем подарок. Соберите 15
                 наклеек и получите БОЛЬШОЙ ПОДАРОК от Школы астрономии
                 KantrSkrip и партнеров!
               </p>
@@ -238,9 +238,11 @@ function useLoading() {
       const dayParameter = query.get("day");
       const hourParameter = query.get("hour");
 
-      const day =
-        dayParameter && !hourParameter ? parseInt(dayParameter, 10) : 8;
+      const now = new Date(Date.now());
+      const defaultDay = new Date(2023, 4 - 1, 8) <= now && now < new Date(2023, 4 - 1, 15 + 1) ? now.getDate() : 8;
+
       const hour = hourParameter ? parseInt(hourParameter, 10) : null;
+      const day = hour ? 8 : (dayParameter ? parseInt(dayParameter, 10) : defaultDay);
 
       const backendEvents = hour
         ? await getEventsByHours(day, [hour])

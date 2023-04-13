@@ -18,7 +18,8 @@ logger.addHandler(stream_handler)
 
 def get_data_mailing(repository: Repository) -> list[MailingData]:
     mailing_data = repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT mailing_id, user.user_id AS user_id, first_name, last_name, ticket.ticket_id AS ticket_id, title, email, start_time, duration, location, adult_count, child_count FROM mailing
+    SELECT mailing_id, user.user_id AS user_id, first_name, last_name, ticket.ticket_id AS ticket_id, title, email, start_time, duration, location, adult_count, child_count
+    FROM mailings VIEW is_send_index AS mailings
     INNER JOIN ticket
     ON ticket.ticket_id=mailings.ticket_id
     INNER JOIN slots
@@ -28,7 +29,7 @@ def get_data_mailing(repository: Repository) -> list[MailingData]:
     INNER JOIN event
     ON event.event_id = slots.event_id
     WHERE is_send = FALSE
-    LIMIT 6;
+    LIMIT 20;
     """.format(YDB_DATABASE), {})[0].rows
     mailings = []
     for mailing in mailing_data:
@@ -36,7 +37,7 @@ def get_data_mailing(repository: Repository) -> list[MailingData]:
     return mailings
 
 
-def save_mailing(repository: Repository, mailing: SendingLog, ticket_id: int):
+def save_mailing(repository: Repository, mailing: SendingLog, mailing_id: str):
     repository.execute("""PRAGMA TablePathPrefix("{}");
         DECLARE $logData AS List<Struct<
             mailing_id: Utf8,
@@ -44,7 +45,7 @@ def save_mailing(repository: Repository, mailing: SendingLog, ticket_id: int):
             response: Utf8,
             created_at: Utf8>>;
 
-        INSERT INTO sending_log
+        UPSERT INTO sending_log
         SELECT 
             mailing_id,
             user_id,
@@ -54,15 +55,14 @@ def save_mailing(repository: Repository, mailing: SendingLog, ticket_id: int):
 
         UPDATE mailings
         SET is_send=true
-        WHERE ticket_id={};
-    """.format(YDB_DATABASE, ticket_id), {"$logData": [mailing]})
+        WHERE mailing_id="{}";
+    """.format(YDB_DATABASE, mailing_id), {"$logData": [mailing]})
 
 
 class Repository:
     def __init__(self):
         self.driver = ydb.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
-                                 credentials=ydb.iam.ServiceAccountCredentials.from_file(
-                                         'service-key.json'))
+                                 credentials=ydb.iam.MetadataUrlCredentials())
         self.pool = ydb.SessionPool(self.driver, size=10)
 
     def connect(self):

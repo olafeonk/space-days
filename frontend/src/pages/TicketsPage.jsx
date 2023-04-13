@@ -18,20 +18,19 @@ import { getMyTickets } from "../apis/backend";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
 
-const STATUS_LOADING = 0;
-const STATUS_ERROR = -1;
-const STATUS_LOADED = 1;
+const STATUS_PAGE_ERROR = -1;
+const STATUS_TICKETS_LOADING = 2;
+const STATUS_TICKETS_LOADED = 3;
 
 const TicketsPage = () => {
-  const savedFormString = window.localStorage.getItem("form");
-  const savedForm = savedFormString && JSON.parse(savedFormString);
+  const savedSearchForm = tryLoadSearchForm();
 
   const [form, setForm] = useState({
-    phone: (savedForm && savedForm.phone) || "",
-    birthdate: (savedForm && savedForm.birthdate) || "",
+    phone: (savedSearchForm && savedSearchForm.phone) || "",
+    birthdate: (savedSearchForm && savedSearchForm.birthdate) || "",
   });
   const [errorMessage, setErrorMessage] = useState(null);
-  const [status, setStatus] = useState(STATUS_LOADED);
+  const [status, setStatus] = useState(STATUS_TICKETS_LOADED);
   const [tickets, setTickets] = useState([]);
 
   const handleFormChange = useCallback((f) => {
@@ -39,31 +38,32 @@ const TicketsPage = () => {
   }, []);
 
   const handleSubmit = async () => {
-    setStatus(STATUS_LOADING);
+    setStatus(STATUS_TICKETS_LOADING);
     const result = await getMyTickets(form.phone, form.birthdate);
     if (result.ok) {
       setErrorMessage(null);
-      setStatus(STATUS_LOADED);
+      setStatus(STATUS_TICKETS_LOADED);
       setTickets(result.body || []);
+      saveSearchForm(form);
       return;
     }
 
     if (result.status === 422) {
       setErrorMessage("Ошибка в заполнении формы");
-      setStatus(STATUS_LOADED);
+      setStatus(STATUS_TICKETS_LOADED);
       setTickets([]);
       return;
     }
 
     if (result.status === 404) {
       setErrorMessage("Пользователь не найден");
-      setStatus(STATUS_LOADED);
+      setStatus(STATUS_TICKETS_LOADED);
       setTickets([]);
       return;
     }
 
     setErrorMessage(null);
-    setStatus(STATUS_ERROR);
+    setStatus(STATUS_PAGE_ERROR);
     setTickets([]);
   };
 
@@ -75,7 +75,7 @@ const TicketsPage = () => {
   //   autoSubmitRef.current = true;
   // }
 
-  if (status === STATUS_ERROR) {
+  if (status === STATUS_PAGE_ERROR) {
     return renderError();
   }
   return (
@@ -109,7 +109,7 @@ const TicketsPage = () => {
         ) : (
           <></>
         )}
-        {status === STATUS_LOADING ? <Loader /> : renderTickets(tickets)}
+        {status === STATUS_TICKETS_LOADING ? <Loader /> : renderTickets(tickets)}
       </Container>
       <Footer />
     </Container>
@@ -121,7 +121,7 @@ function renderError() {
 }
 
 function renderForm(form, status, handleFormChange, handleShowTickets) {
-  const submitDisabled = !checkFormFilled(form) || status === STATUS_LOADING;
+  const submitDisabled = !checkFormFilled(form) || status === STATUS_TICKETS_LOADING;
   return (
     <Form className="tickets-page__form">
       <Form.Group controlId="formPhone">
@@ -163,6 +163,8 @@ function renderTickets(tickets) {
   return tickets.map((ticket) => {
     const dateTime = convertTime(ticket.start_time);
 
+    const child = ticket.child;
+    const adult = ticket.amount - ticket.child;
     return (
       <div className="ticket-wrapper" key={ticket.ticket_id}>
         <div>
@@ -183,12 +185,7 @@ function renderTickets(tickets) {
             {ticket.location}
           </p>
           <p className="ticket__seats">
-            {`${ticket.amount} ${pluralize(
-              ticket.amount,
-              "участник",
-              "участника",
-              "участников"
-            )}`}
+            {`${adult} ${pluralize(adult, 'взрослый', 'взрослых', 'взрослых')}`}, {`${child} ${pluralize(child, 'ребенок', 'детей', 'детей')}`}
           </p>
           <p className="ticket__info">
             Для того, чтобы пройти на мероприятие — назовите номер билета
@@ -207,6 +204,24 @@ function checkFormFilled(form) {
   }
 
   return false;
+}
+
+function saveSearchForm(searchForm) {
+  window.localStorage.setItem("searchForm", JSON.stringify(searchForm));
+}
+
+function tryLoadSearchForm() {
+  try {
+    const registrationFormString = window.localStorage.getItem("form");
+    const registrationForm = registrationFormString ? JSON.parse(registrationFormString) : null;
+
+    const searchFormString = window.localStorage.getItem("searchForm");
+    const searchForm = searchFormString ? JSON.parse(searchFormString) : null;
+
+    return searchForm || registrationForm;
+  } catch {
+    return null;
+  }
 }
 
 export default TicketsPage;

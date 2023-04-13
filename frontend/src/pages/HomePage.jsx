@@ -10,6 +10,7 @@ import InfoList from "../components/InfoInNumbers/InfoList";
 import info from "../components/InfoInNumbers/infoObj";
 import PartnerCarousel from "../components/PartnerCarousel";
 import { LinkContainer } from "react-router-bootstrap";
+import { Link } from "react-router-dom";
 
 const HomePage = () => (
   <Container>
@@ -77,7 +78,7 @@ const HomePage = () => (
               Собери не менее <b>5 наклеек</b>
             </li>
             <li>
-              Приходи на закрытие{" "}
+              Приходи на <Link to="/events?day=15">закрытие</Link>{" "}
               <b>
                 15 апреля с 13:00 до 16:00 по адресу ул. Мамина-Сибиряка, 193
               </b>{" "}

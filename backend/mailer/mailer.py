@@ -75,7 +75,7 @@ def send_email(
     save_mailing(repository,
                  SendingLog(mailing_id=mailing.mailing_id, user_id=mailing.user_id, response=str(resp.json()),
                             created_at=get_datetime_now()),
-                 mailing.ticket_id)
+                 mailing.mailing_id)
 
 
 def main():
@@ -84,4 +84,4 @@ def main():
     mailings = get_data_mailing(repository)
     for mailing in mailings:
         send_email(repository, mailing)
-        time.sleep(2)
+        time.sleep(1)

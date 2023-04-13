@@ -40,14 +40,12 @@ def user_came(repository: Repository, ticket_id: int):
 
 def get_events_from_phone(repository: Repository, phone: str):
     return repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT first_name, title, ticket.ticket_id AS ticket_id, start_time, ticket.amount AS amount FROM ticket
-    INNER JOIN slots
-    ON ticket.slot_id = slots.slot_id
-    INNER JOIN user
-    ON user.user_id = ticket.user_id
-    INNER JOIN event
-    ON event.event_id = slots.event_id
-    WHERE user.phone="{}"
+    SELECT first_name, title, ticket_x.ticket_id AS ticket_id, start_time, ticket_x.amount AS amount
+    FROM user VIEW phone_index AS user_x
+    INNER JOIN ticket VIEW user_slot_index AS ticket_x ON user_x.user_id = ticket_x.user_id
+    INNER JOIN slots ON slots.slot_id = ticket_x.slot_id
+    INNER JOIN event ON event.event_id = slots.event_id
+    WHERE user_x.phone="{}"
     ORDER BY start_time
     """.format(YDB_DATABASE, phone), {})[0].rows
 
@@ -55,8 +53,7 @@ def get_events_from_phone(repository: Repository, phone: str):
 class Repository:
     def __init__(self):
         self.driver = ydb.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
-                                 credentials=ydb.iam.ServiceAccountCredentials.from_file(
-                                         'service-key.json'))
+                                 credentials=ydb.iam.MetadataUrlCredentials())
         self.pool = ydb.SessionPool(self.driver, size=10)
 
     def connect(self):

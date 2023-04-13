@@ -2,11 +2,12 @@ import { Container } from "react-bootstrap";
 import { padTime, pluralize, formatTicketId, convertDate, convertTime } from "../core";
 import Image from "react-bootstrap/Image";
 
-// TODO начать использовать child детей при показе билета на фронте
-// TODO А еще передавать event.duration и event.age
+
 const Ticket = ({ event, slot, ticket }) => {
   const { title, location } = event;
   const dateTime = convertTime(slot.start_time);
+  const child = ticket.child;
+  const adult = ticket.amount - ticket.child;
   return (
     <Container className="ticket">
       <h1 className="ticket__title">Ваш билет на мероприятие</h1>
@@ -31,7 +32,7 @@ const Ticket = ({ event, slot, ticket }) => {
             {location}
           </p>
           <p className="ticket__seats">
-            {`${ticket.amount} ${pluralize(ticket.amount, 'участник', 'участника', 'участников')}`}
+            {`${adult} ${pluralize(adult, 'взрослый', 'взрослых', 'взрослых')}`}, {`${child} ${pluralize(child, 'ребенок', 'детей', 'детей')}`}
           </p>
           <p className="ticket__info">
             Для того, чтобы пройти на мероприятие — назовите номер билета
