@@ -47,7 +47,10 @@ const EventCard = ({ event, onRegister }) => {
           <span className="event-card__title">Место мероприятия:</span>{" "}
           <span>{event.location}</span>
         </div>
-        <p className="event-card__description">{event.description}</p>
+        <p
+          className="event-card__description"
+          dangerouslySetInnerHTML={{ __html: event.description }}
+        ></p>
       </div>
       <Button
         disabled={!slot}
