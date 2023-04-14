@@ -182,7 +182,7 @@ function renderRegistrationForm(
             <span>Осталось мест: </span>
             {available}
           </p>
-          <p>{description}</p>
+          <p dangerouslySetInnerHTML={{ __html: description }}></p>
         </Col>
       </Row>
       <Row className="registration-info__button">
