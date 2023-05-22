@@ -13,8 +13,10 @@ class Event(BaseModel):
     summary: str
     title: str
     location: str
-    age: str | None
-    duration: str | None
+    age: str
+    duration: str
+    id_partner: str
+    is_children: bool
 
 
 class Slot(BaseModel):
