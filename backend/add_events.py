@@ -67,6 +67,8 @@ class Slot(BaseModel):
     amount: int
 
 
+
+
 def timestamp_to_str(start_time):
     print("Start time", start_time)
     return f"{start_time.year}-{start_time.month}-{start_time.day}T{start_time.hour}:{start_time.minute}:{start_time.second}Z"

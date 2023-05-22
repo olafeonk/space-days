@@ -19,6 +19,7 @@ from ..adapters.repository import (
     is_available_slot,
     is_user_already_registration,
     save_new_mailing,
+    save_events,
 )
 from ..core import dateFromYdbDate, strFromDate, dateFromStr
 import app.domain.model as model
@@ -109,6 +110,22 @@ class UserEventsResponse(BaseModel):
     duration: str | None
     child: int
 
+
+class SlotJson(BaseModel):
+    start_time: str
+    amount: int
+
+
+class EventJson(BaseModel):
+    description: str
+    location: str
+    summary: str
+    title: str
+    age: str
+    duration: str
+    id_partner: str
+    is_children: bool
+    slots: list[SlotJson]
 
 
 ADD_EVENT_QUERY = """PRAGMA TablePathPrefix("{}");
@@ -460,6 +477,20 @@ def add_user(request: Request, userRequest: UserRequest, response: Response, for
         user_data=ticket.user_data,
         child=len(childs),
     )
+
+
+@router.post('/api/event')
+def save_event(request: Request, body: EventJson):
+    print("run")
+    repository: Repository = request.app.repository
+    count_event = get_count_table(repository, "event") + 2
+    count_slots = get_count_table(repository, "slots")
+    print(count_event, count_slots)
+    event = model.Event(event_id=count_event, **body.dict())
+    slots = []
+    for slot_id, slot in enumerate(body.slots):
+        slots.append(model.Slot(slot_id=count_slots + slot_id, event_id=count_event, **slot.dict()))
+    save_events(repository, [event], slots)
 
 
 @router.post('/api/tickets/my')

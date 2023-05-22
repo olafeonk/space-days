@@ -97,6 +97,51 @@ def save_new_mailing(repository: Repository, mailing: model.SendingLog):
     """.format(YDB_DATABASE), {"$mailingData": [mailing]})
 
 
+def save_events(repository: Repository, events: list[model.Event], slots: list[model.Slot]):
+    print(events)
+    print(slots)
+    repository.execute("""PRAGMA TablePathPrefix("{}");
+
+    DECLARE $eventData AS List<Struct<
+        event_id: Uint64,
+        age: Utf8,
+        description: Utf8,
+        duration: Utf8,
+        is_children: bool,
+        location: Utf8,
+        summary: Utf8,
+        title: Utf8,
+        id_partner: Utf8>>;
+
+    DECLARE $slotData AS List<Struct<
+        slot_id: Uint64,
+        event_id: Uint64,
+        amount: Uint64,
+        start_time: Utf8>>;
+
+    INSERT INTO event
+    SELECT
+        event_id,
+        age,
+        description,
+        duration,
+        is_children,
+        location,
+        summary,
+        title,
+        id_partner
+    FROM AS_TABLE($eventData);
+
+    INSERT INTO slots
+    SELECT
+        slot_id,
+        event_id,
+        amount,
+        CAST(start_time AS Datetime) AS start_time
+    FROM AS_TABLE($slotData);
+    """.format(YDB_DATABASE), {"$eventData": events, "$slotData": slots})
+
+
 def get_user(repository: Repository, phone: str) -> model.User | None:
     user = (repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT * FROM user VIEW phone_index
