@@ -1606,3 +1606,7 @@ input[type="radio"] {
     font-size: 8px;
   }
 }
+
+input:invalid {
+  border: red solid 2px;
+}
