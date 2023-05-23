@@ -99,6 +99,53 @@ export async function getMyTickets(phone, birthdate) {
     }
 }
 
+export async function addEvent(form, force = false) {
+    if (API_BASE_URL) {
+        const body = {
+            description: form.description,
+            location: form.location,
+            summary: form.summary,
+            title: form.title,
+            age: form.age,
+            duration: form.duration,
+            id_partner: form.id_partner,
+            is_children: form.is_children,
+            slots: form.slots.map((it) => ({
+                start_time: `${form.date}T${it.start_time}:00+00:00`,
+                amount: it.amount,
+            })),
+            force_registration: force,
+        };
+
+        const response = await fetch(`${API_BASE_URL}/event`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (response.ok || response.status === 409 || response.status === 422) {
+            return {
+                ok: response.ok,
+                status: response.status,
+                body: await response.json()
+            };
+        } else {
+            console.log("HTTP error: " + response.status);
+            return {
+                status: response.status
+            };
+        }
+    } else {
+        return delay(1000).then(() => ({
+            ok: true,
+            status: 200,
+            body: sampleTicket
+        }));
+    }
+}
+
 export async function subscribeEvent(slotId, form, force = false) {
     if (API_BASE_URL) {
         const body = {

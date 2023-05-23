@@ -1,31 +1,30 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { padTime, pluralize, convertDate, convertTime } from "../core";
+import partnersLinks from "../partnersLinks";
+import AddEventForm from "../components/AddEventForm";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
-import { getMyTickets } from "../apis/backend";
 
 const STATUS_PAGE_ERROR = -1;
-const STATUS_TICKETS_LOADING = 2;
-const STATUS_TICKETS_LOADED = 3;
+const STATUS_ADDFORM_VALIDATION_ERROR = 4;
+const STATUS_ADDFORM_LOADING = 2;
+const STATUS_ADDFORM_LOADED = 3;
+const STATUS_ADDFORM_START = 5;
 
 const AddEventPage = () => {
   const savedSearchForm = tryLoadSearchForm();
 
   const [form, setForm] = useState({
-    phone: (savedSearchForm && savedSearchForm.phone) || "",
     partnerId: (savedSearchForm && savedSearchForm.partnerId) || "",
   });
 
   const [errorMessage, setErrorMessage] = useState(null);
-  const [status, setStatus] = useState(STATUS_TICKETS_LOADED);
-  const [tickets, setTickets] = useState([]);
+  const [status, setStatus] = useState(STATUS_ADDFORM_START);
+  const [validated, setValidated] = useState(false);
 
   const handleFormChange = useCallback((f) => {
     setForm(f);
@@ -47,12 +46,20 @@ const AddEventPage = () => {
 
   function renderForm(form, status, handleFormChange, handleShowTickets) {
     const submitDisabled =
-      !checkFormFilled(form) || status === STATUS_TICKETS_LOADING;
+      !checkFormFilled(form) || status === STATUS_ADDFORM_LOADING;
 
     return (
       <Form
         className="tickets-page__form"
-        style={{ flexDirection: "column", rowGap: 0, alignItems: "normal" }}
+        style={{
+          flexDirection: "column",
+          rowGap: 20,
+          alignItems: "normal",
+          position: "relative",
+        }}
+        noValidate
+        validated={validated}
+        onSubmit={handleSubmit}
       >
         <Form.Group controlId="formBirthday">
           <Form.Label>ID партнера</Form.Label>
@@ -60,24 +67,36 @@ const AddEventPage = () => {
             type="text"
             className="rounded"
             value={form.partnerId}
-            title="aaaa"
             onChange={(event) =>
               handleFormChange({ ...form, partnerId: event.target.value })
             }
             required
-            pattern="^[A-Za-z\s]{2,}"
+            pattern="{2,}"
+            style={{ margin: 0 }}
           />
+          <Form.Control.Feedback type="invalid">
+            Введите ваш ID партнера
+          </Form.Control.Feedback>
         </Form.Group>
         <Button
           disabled={submitDisabled}
           variant="outline-primary"
           type="submit"
           className="rounded d-flex flex-column justify-content-center align-items-center"
-          onClick={handleShowTickets}
           style={{ margin: 0 }}
         >
           Добавить событие
         </Button>
+        {errorMessage ? (
+          <h6
+            className={"text-danger"}
+            style={{ textAlign: "center", padding: 10 }}
+          >
+            {errorMessage}
+          </h6>
+        ) : (
+          <></>
+        )}
       </Form>
     );
   }
@@ -98,38 +117,78 @@ const AddEventPage = () => {
     }
   }
 
-  const handleSubmit = async () => {
-    setStatus(STATUS_TICKETS_LOADING);
-    const result = await getMyTickets(form.phone, form.partnerId);
-    if (result.ok) {
-      setErrorMessage(null);
-      setStatus(STATUS_TICKETS_LOADED);
-      setTickets(result.body || []);
-      saveSearchForm(form);
+  const handleSubmit = (event) => {
+    setStatus(STATUS_ADDFORM_LOADING);
+    const formCheck = event.currentTarget;
+    if (!formCheck.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+      setStatus(STATUS_ADDFORM_VALIDATION_ERROR);
+    }
+    setValidated(true);
+    if (formCheck.checkValidity()) {
+      if (form.partnerId in partnersLinks) {
+        setErrorMessage(null);
+        setStatus(STATUS_ADDFORM_LOADED);
+        saveSearchForm(form);
+        return;
+      }
+
+      setErrorMessage(
+        "Ваш ID партнера не найден. Проверьте корректность ввода, либо свяжитесь с организатором"
+      );
+      setStatus(STATUS_ADDFORM_START);
       return;
     }
-
-    if (result.status === 422) {
-      setErrorMessage("Ошибка в заполнении формы");
-      setStatus(STATUS_TICKETS_LOADED);
-      setTickets([]);
-      return;
-    }
-
-    if (result.status === 404) {
-      setErrorMessage("Пользователь не найден");
-      setStatus(STATUS_TICKETS_LOADED);
-      setTickets([]);
-      return;
-    }
-
-    setErrorMessage(null);
-    setStatus(STATUS_PAGE_ERROR);
-    setTickets([]);
   };
+  //   setStatus(STATUS_ADDFORM_LOADING);
+  //   const formCheck = event.currentTarget;
+  //   if (!formCheck.checkValidity()) {
+  //     event.preventDefault();
+  //     event.stopPropagation();
+  //     setStatus(STATUS_ADDFORM_LOADED);
+  //   }
+  //   setValidated(true);
+  //   if (formCheck.checkValidity()) {
+  //     const result = await getMyTickets(form.phone, form.partnerId);
+  //     if (result.ok) {
+  //       setErrorMessage(null);
+  //       setStatus(STATUS_ADDFORM_LOADED);
+  //       setTickets(result.body || []);
+  //       saveSearchForm(form);
+  //       return;
+  //     }
+
+  //     if (result.status === 422) {
+  //       setErrorMessage("Ошибка в заполнении формы");
+  //       setStatus(STATUS_ADDFORM_LOADED);
+  //       setTickets([]);
+  //       return;
+  //     }
+
+  //     if (result.status === 404) {
+  //       setErrorMessage("Пользователь не найден");
+  //       setStatus(STATUS_ADDFORM_LOADED);
+  //       setTickets([]);
+  //       return;
+  //     }
+
+  //     setErrorMessage(null);
+  //     setStatus(STATUS_PAGE_ERROR);
+  //     setTickets([]);
+  //   }
+  // };
 
   function saveSearchForm(searchForm) {
     window.localStorage.setItem("searchForm", JSON.stringify(searchForm));
+  }
+
+  function renderAddEventForm() {
+    return <AddEventForm partnerId={form.partnerId} />;
+  }
+
+  if (status === STATUS_PAGE_ERROR) {
+    return renderError();
   }
 
   return (
@@ -138,7 +197,13 @@ const AddEventPage = () => {
     >
       <Header />
       <Container className="tickets-page tickets-page_with-tickets">
-        {renderForm(form, status, handleFormChange, handleSubmit)}
+        {status === STATUS_ADDFORM_LOADING ? (
+          <Loader />
+        ) : status === STATUS_ADDFORM_LOADED ? (
+          renderAddEventForm()
+        ) : (
+          renderForm(form, status, handleFormChange, handleSubmit)
+        )}
       </Container>
       <Footer />
     </Container>

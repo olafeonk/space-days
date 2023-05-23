@@ -1607,6 +1607,11 @@ input[type="radio"] {
   }
 }
 
-input:invalid {
-  border: red solid 2px;
+.add-event-form input {
+  width: 100%;
+}
+
+.add-event-form .form-check-input {
+  width: 30px;
+  height: 30px;
 }
