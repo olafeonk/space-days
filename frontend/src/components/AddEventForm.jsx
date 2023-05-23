@@ -4,21 +4,16 @@ import SlotsForm from "./SlotsForm";
 import Button from "react-bootstrap/Button";
 import { addEvent } from "../apis/backend";
 
-const STATUS_PAGE_ERROR = -1;
-const STATUS_PAGE_LOADED = 1;
-const STATUS_REGISTRATION_LOADING = 2;
-
 const AddEventForm = (partnerId) => {
   const [form, handleFormChange] = useForm();
 
-  const [status, setStatus] = useState(STATUS_PAGE_LOADED);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleRegister = async () => {
-    setStatus(STATUS_REGISTRATION_LOADING);
     const result = await addEvent(form);
     if (result.ok) {
       alert("Событие добавлено");
+      setErrorMessage("Событие успешно добавлено");
       return;
     }
 
@@ -28,7 +23,6 @@ const AddEventForm = (partnerId) => {
     }
 
     setErrorMessage(null);
-    setStatus(STATUS_PAGE_ERROR);
   };
 
   function useForm() {
