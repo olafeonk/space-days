@@ -8,8 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import uvicorn
 from pydantic import BaseModel, EmailStr
-from datetime import datetime, date, time, timedelta
-from ..config import YDB_DATABASE, API_TOKEN
+from datetime import datetime, date, timedelta
+from ..config import YDB_DATABASE
 from ..adapters.repository import (
     get_count_table,
     generate_ticket_id,
@@ -21,9 +21,8 @@ from ..adapters.repository import (
     save_new_mailing,
     save_events,
 )
-from ..core import dateFromYdbDate, strFromDate, dateFromStr
-import app.domain.model as model
-import aiohttp
+from ..core import str_from_date
+from ..domain import model
 
 from pythonjsonlogger import jsonlogger
 
@@ -435,7 +434,7 @@ def add_user(request: Request, userRequest: UserRequest, response: Response, for
         first_name=userRequest.first_name,
         last_name=userRequest.last_name,
         phone=phone,
-        birthdate_str=strFromDate(userRequest.birthdate),
+        birthdate_str=str_from_date(userRequest.birthdate),
         email=userRequest.email,
     )
 

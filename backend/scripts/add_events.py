@@ -118,7 +118,7 @@ def get_data() -> tuple[list[Event], list[Slot]]:
 async def main():
     events, slots = get_data()
     async with ydb.aio.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
-                              credentials=ydb.iam.ServiceAccountCredentials.from_file('service-key.json')) as driver:
+                              credentials=ydb.iam.ServiceAccountCredentials.from_file('../service-key.json')) as driver:
         await driver.wait(fail_fast=True)
         async with ydb.aio.SessionPool(driver=driver, size=10) as pool:
             session = await pool.acquire()

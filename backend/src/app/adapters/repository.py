@@ -1,12 +1,11 @@
 from __future__ import annotations
 import ydb
 import ydb.iam
-from app.config import YDB_DATABASE, YDB_ENDPOINT
+from ..config import YDB_DATABASE, YDB_ENDPOINT
 from random import randint
-from datetime import date, timedelta
-import app.domain.model as model
+from ..domain import model
 import logging
-from ..core import dateFromYdbDate, strFromDate, dateFromStr
+from ..core import date_from_ydb_date, date_from_str
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +24,7 @@ def get_count_table(repository: Repository, name_table: str) -> int:
     SELECT COUNT(*) as count FROM {}; 
     """.format(YDB_DATABASE, name_table), {}))[0].rows[0].count
 
+
 def get_count_available_ticket_by_slot(repository: Repository, slot_id: int) -> dict[int, int]:
     result_query = (repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT
@@ -39,6 +39,7 @@ def get_count_available_ticket_by_slot(repository: Repository, slot_id: int) -> 
         return row.available_ticket
     return 0
 
+
 def generate_ticket_id(repository: Repository) -> int:
     for _ in range(20):
         ticket_number = randint(int(1e8), int(1e9) - 1)
@@ -49,6 +50,7 @@ def generate_ticket_id(repository: Repository) -> int:
         if not ticket:
             return ticket_number
     raise RecursionError("Can`t generate ticket id")
+
 
 def is_available_slot(repository: Repository, slot_id: int) -> bool:
     return (repository.execute("""PRAGMA TablePathPrefix("{}");
@@ -149,8 +151,8 @@ def get_user(repository: Repository, phone: str) -> model.User | None:
     """.format(YDB_DATABASE, phone), {}))[0].rows
     if user:
         logger.info(user[0])
-        birthdate = dateFromStr(user[0].birthdate_str) if user[0].birthdate_str \
-            else dateFromYdbDate(user[0].birthdate)
+        birthdate = date_from_str(user[0].birthdate_str) if user[0].birthdate_str \
+            else date_from_ydb_date(user[0].birthdate)
         return model.User(
             user_id=user[0].user_id,
             first_name=user[0].first_name,
@@ -171,7 +173,7 @@ class Repository:
         self.driver.wait(fail_fast=True)
         return self
 
-    def executeOld(self, query: str, data: dict):
+    def execute_old(self, query: str, data: dict):
         logger.info(query)
 
         session = self.pool.acquire()
