@@ -2,6 +2,9 @@ from datetime import timedelta, datetime
 
 from .repository import Repository, get_event_from_ticket_id, user_came, get_events_from_phone
 import telebot
+import cv2
+from urllib.request import urlopen
+import numpy as np
 from .config import BOT_TOKEN
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -31,9 +34,15 @@ def send_event(event, ticket_id, chat_id):
     bot.send_message(chat_id, message_event, reply_markup=keyboard)
 
 
+@bot.message_handler(commands=['start'])
+def handle_start_or_link(message):
+    if len(message.text.split()) == 1:
+        echo_message(message)
+
+
 @bot.message_handler(commands=['ticket'])
 def get_ticket(message):
-    if len(message.text.split()) == 2 and message.text.split()[1].is_digit():
+    if len(message.text.split()) == 2 and message.text.split()[1].isdigit():
         ticket_id = message.text.split()[1]
         event = get_event_from_ticket_id(repository, int(ticket_id))
         if not event:
@@ -92,3 +101,26 @@ def echo_message(message):
             send_event(event[0], ticket_id, message.chat.id)
             return
     bot.send_message(message.chat.id, "Воспользуйтесь командами /ticket /phone для поиска билетов")
+
+
+def read_qr_code(url):
+    try:
+        req = urlopen(url)
+        arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+        img = cv2.imdecode(arr, -1)
+        detect = cv2.QRCodeDetector()
+        value, points, straight_qrcode = detect.detectAndDecode(img)
+        return "Sorry, couldn't read it, please try again!" if value == "" else value
+    except Exception:
+        return "Sorry, something went wrong"
+
+
+@bot.message_handler(content_types=['photo'])
+def process_photo(message):
+    bot.send_message(message.chat.id, "Вижу картинку. Читаю...")
+    fileID = message.photo[-1].file_id
+    file_info = bot.get_file(fileID)
+    file_path = f'https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}'
+    info = read_qr_code(file_path)
+
+    bot.send_message(message.chat.id, f"{info}")
