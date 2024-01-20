@@ -19,20 +19,20 @@ logger.addHandler(stream_handler)
 
 def get_event_from_ticket_id(repository: Repository, ticket_id: int):
     return repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT first_name, title, start_time, ticket.amount AS amount FROM ticket
+    SELECT first_name, title, start_time, tickets.amount AS amount FROM tickets
     INNER JOIN slots
-    ON ticket.slot_id = slots.slot_id
-    INNER JOIN user
-    ON user.user_id = ticket.user_id
-    INNER JOIN event
-    ON event.event_id = slots.event_id
-    WHERE ticket.ticket_id = {}; 
+    ON tickets.slot_id = slots.slot_id
+    INNER JOIN users
+    ON users.user_id = tickets.user_id
+    INNER JOIN events
+    ON events.event_id = slots.event_id
+    WHERE tickets.ticket_id = {}; 
     """.format(YDB_DATABASE, ticket_id), {})[0].rows
 
 
 def user_came(repository: Repository, ticket_id: int):
     repository.execute("""PRAGMA TablePathPrefix("{}");
-    UPDATE ticket
+    UPDATE tickets
     SET is_come=true
     WHERE ticket_id={}
     """.format(YDB_DATABASE, ticket_id), {})
@@ -41,10 +41,10 @@ def user_came(repository: Repository, ticket_id: int):
 def get_events_from_phone(repository: Repository, phone: str):
     return repository.execute("""PRAGMA TablePathPrefix("{}");
     SELECT first_name, title, ticket_x.ticket_id AS ticket_id, start_time, ticket_x.amount AS amount
-    FROM user VIEW phone_index AS user_x
-    INNER JOIN ticket VIEW user_slot_index AS ticket_x ON user_x.user_id = ticket_x.user_id
+    FROM users VIEW phone_index AS user_x
+    INNER JOIN tickets VIEW user_slot_index AS ticket_x ON user_x.user_id = ticket_x.user_id
     INNER JOIN slots ON slots.slot_id = ticket_x.slot_id
-    INNER JOIN event ON event.event_id = slots.event_id
+    INNER JOIN events ON events.event_id = slots.event_id
     WHERE user_x.phone="{}"
     ORDER BY start_time
     """.format(YDB_DATABASE, phone), {})[0].rows
@@ -53,7 +53,8 @@ def get_events_from_phone(repository: Repository, phone: str):
 class Repository:
     def __init__(self):
         self.driver = ydb.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
-                                 credentials=ydb.iam.MetadataUrlCredentials())
+                                 credentials=ydb.iam.ServiceAccountCredentials.from_file(
+                                     'service-key.json'))
         self.pool = ydb.SessionPool(self.driver, size=10)
 
     def connect(self):

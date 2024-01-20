@@ -18,16 +18,16 @@ logger.addHandler(stream_handler)
 
 def get_data_mailing(repository: Repository) -> list[MailingData]:
     mailing_data = repository.execute("""PRAGMA TablePathPrefix("{}");
-    SELECT mailing_id, user.user_id AS user_id, first_name, last_name, ticket.ticket_id AS ticket_id, title, email, start_time, duration, location, adult_count, child_count
+    SELECT mailing_id, users.user_id AS user_id, first_name, last_name, tickets.ticket_id AS ticket_id, title, email, start_time, duration, location, adult_count, child_count
     FROM mailings VIEW is_send_index AS mailings
-    INNER JOIN ticket
-    ON ticket.ticket_id=mailings.ticket_id
+    INNER JOIN tickets
+    ON tickets.ticket_id=mailings.ticket_id
     INNER JOIN slots
-    ON ticket.slot_id = slots.slot_id
-    INNER JOIN user
-    ON user.user_id = ticket.user_id
-    INNER JOIN event
-    ON event.event_id = slots.event_id
+    ON tickets.slot_id = slots.slot_id
+    INNER JOIN users
+    ON users.user_id = tickets.user_id
+    INNER JOIN events
+    ON events.event_id = slots.event_id
     WHERE is_send = FALSE
     LIMIT 20;
     """.format(YDB_DATABASE), {})[0].rows
@@ -62,9 +62,9 @@ def save_mailing(repository: Repository, mailing: SendingLog, mailing_id: str):
 class Repository:
     def __init__(self):
         self.driver = ydb.Driver(endpoint=YDB_ENDPOINT, database=YDB_DATABASE,
-                                 credentials=ydb.iam.MetadataUrlCredentials())
+                                 credentials=ydb.iam.ServiceAccountCredentials.from_file(
+                                     'service-key.json'))
         self.pool = ydb.SessionPool(self.driver, size=10)
-
     def connect(self):
         self.driver.wait(fail_fast=True)
         return self

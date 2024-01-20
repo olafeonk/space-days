@@ -1,13 +1,15 @@
-from datetime import timedelta, datetime
-
-from .repository import Repository, get_event_from_ticket_id, user_came, get_events_from_phone
 import telebot
 import cv2
-from urllib.request import urlopen
 import numpy as np
+import re
+from datetime import timedelta, datetime
+from urllib.request import urlopen
+
+from .repository import Repository, get_event_from_ticket_id, user_came, get_events_from_phone
 from .config import BOT_TOKEN
 
 bot = telebot.TeleBot(BOT_TOKEN)
+re_ticket = rf'https://t\.me/{bot.get_me().username}\?start=(\S*)'
 
 repository = Repository()
 repository.connect()
@@ -34,22 +36,27 @@ def send_event(event, ticket_id, chat_id):
     bot.send_message(chat_id, message_event, reply_markup=keyboard)
 
 
+def handle_ticket(ticket_id, chat_id):
+    event = get_event_from_ticket_id(repository, int(ticket_id))
+    if not event:
+        bot.send_message(chat_id, "Номер билета некорректный")
+        return
+    event = event[0]
+    send_event(event, ticket_id, chat_id)
+
+
 @bot.message_handler(commands=['start'])
 def handle_start_or_link(message):
-    if len(message.text.split()) == 1:
-        echo_message(message)
+    if len(message.text.split()) > 1:
+        get_ticket(message)
+        return
 
 
 @bot.message_handler(commands=['ticket'])
 def get_ticket(message):
     if len(message.text.split()) == 2 and message.text.split()[1].isdigit():
         ticket_id = message.text.split()[1]
-        event = get_event_from_ticket_id(repository, int(ticket_id))
-        if not event:
-            bot.send_message(message.chat.id, "Номер билета некорректный")
-            return
-        event = event[0]
-        send_event(event, ticket_id, message.chat.id)
+        handle_ticket(ticket_id, message.chat.id)
     else:
         bot.send_message(message.chat.id, "Введите номер билета в формат /ticket 123456789")
 
@@ -117,10 +124,16 @@ def read_qr_code(url):
 
 @bot.message_handler(content_types=['photo'])
 def process_photo(message):
-    bot.send_message(message.chat.id, "Вижу картинку. Читаю...")
+    bot.send_message(message.chat.id, "Читаю QR-код с фото...")
     fileID = message.photo[-1].file_id
     file_info = bot.get_file(fileID)
     file_path = f'https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}'
     info = read_qr_code(file_path)
-
-    bot.send_message(message.chat.id, f"{info}")
+    if info is None or len(info) == 0:
+        bot.send_message(message.chat.id, "Не удалось прочитать QR-код")
+        return
+    ticket_no = re.findall(re_ticket, info)
+    if len(ticket_no) == 0:
+        bot.send_message(message.chat.id, f"Не удалось прочитать номер билета. Вот что здесь написано: {info}")
+        return
+    handle_ticket(ticket_no[0], message.chat.id)
