@@ -1,10 +1,11 @@
+import math
+
 import pandas as pd
 import ydb
 import ydb.iam
 import asyncio
-from app.config import YDB_DATABASE, YDB_ENDPOINT
+from backend.src.app.config import YDB_DATABASE, YDB_ENDPOINT
 from pydantic import BaseModel
-from datetime import datetime
 
 ADD_EVENT_QUERY = """PRAGMA TablePathPrefix("{}");
 
@@ -25,7 +26,7 @@ DECLARE $slotData AS List<Struct<
     amount: Uint64,
     start_time: Utf8>>;
 
-INSERT INTO event
+INSERT INTO events
 SELECT
     event_id,
     age,
@@ -55,7 +56,7 @@ class Event(BaseModel):
     title: str
     location: str
     age: str
-    duration: str
+    duration: int
     is_children: bool
     id_partner: str
 
@@ -67,21 +68,18 @@ class Slot(BaseModel):
     amount: int
 
 
-
-
 def timestamp_to_str(start_time):
     print("Start time", start_time)
     return f"{start_time.year}-{start_time.month}-{start_time.day}T{start_time.hour}:{start_time.minute}:{start_time.second}Z"
 
 
 def get_data() -> tuple[list[Event], list[Slot]]:
-    data = pd.read_excel("space_days5.xlsx")
+    data = pd.read_excel("space_days.xlsx")
     print(data)
     events = []
     slot_counter = 0
     slots = []
     for index, row in data.iterrows():
-        print(row)
         event = Event(
             event_id=row['id'],
             description=row['Полное описание'],
@@ -98,8 +96,9 @@ def get_data() -> tuple[list[Event], list[Slot]]:
         slot_counter += 1
         for i in range(1, 12):
             amount = row[f'количество людей в определенный слот.{i}']
+
             start_time = row[f'Время начала.{i}']
-            if amount != float('nan') and not pd.isnull(start_time) :
+            if not math.isnan(amount) and not pd.isnull(start_time):
                 slots_1.append(
                     Slot(event_id=row['id'], slot_id=slot_counter,
                          start_time=timestamp_to_str(start_time), amount=amount))
