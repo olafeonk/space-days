@@ -5,12 +5,18 @@
     margin-block-end: 35px;
 }
 
-.addButton {
+.addButton.addButton {
     margin-block-end: 55px;
     font-size: 13px;
+    font-weight: 600 !important;
     padding: 15px 30px;
     border-width: 2px;
     border-radius: 7px;
+    margin-inline-end: 30px;
+}
+
+.icon {
+    margin-inline-start: 5px;
 }
 
 .table {
@@ -36,7 +42,7 @@
     background-color: #F8FAFF;
 }
 
-.titles > h3 {
+.titles>h3 {
     display: flex;
     align-items: center;
     font-size: 11px;
@@ -52,25 +58,30 @@
     object-fit: contain;
 }
 
-.row > span,
-.row > a {
+.row>span,
+.row>a {
     font-size: 13px;
     display: flex;
-    align-items: center;
+    margin-block-start: 10px;
     margin-inline-start: 15px;
 }
 
 .description {
     overflow-y: scroll;
-    scrollbar-color: red orange;
-  scrollbar-width: thin;
+    scrollbar-color: #81848D;
+    scrollbar-width: thin;
+    margin-block-end: 15px;
+}
+
+.description::-webkit-scrollbar {
+    width: 5px;
 }
 
 .description::-webkit-scrollbar-thumb {
-    background-color: blue;    /* цвет плашки */
-  border-radius: 20px;       /* закругления плашки */
-  border: 3px solid orange;
-
+    background-color: #81848D;
+    /* цвет плашки */
+    border-radius: 10px;
+    /* закругления плашки */
 }
 
 .buttons {
@@ -106,4 +117,8 @@
     display: block;
     border-bottom: 3px solid #81848D;
     color: black;
+}
+
+.addButton:hover .loadIcon {
+    fill: white;
 }

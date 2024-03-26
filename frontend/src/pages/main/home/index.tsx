@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import styles from "./styles.module.css";
 import React from "react";
 import "commonStyles.css";
+import classnames from "classnames";
 
 export const HomePage = () => (
   <Container>
@@ -32,7 +33,7 @@ export const HomePage = () => (
           <LinkContainer to="/admin/partners">
             <Button
               variant="outline-primary"
-              className="rounded-pill align-self-start"
+              className={classnames(styles.mainButton, "rounded-pill align-self-start")}
             >
               Зарегистрироваться
             </Button>

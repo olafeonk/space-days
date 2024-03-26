@@ -45,7 +45,7 @@ export const EventsPage = () => {
   return (
     <Container
       className="p-0"
-      style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       {body}
     </Container>
@@ -75,12 +75,12 @@ function renderLoaded(content, handleRegister) {
       <Row className="event-top-info">
         <Col>
           <a href="./">
-            <Image src="./image/arrow.png" alt="назад"></Image>
+            <Image src={require("shared/image/arrow.png")} alt="назад" />
           </a>
         </Col>
         <Col>
           <div className="rounded-pill warning warning_event">
-            <Image src="./image/warning.png" alt="внимание"></Image>
+            <Image src={require("shared/image/warning.png")} alt="внимание" />
             <p>
               Регистрироваться нужно на <span>каждое</span> мероприятие{" "}
               <span>строго на то время</span>, в которое вы хотите посетить!
@@ -103,7 +103,7 @@ function renderLoaded(content, handleRegister) {
             <h1 className="day-title">{dayMap[day]}</h1>
           )}
           <div className="rounded-pill warning warning_event">
-            <Image src="./image/warning.png" alt="внимание"></Image>
+            <Image src={require("shared/image/warning.png")} alt="внимание" />
             <p>
               <b>Обратите внимание</b> на{" "}
               <span>время начала и окончания мастер класса.</span>
@@ -113,7 +113,7 @@ function renderLoaded(content, handleRegister) {
             </p>
           </div>
           <div className="rounded-pill warning warning_event">
-            <Image src="./image/warning.png" alt="внимание"></Image>
+            <Image src={require("shared/image/warning.png")} alt="внимание" />
             <p>
               <b>Обратите внимание</b>, мероприятия имеют{" "}
               <span>возрастные ограничения</span>. Вход на мастер классы строго
@@ -128,7 +128,7 @@ function renderLoaded(content, handleRegister) {
         {day === 15 && (
           <Col className="event-card present-15" as={"article"}>
             <div className="img-wrapper">
-              <Image fluid rounded src="./image/present_logo.png"></Image>
+              <Image fluid rounded src={require("shared/image/present_logo.png")}></Image>
             </div>
 
             <div>

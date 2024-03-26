@@ -26,7 +26,7 @@ export const AdminUsersPage = () => {
         <>
             <h1>Администраторы</h1>
             <hr className={styles.hr} />
-
+            <p>В разработке</p>
         </>
     )
 };

@@ -26,7 +26,7 @@ export const ExportPage = () => {
         <>
             <h1>Выгрузка</h1>
             <hr className={styles.hr} />
-
+            <p>В разработке</p>
         </>
     )
 };

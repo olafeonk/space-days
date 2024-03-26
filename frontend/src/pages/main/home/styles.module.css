@@ -72,3 +72,7 @@
   .banner a {
     padding: 18px 60px;
   }
+
+  .mainButton {
+    font-weight: 700;
+  }

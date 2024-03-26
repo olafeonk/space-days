@@ -84,10 +84,10 @@ export const TicketsPage = () => {
       <Row>
         <Col className="rules">
           <a href="./#/events">
-            <Image src="./image/arrow.png" alt="назад"></Image>
+            <Image src={require("shared/image/arrow.png")} alt="назад" />
           </a>
           <div className="rounded-pill warning">
-            <Image src="./image/warning.png" alt="внимание"></Image>
+            <Image src={require("shared/image/warning.png")} alt="внимание" />
             <p>
               Используйте номер телефона и дату рождения, которые вы указали при
               регистрации!

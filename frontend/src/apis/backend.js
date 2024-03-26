@@ -231,6 +231,36 @@ export async function addPartnerLogo(form, id) {
     }
 }
 
+export async function loadEvents(file, force = false) {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (API_BASE_URL) {
+        const response = await fetch(`${API_BASE_URL}/events/xlsx`, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (response.ok || response.status === 409 || response.status === 422) {
+            return {
+                ok: response.ok,
+                status: response.status,
+                body: await response.json()
+            };
+        } else {
+            console.log("HTTP error: " + response.status);
+            return {
+                status: response.status
+            };
+        }
+    } else {
+        return delay(1000).then(() => ({
+            ok: true,
+            status: 200,
+            body: sampleTicket
+        }));
+    }
+}
+
 export async function addEvent(form, force = false) {
     if (API_BASE_URL) {
         const body = {

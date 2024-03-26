@@ -39,7 +39,7 @@ export const AddEventForm = ({ event }: TAddEventFormProps) => {
     reset,
   } = useForm<Inputs>();
 
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [partnersList, setpartnersList] = useState([]);
   useEffect(() => {
@@ -72,44 +72,44 @@ export const AddEventForm = ({ event }: TAddEventFormProps) => {
   };
 
 
-  return (
+  /*return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.addEventForm}>
       <div className={classnames(styles.formBlock, styles.information)}>
         <h3>Информация</h3>
         <label className={styles.input}>
           Название*
-          <input className={styles.inputArea} {...register("name", { required: true })} />
+          <input className={styles.inputArea} {...register("title", { required: true })} />
         </label>
         <label className={styles.input}>
           Краткое описание*
-          <input className={styles.inputArea} {...register("name", { required: true })} />
+          <input className={styles.inputArea} {...register("summary", { required: true })} />
         </label>
         <label className={styles.input}>
           Полное описание*
-          <input className={styles.inputArea} {...register("name", { required: true })} />
+          <input className={styles.inputArea} {...register("description", { required: true })} />
         </label>
         <label className={styles.input}>
           Место проведения*
-          <input className={styles.inputArea} {...register("name", { required: true })} />
+          <input className={styles.inputArea} {...register("location", { required: true })} />
         </label>
         <label className={styles.input}>
           Возраст*
-          <input className={styles.inputArea} {...register("name", { required: true })} />
+          <input className={styles.inputArea} {...register("age", { required: true })} />
         </label>
         <label className={styles.input}>
           Продолжительность*
-          <input className={styles.inputArea} {...register("name", { required: true })} />
+          <input className={styles.inputArea} {...register("duration", { required: true })} />
         </label>
         <label className={styles.input}>
           Дата проведения*
-          <input className={styles.inputArea} {...register("name", { required: true })} />
+          <input className={styles.inputArea} {...register("date", { required: true })} />
         </label>
         <label className={styles.input}>
           Можно взрослым
-          <input className={styles.inputArea} {...register("name", { required: true })} />
+          <input className={styles.inputArea} {...register("is_children", { required: true })} />
         </label>
       </div>
-      <div className={styles.formBlock}><h3>Партнер</h3>
+      <div className={styles.formBlock}><h3>Партнёр</h3>
         <div className={styles.partners}>
 
         </div>
@@ -138,5 +138,7 @@ export const AddEventForm = ({ event }: TAddEventFormProps) => {
         Добавить
       </Button>
     </form >
-  );
+  );*/
+
+  return <p>В разработке</p>
 };

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
 
 body {
   margin: 0;
@@ -263,13 +263,6 @@ a.hidden {
   margin-bottom: 21px;
 }
 
-body::-webkit-scrollbar-thumb {
-  background-color: blue;    /* цвет плашки */
-border-radius: 20px;       /* закругления плашки */
-border: 3px solid orange;
-
-}
-
 .present {
   padding: 60px;
   gap: 150px;
@@ -433,7 +426,7 @@ border: 3px solid orange;
 button,
 .banner a.btn,
 .registration a.btn {
-  font-weight: 700 !important;
+  font-weight: 700;
 }
 
 .add-child-button {

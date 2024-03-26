@@ -40,13 +40,13 @@ const Ticket = ({ event, slot, ticket }) => {
         </div>
       </div>
       <div className="rounded-pill warning">
-        <Image src="./image/warning.png" alt="внимание"></Image>
+        <Image src={require("shared/image/warning.png")} alt="внимание" />
         <p>
           Вся необходимая информация о мероприятии будет выслана на вашу почту
         </p>
       </div>
       <div style={{ textAlign: "center", padding: 20, fontSize: 24 }}>
-          <a href="/#/events">Записаться еще</a>
+        <a href="/#/events">Записаться еще</a>
       </div>
     </Container>
   );
